@@ -6,7 +6,10 @@
     "neos/neos": "~4.3",
     "neos/fusion": "~4.3",
     "neos/content-repository": "~4.3",
-    "neos/fusion-afx": "~1.2"
+    "neos/fusion-afx": "~1.2",
+    "doctrine/dbal": "*",
+    "doctrine/migrations": "*",
+    "neos/content-repository-dimensionspace": "dev-master"
   },
   "autoload": {
     "psr-4": {
