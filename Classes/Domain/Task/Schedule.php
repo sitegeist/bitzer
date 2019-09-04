@@ -13,6 +13,7 @@ use Sitegeist\Bitzer\Infrastructure\DbalClient;
 
 /**
  * The schedule, the repository for tasks
+ * @Flow\Scope("singleton")
  */
 class Schedule
 {

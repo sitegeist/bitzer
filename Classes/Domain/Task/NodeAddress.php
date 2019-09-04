@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Task;
 
 use Neos\Flow\Annotations as Flow;
@@ -7,6 +8,7 @@ use Neos\Flow\Annotations as Flow;
  * The node address value object
  *
  * To be replaced by the actual node address from the new content repository
+ * @Flow\Proxy(false)
  */
 final class NodeAddress
 {

@@ -1,10 +1,12 @@
 <?php
+declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Task;
 
 use Neos\Flow\Annotations as Flow;
 
 /**
  * The action status type value object according to https://schema.org/ActionStatusType
+ * @Flow\Proxy(false)
  */
 final class ActionStatusType
 {
