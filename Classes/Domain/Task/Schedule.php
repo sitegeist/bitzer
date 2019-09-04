@@ -86,7 +86,7 @@ class Schedule
         $factory = $this->resolveFactory($className);
         $object = null;
         if (isset($rawData['object']) && !empty($rawData['object'])) {
-            $nodeAddress = json_decode($rawData['object'], true);
+            $nodeAddress = NodeAddress::fromArray(json_decode($rawData['object'], true));
             $object = $this->resolveNode($nodeAddress);
         }
 
@@ -102,17 +102,17 @@ class Schedule
         );
     }
 
-    private function resolveNode(array $nodeAddress): ?NodeInterface
+    private function resolveNode(NodeAddress $nodeAddress): ?NodeInterface
     {
         $presets = $this->contentDimensionPresetSource->getAllPresets();
         $contextDimensions = [];
-        foreach ($nodeAddress['dimensionSpacePoint'] as $dimensionName => $dimensionValue) {
+        foreach ($nodeAddress->getDimensionSpacePoint()->getCoordinates() as $dimensionName => $dimensionValue) {
             $contextDimensions[$dimensionName] = $presets[$dimensionName]['presets'][$dimensionValue]['values'];
         }
         $contentContext = $this->contentContextFactory->create([
-             'workspaceName' => $nodeAddress['workspaceName'],
+             'workspaceName' => $nodeAddress->getWorkspaceName(),
              'dimensions' => $contextDimensions,
-             'targetDimensions' => $nodeAddress['dimensionSpacePoint'],
+             'targetDimensions' => $nodeAddress->getDimensionSpacePoint()->getCoordinates(),
              'invisibleContentShown' => true,
              'removedContentShown' => false,
              'inaccessibleContentShown' => true
