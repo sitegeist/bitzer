@@ -80,6 +80,12 @@ class Schedule
         );
     }
 
+    final public function cancelTask(TaskIdentifier $taskIdentifier): void
+    {
+        $this->getDatabaseConnection()->executeQuery('DELETE FROM ' . self::TABLE_NAME . ' WHERE identifier = :identifier', [
+            'identifier' => (string) $taskIdentifier
+        ]);
+    }
     private function createTaskFromRawData(array $rawData): TaskInterface
     {
         $className = TaskClassName::fromString($rawData['classname']);
