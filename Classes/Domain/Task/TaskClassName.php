@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Task;
 
 use Neos\Flow\Annotations as Flow;
+use Neos\Flow\Reflection\ReflectionService;
 
 /**
  * The task class name value object
@@ -20,7 +21,7 @@ final class TaskClassName
         $this->value = $value;
     }
 
-    public static function fromString(string $value): TaskClassName
+    public static function createFromString(string $value): TaskClassName
     {
         if (!class_exists($value)) {
             throw new ClassNameIsUnavailable('Given task class name "' . $value . '" is not available in this installation.', 1567428115);
@@ -30,6 +31,18 @@ final class TaskClassName
         }
 
         return new static($value);
+    }
+
+    public static function fromShortType(string $shortType, ReflectionService $reflectionService): TaskClassName
+    {
+        $classNames = $reflectionService->getAllImplementationClassNamesForInterface(TaskInterface::class);
+        foreach ($classNames as $className) {
+            if ($className::getShortType() === $shortType) {
+                return new static($className);
+            }
+        }
+
+        throw new ShortTypeDefinesNoTask('Given short type "' . $shortType . '" does not define a task implementation.', 1567507976);
     }
 
     public function getValue(): string

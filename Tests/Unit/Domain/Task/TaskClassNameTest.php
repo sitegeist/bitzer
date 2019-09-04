@@ -20,7 +20,7 @@ class TaskClassNameTest extends UnitTestCase
     {
         $correctExceptionThrown = false;
         try {
-            $className = TaskClassName::fromString('I\\Do\\Not\\Exist');
+            $className = TaskClassName::createFromString('I\\Do\\Not\\Exist');
         } catch (ClassNameIsUnavailable $expectedException) {
             $correctExceptionThrown = true;
         }
@@ -36,7 +36,7 @@ class TaskClassNameTest extends UnitTestCase
         require_once ('Fixtures/InvalidTask.php');
         $correctExceptionThrown = false;
         try {
-            $className = TaskClassName::fromString(InvalidTask::class);
+            $className = TaskClassName::createFromString(InvalidTask::class);
         } catch (ClassNameDefinesNoTask $expectedException) {
             $correctExceptionThrown = true;
         }

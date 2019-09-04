@@ -9,6 +9,8 @@ use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\ContentRepository\Domain\Service\ContextFactoryInterface;
 use Neos\Flow\Annotations as Flow;
 use Neos\Neos\Domain\Service\ContentDimensionPresetSourceInterface;
+use Sitegeist\Bitzer\Domain\Task\Command\ScheduleTask;
+use Sitegeist\Bitzer\Domain\Task\Generic\GenericTaskFactory;
 use Sitegeist\Bitzer\Infrastructure\DbalClient;
 
 /**
@@ -60,6 +62,18 @@ class Schedule
         return null;
     }
 
+    /**
+     * @return array|TaskInterface[]
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    final public function findAll(): array
+    {
+        $rawDataSet = $this->getDatabaseConnection()->executeQuery(
+            'SELECT * FROM ' . self::TABLE_NAME
+        )->fetchAll();
+
+        return $this->createTasksFromRawDataSet($rawDataSet);
+    }
 
     final public function scheduleTask(ScheduleTask $command): void
     {
@@ -87,9 +101,24 @@ class Schedule
             'identifier' => (string) $taskIdentifier
         ]);
     }
+
+    /**
+     * @param array $rawDataSet
+     * @return array|TaskInterface[]
+     */
+    private function createTasksFromRawDataSet(array $rawDataSet): array
+    {
+        $tasks = [];
+        foreach ($rawDataSet as $rawData) {
+            $tasks[] = $this->createTaskFromRawData($rawData);
+        }
+
+        return $tasks;
+    }
+
     private function createTaskFromRawData(array $rawData): TaskInterface
     {
-        $className = TaskClassName::fromString($rawData['classname']);
+        $className = TaskClassName::createFromString($rawData['classname']);
         $factory = $this->resolveFactory($className);
         $object = null;
         if (isset($rawData['object']) && !empty($rawData['object'])) {

@@ -10,6 +10,13 @@ use Psr\Http\Message\UriInterface;
  */
 interface TaskInterface
 {
+    /**
+     * The short type to resolve the class name
+     *
+     * @return string
+     */
+    public static function getShortType(): string;
+
     public function getIdentifier(): TaskIdentifier;
 
     /**
