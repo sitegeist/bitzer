@@ -60,7 +60,8 @@ class Schedule
         return null;
     }
 
-    final public function addTask(CreateTask $command): void
+
+    final public function scheduleTask(ScheduleTask $command): void
     {
         $this->getDatabaseConnection()->executeQuery('INSERT INTO ' . self::TABLE_NAME . ' VALUES (
         :identifier, :className, :description, :scheduledTime, :actionStatus, :agent, :object, :target)',
