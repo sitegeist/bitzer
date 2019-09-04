@@ -1,6 +1,5 @@
 <?php
 declare(strict_types=1);
-
 namespace Sitegeist\Bitzer\Domain\Task;
 
 use Doctrine\DBAL\Connection;
@@ -8,6 +7,7 @@ use Doctrine\DBAL\Types\Type;
 use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\ContentRepository\Domain\Service\ContextFactoryInterface;
 use Neos\Flow\Annotations as Flow;
+use Neos\Flow\Http\Uri;
 use Neos\Neos\Domain\Service\ContentDimensionPresetSourceInterface;
 use Sitegeist\Bitzer\Domain\Task\Command\ScheduleTask;
 use Sitegeist\Bitzer\Domain\Task\Generic\GenericTaskFactory;
@@ -70,6 +70,22 @@ class Schedule
     {
         $rawDataSet = $this->getDatabaseConnection()->executeQuery(
             'SELECT * FROM ' . self::TABLE_NAME
+        )->fetchAll();
+
+        return $this->createTasksFromRawDataSet($rawDataSet);
+    }
+
+    final public function findForAgents(array $agentIdentifiers): array
+    {
+        $rawDataSet = $this->getDatabaseConnection()->executeQuery(
+            'SELECT * FROM ' . self::TABLE_NAME . '
+ WHERE agent IN (:agentIdentifiers)',
+            [
+                'agentIdentifiers' => $agentIdentifiers
+            ],
+            [
+                'agentIdentifiers' => Connection::PARAM_STR_ARRAY
+            ]
         )->fetchAll();
 
         return $this->createTasksFromRawDataSet($rawDataSet);

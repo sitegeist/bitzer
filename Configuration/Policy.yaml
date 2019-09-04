@@ -1,0 +1,41 @@
+privilegeTargets:
+  'Neos\Flow\Security\Authorization\Privilege\Method\MethodPrivilege':
+    'Sitegeist.Bitzer:Module.Bitzer':
+      matcher: 'method(Sitegeist\Bitzer\Application\Controller\BitzerController->(index|mySchedule)Action())'
+    'Sitegeist.Bitzer:Module.Bitzer.Administration':
+      matcher: 'method(Sitegeist\Bitzer\Application\Controller\BitzerController->(schedule|scheduleTask)Action())'
+
+roles:
+
+  'Sitegeist.Bitzer:Test': []
+  'Sitegeist.Bitzer:Agent':
+    abstract: true
+    privileges:
+      -
+        privilegeTarget: 'Sitegeist.Bitzer:Module.Bitzer'
+        permission: GRANT
+
+  'Sitegeist.Bitzer:Administrator':
+    abstract: true
+    privileges:
+      -
+        privilegeTarget: 'Sitegeist.Bitzer:Module.Bitzer'
+        permission: GRANT
+      -
+        privilegeTarget: 'Sitegeist.Bitzer:Module.Bitzer.Administration'
+        permission: GRANT
+
+  'Neos.Neos:AbstractEditor':
+    privileges:
+      - privilegeTarget: 'Sitegeist.Bitzer:Module.Bitzer'
+        permission: GRANT
+
+  'Neos.Neos:Administrator':
+    privileges:
+      -
+        privilegeTarget: 'Sitegeist.Bitzer:Module.Bitzer'
+        permission: GRANT
+      -
+        privilegeTarget: 'Sitegeist.Bitzer:Module.Bitzer.Administration'
+        permission: GRANT
+

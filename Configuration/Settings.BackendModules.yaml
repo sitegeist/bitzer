@@ -1,0 +1,16 @@
+Neos:
+  Neos:
+    modules:
+      management:
+        submodules:
+          task:
+            controller: \Sitegeist\Bitzer\Application\Controller\BitzerController
+            label: 'Sitegeist.Bitzer:Module.Bitzer:label'
+            description: 'Sitegeist.Bitzer:Module.Bitzer:description'
+            icon: 'fas fa-clipboard-list'
+            privilegeTarget: 'Sitegeist.Bitzer:Module.Bitzer'
+    userInterface:
+      translation:
+        autoInclude:
+          Sitegeist.Bitzer:
+            - 'Module.Bitzer'

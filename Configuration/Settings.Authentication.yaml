@@ -1,0 +1,11 @@
+Neos:
+  Flow:
+    security:
+      authentication:
+        providers:
+          'Neos.Neos:Backend':
+            requestPatterns:
+              'Sitegeist.Bitzer:ModuleControllers':
+                pattern: 'ControllerObjectName'
+                patternOptions:
+                  controllerObjectNamePattern: 'Sitegeist\Bitzer\Application\Controller\BitzerController'
