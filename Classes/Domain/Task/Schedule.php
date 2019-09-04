@@ -94,7 +94,7 @@ class Schedule
             new TaskIdentifier($rawData['identifier']),
             $className,
             $rawData['description'],
-            \DateTimeImmutable::createFromFormat('c', $rawData['scheduledtime']),
+            ScheduledTime::createFromDatabaseValue($rawData['scheduledtime']),
             ActionStatusType::createFromString($rawData['actionstatus']),
             $rawData['agent'],
             $object,
