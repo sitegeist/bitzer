@@ -1,15 +1,18 @@
 <?php
-namespace Sitegeist\Bitzer\Domain\Task;
+declare(strict_types=1);
+namespace Sitegeist\Bitzer\Domain\Task\Command;
 
-use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\Flow\Annotations as Flow;
 use Psr\Http\Message\UriInterface;
+use Sitegeist\Bitzer\Domain\Task\NodeAddress;
+use Sitegeist\Bitzer\Domain\Task\TaskClassName;
+use Sitegeist\Bitzer\Domain\Task\TaskIdentifier;
 
 /**
- * The CreateTask command
+ * The ScheduleTask command
  * @Flow\Proxy(false)
  */
-final class CreateTask
+final class ScheduleTask
 {
     /**
      * @var TaskIdentifier
@@ -37,7 +40,7 @@ final class CreateTask
     private $agent;
 
     /**
-     * @var NodeInterface|null
+     * @var NodeAddress|null
      */
     private $object;
 
@@ -52,7 +55,7 @@ final class CreateTask
         string $description,
         \DateTimeImmutable $scheduledTime,
         string $agent,
-        ?NodeInterface $object,
+        ?NodeAddress $object,
         ?UriInterface $target
     ) {
         $this->identifier = $identifier;
@@ -89,7 +92,7 @@ final class CreateTask
         return $this->agent;
     }
 
-    public function getObject(): ?NodeInterface
+    public function getObject(): ?NodeAddress
     {
         return $this->object;
     }

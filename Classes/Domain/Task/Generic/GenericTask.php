@@ -1,10 +1,13 @@
 <?php
-namespace Sitegeist\Bitzer\Domain\Task;
+declare(strict_types=1);
+namespace Sitegeist\Bitzer\Domain\Task\Generic;
 
 use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\Flow\Annotations as Flow;
-use Neos\Flow\Http\Uri;
 use Psr\Http\Message\UriInterface;
+use Sitegeist\Bitzer\Domain\Task\ActionStatusType;
+use Sitegeist\Bitzer\Domain\Task\TaskIdentifier;
+use Sitegeist\Bitzer\Domain\Task\TaskInterface;
 
 /**
  * The task identifier value object
@@ -38,7 +41,7 @@ final class GenericTask implements TaskInterface
     private $agent;
 
     /**
-     * @var string
+     * @var UriInterface|null
      */
     private $target;
 
@@ -49,7 +52,7 @@ final class GenericTask implements TaskInterface
      * @param \DateTimeImmutable $scheduledTime
      * @param ActionStatusType $actionStatus
      * @param string $agent
-     * @param string $target
+     * @param UriInterface $target
      */
     public function __construct(
         TaskIdentifier $identifier,
@@ -57,7 +60,7 @@ final class GenericTask implements TaskInterface
         \DateTimeImmutable $scheduledTime,
         ActionStatusType $actionStatus,
         string $agent,
-        string $target
+        ?UriInterface $target
     ) {
         $this->identifier = $identifier;
         $this->description = $description;
@@ -66,6 +69,12 @@ final class GenericTask implements TaskInterface
         $this->agent = $agent;
         $this->target = $target;
     }
+
+    public static function getShortType(): string
+    {
+        return 'generic';
+    }
+
 
     public function getIdentifier(): TaskIdentifier
     {
@@ -145,6 +154,6 @@ final class GenericTask implements TaskInterface
      */
     public function getTarget(): ?UriInterface
     {
-        return new Uri($this->target);
+        return $this->target;
     }
 }
