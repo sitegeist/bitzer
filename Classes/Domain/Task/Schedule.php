@@ -66,12 +66,12 @@ class Schedule
         :identifier, :className, :description, :scheduledTime, :actionStatus, :agent, :object, :target)',
             [
                 'identifier' => (string)$command->getIdentifier(),
-                'classname' => (string)$command->getClassName(),
+                'className' => (string)$command->getClassName(),
                 'description' => $command->getDescription(),
                 'scheduledTime' => $command->getScheduledTime(),
                 'actionStatus' => ActionStatusType::potential(),
                 'agent' => $command->getAgent(),
-                'object' => $command->getObject(),
+                'object' => $command->getObject() ? json_encode($command->getObject()) : null,
                 'target' => $command->getTarget()
             ],
             [
@@ -104,7 +104,7 @@ class Schedule
             ActionStatusType::createFromString($rawData['actionstatus']),
             $rawData['agent'],
             $object,
-            $rawData['target'] ?? null
+            isset($rawData['target']) ? new Uri($rawData['target']) : null
         );
     }
 
