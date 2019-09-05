@@ -8,6 +8,12 @@
       <trans-unit id="description" xml:space="preserve" approved="yes">
         <source>The management module for editorial tasks</source>
       </trans-unit>
+      <trans-unit id="completeTask.label" xml:space="preserve" approved="yes">
+        <source>Complete task</source>
+      </trans-unit>
+      <trans-unit id="completeTask.success" xml:space="preserve" approved="yes">
+        <source>Task "{0}" was successfully completed.</source>
+      </trans-unit>
     </body>
   </file>
 </xliff>

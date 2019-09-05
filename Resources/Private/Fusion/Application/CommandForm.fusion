@@ -1,0 +1,29 @@
+prototype(Sitegeist.Bitzer:CommandForm) < prototype(Neos.Fusion:Component) {
+    commandName = ''
+    commandArguments = Neos.Fusion:DataStructure
+    icon = ''
+
+    renderer = Neos.Fusion:Tag {
+        tagName = 'form'
+
+        attributes = Neos.Fusion:Attributes {
+            method = 'POST'
+            data-neos-toggle = 'tooltip'
+            data-original-title = ${Translation.translate(props.commandName + '.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}
+
+            action = Neos.Fusion:UriBuilder {
+                package = 'Sitegeist.Bitzer'
+                subpackage = 'Application'
+                controller = 'Bitzer'
+                action = ${props.commandName}
+                arguments = ${props.commandArguments}
+            }
+        }
+        content = afx`
+            <input type="hidden" name="__csrfToken" value={${Security.csrfToken()}} />
+            <button type="submit">
+                <i class={${'fas fa-' + props.icon + ' icon-white'}}></i>
+            </button>
+        `
+    }
+}

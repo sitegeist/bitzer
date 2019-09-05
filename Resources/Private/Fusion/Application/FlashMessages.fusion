@@ -1,0 +1,11 @@
+prototype(Sitegeist.Bitzer:FlashMessages) < prototype(Neos.Fusion:Component) {
+    flashMessages = ${flashMessages}
+
+    renderer = afx`
+        <ul id="neos-notifications-inline">
+            <Neos.Fusion:Collection collection={props.flashMessages}>
+                <li data-type={${String.toLowerCase(item.severity)}}>{item.message}</li>
+            </Neos.Fusion:Collection>
+        </ul>
+    `
+}

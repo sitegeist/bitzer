@@ -5,7 +5,9 @@ namespace Sitegeist\Bitzer\Application;
 
 use Neos\Flow\Annotations as Flow;
 use Sitegeist\Bitzer\Domain\Agent\AgentRepository;
+use Sitegeist\Bitzer\Domain\Task\ActionStatusType;
 use Sitegeist\Bitzer\Domain\Task\Command\CancelTask;
+use Sitegeist\Bitzer\Domain\Task\Command\CompleteTask;
 use Sitegeist\Bitzer\Domain\Task\Exception\AgentDoesNotExist;
 use Sitegeist\Bitzer\Domain\Task\Exception\ObjectDoesNotExist;
 use Sitegeist\Bitzer\Domain\Task\NodeAddress;
@@ -60,6 +62,13 @@ class Bitzer
         $this->requireTaskToExist($command->getIdentifier());
 
         $this->schedule->cancelTask($command->getIdentifier());
+    }
+
+    final public function handleCompleteTask(CompleteTask $command): void
+    {
+        $this->requireTaskToExist($command->getIdentifier());
+
+        $this->schedule->updateTaskActionStatus($command->getIdentifier(), ActionStatusType::completed());
     }
 
     private function requireTaskToExist(TaskIdentifier $identifier): void

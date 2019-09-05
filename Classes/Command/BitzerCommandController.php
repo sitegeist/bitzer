@@ -9,6 +9,7 @@ use Psr\Http\Message\UriInterface;
 use Neos\Flow\Annotations as Flow;
 use Sitegeist\Bitzer\Application\Bitzer;
 use Sitegeist\Bitzer\Domain\Task\Command\CancelTask;
+use Sitegeist\Bitzer\Domain\Task\Command\CompleteTask;
 use Sitegeist\Bitzer\Domain\Task\NodeAddress;
 use Sitegeist\Bitzer\Domain\Task\Schedule;
 use Sitegeist\Bitzer\Domain\Task\ScheduledTime;
@@ -72,5 +73,12 @@ class BitzerCommandController extends CommandController
         $command = new CancelTask($taskIdentifier);
 
         $this->bitzer->handleCancelTask($command);
+    }
+
+    public function completeTaskCommand(TaskIdentifier $taskIdentifier): void
+    {
+        $command = new CompleteTask($taskIdentifier);
+
+        $this->bitzer->handleCompleteTask($command);
     }
 }

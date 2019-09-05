@@ -93,14 +93,14 @@ class Schedule
 
     final public function scheduleTask(ScheduleTask $command): void
     {
-        $this->getDatabaseConnection()->executeQuery('INSERT INTO ' . self::TABLE_NAME . ' VALUES (
-        :identifier, :className, :description, :scheduledTime, :actionStatus, :agent, :object, :target)',
+        $this->getDatabaseConnection()->insert(
+            self::TABLE_NAME,
             [
                 'identifier' => (string)$command->getIdentifier(),
-                'className' => (string)$command->getClassName(),
+                'classname' => (string)$command->getClassName(),
                 'description' => $command->getDescription(),
-                'scheduledTime' => $command->getScheduledTime(),
-                'actionStatus' => ActionStatusType::potential(),
+                'scheduledtime' => $command->getScheduledTime(),
+                'actionstatus' => ActionStatusType::potential(),
                 'agent' => $command->getAgent(),
                 'object' => $command->getObject() ? json_encode($command->getObject()) : null,
                 'target' => $command->getTarget()
@@ -116,6 +116,19 @@ class Schedule
         $this->getDatabaseConnection()->executeQuery('DELETE FROM ' . self::TABLE_NAME . ' WHERE identifier = :identifier', [
             'identifier' => (string) $taskIdentifier
         ]);
+    }
+
+    final public function updateTaskActionStatus(TaskIdentifier $taskIdentifier, ActionStatusType $actionStatus): void
+    {
+        $this->getDatabaseConnection()->update(
+            self::TABLE_NAME,
+            [
+                'actionstatus' => $actionStatus,
+            ],
+            [
+                'identifier' => $taskIdentifier
+            ]
+        );
     }
 
     /**

@@ -1,32 +1,32 @@
 prototype(Sitegeist.Bitzer:Application.MySchedule) < prototype(Neos.Fusion:Component) {
     tasks = ${[]}
 
-    renderer = afx`<table class="neos-table">
-        <thead>
-        <tr>
-            <th>[Datum]</th>
-            <th>[Beschreibung]</th>
-            <th>&nbsp;</th>
-        </tr>
-        </thead>
+    renderer = afx`
+        <Sitegeist.Bitzer:FlashMessages />
+        <table class="neos-table">
+            <thead>
+            <tr>
+                <th>[Datum]</th>
+                <th>[Beschreibung]</th>
+                <th>&nbsp;</th>
+            </tr>
+            </thead>
 
-        <tbody>
-            <Neos.Fusion:Collection collection={props.tasks}>
-                <tr>
-                    <td>{Date.format(item.scheduledTime, 'Y-m-d H:i:s')}</td>
-                    <td>{item.description}</td>
-                    <td class="neos-action">
-                        <div class="neos-pull-right">
-                            <a data-neos-toggle="tooltip" class="neos-button neos-button-primary" title="" href="" data-original-title="[Start task]" @if.hasTarget={item.target}>
-                                <i class="fas fa-info-play icon-white"></i>
-                            </a>
-                            <a data-neos-toggle="tooltip" class="neos-button neos-button-primary" title="" href="" data-original-title="[Complete task]">
-                                <i class="fas fa-check icon-white"></i>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-            </Neos.Fusion:Collection>
-        </tbody>
-    </table>`
+            <tbody>
+                <Neos.Fusion:Collection collection={props.tasks}>
+                    <tr>
+                        <td>{Date.format(item.scheduledTime, 'Y-m-d H:i:s')}</td>
+                        <td>{item.description}</td>
+                        <td class="neos-action">
+                            <div class="neos-pull-right">
+                                <a data-neos-toggle="tooltip" class="neos-button neos-button-primary" title="" href="" data-original-title="[Start task]" @if.hasTarget={item.target}>
+                                    <i class="fas fa-info-play icon-white"></i>
+                                </a>
+                                <Sitegeist.Bitzer:CommandForm commandName="completeTask" commandArguments={{taskIdentifier: String.toString(item.identifier)}} icon="check" />
+                            </div>
+                        </td>
+                    </tr>
+                </Neos.Fusion:Collection>
+            </tbody>
+        </table>`
 }
