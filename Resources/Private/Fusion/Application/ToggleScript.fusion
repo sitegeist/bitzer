@@ -1,0 +1,10 @@
+prototype(Sitegeist.Bitzer:ToggleScript) < prototype(Neos.Fusion:Value) {
+    value = "<script>
+            (function($) {
+                $('.fold-toggle').click(function() {
+    $(this).toggleClass('fas fa-chevron-down fas fa-chevron-up');
+$('tr.' + $(this).data('toggle')).toggle();
+});
+})(jQuery);
+</script>"
+}

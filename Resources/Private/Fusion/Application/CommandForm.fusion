@@ -10,6 +10,7 @@ prototype(Sitegeist.Bitzer:CommandForm) < prototype(Neos.Fusion:Component) {
             method = 'POST'
             data-neos-toggle = 'tooltip'
             data-original-title = ${Translation.translate(props.commandName + '.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}
+            style = 'display: inline-block'
 
             action = Neos.Fusion:UriBuilder {
                 package = 'Sitegeist.Bitzer'

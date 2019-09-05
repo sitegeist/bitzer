@@ -6,6 +6,7 @@ use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\Flow\Annotations as Flow;
 use Psr\Http\Message\UriInterface;
 use Sitegeist\Bitzer\Domain\Task\ActionStatusType;
+use Sitegeist\Bitzer\Domain\Task\NodeAddress;
 use Sitegeist\Bitzer\Domain\Task\TaskIdentifier;
 use Sitegeist\Bitzer\Domain\Task\TaskInterface;
 
@@ -60,6 +61,7 @@ final class GenericTask implements TaskInterface
         \DateTimeImmutable $scheduledTime,
         ActionStatusType $actionStatus,
         string $agent,
+        ?NodeAddress $object,
         ?UriInterface $target
     ) {
         $this->identifier = $identifier;

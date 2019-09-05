@@ -1,6 +1,0 @@
-prototype(Sitegeist.Bitzer:Presentation.ListItem) < prototype(Neos.Fusion:Component) {
-    icon = ''
-    primaryText = ''
-    secondaryText = ''
-    links = Neos.Fusion:RawArray
-}

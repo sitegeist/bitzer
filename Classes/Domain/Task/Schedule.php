@@ -75,20 +75,50 @@ class Schedule
         return $this->createTasksFromRawDataSet($rawDataSet);
     }
 
-    final public function findForAgents(array $agentIdentifiers): array
+    final public function findPastDueDueAndUpcoming(\DateInterval $upcomingInterval, ?array $agentIdentifiers = null): array
     {
-        $rawDataSet = $this->getDatabaseConnection()->executeQuery(
-            'SELECT * FROM ' . self::TABLE_NAME . '
- WHERE agent IN (:agentIdentifiers)',
-            [
-                'agentIdentifiers' => $agentIdentifiers
-            ],
-            [
-                'agentIdentifiers' => Connection::PARAM_STR_ARRAY
-            ]
-        )->fetchAll();
+        $now = ScheduledTime::now();
+        $referenceDate = $now->sub($upcomingInterval);
 
-        return $this->createTasksFromRawDataSet($rawDataSet);
+        $query = 'SELECT * FROM ' . self::TABLE_NAME . '
+ WHERE scheduledtime >= :referenceDate
+ AND actionstatus IN (:actionStatusTypes)';
+        $parameters = [
+            'referenceDate' => $referenceDate,
+            'actionStatusTypes' => [
+                ActionStatusType::TYPE_POTENTIAL,
+                ActionStatusType::TYPE_ACTIVE
+            ]
+        ];
+        $types = [
+            'referenceDate' => Type::DATE_IMMUTABLE,
+            'actionStatusTypes' => Connection::PARAM_STR_ARRAY
+        ];
+
+        if ($agentIdentifiers) {
+            $parameters['agentIdentifiers'] = $agentIdentifiers;
+            $types['agentIdentifiers'] = Connection::PARAM_STR_ARRAY;
+            $query .= ' AND agent IN (:agentIdentifiers)';
+        }
+        $query .= ' ORDER BY scheduledtime ASC';
+
+        $rawDataSet = $this->getDatabaseConnection()->executeQuery(
+            $query,
+            $parameters,
+            $types
+        )->fetchAll();
+        $tasks = $this->createTasksFromRawDataSet($rawDataSet);
+
+        $groupedTasks = [
+            TaskDueStatusType::STATUS_PAST_DUE => [],
+            TaskDueStatusType::STATUS_DUE => [],
+            TaskDueStatusType::STATUS_UPCOMING => []
+        ];
+        foreach ($tasks as $task) {
+            $groupedTasks[(string)TaskDueStatusType::forTask($task)][] = $task;
+        }
+
+        return $groupedTasks;
     }
 
     final public function scheduleTask(ScheduleTask $command): void
@@ -106,7 +136,7 @@ class Schedule
                 'target' => $command->getTarget()
             ],
             [
-                'scheduledTime' => Type::DATE_IMMUTABLE
+                'scheduledtime' => Type::DATE_IMMUTABLE
             ]
         );
     }

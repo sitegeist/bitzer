@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Sitegeist\Bitzer\Command;
 
 use Neos\Flow\Cli\CommandController;
+use Neos\Flow\Http\Uri;
 use Neos\Flow\Reflection\ReflectionService;
 use Psr\Http\Message\UriInterface;
 use Neos\Flow\Annotations as Flow;
@@ -53,7 +54,7 @@ class BitzerCommandController extends CommandController
         string $scheduledTime,
         string $agent,
         ?NodeAddress $object = null,
-        ?UriInterface $target = null
+        ?Uri $target = null
     ) {
         $command = new ScheduleTask(
             TaskIdentifier::create(),

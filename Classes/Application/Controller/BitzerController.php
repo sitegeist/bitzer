@@ -51,6 +51,12 @@ class BitzerController extends ModuleController
     protected $translator;
 
     /**
+     * @Flow\InjectConfiguration(path="upcomingInterval")
+     * @var string
+     */
+    protected $upcomingInterval;
+
+    /**
      * @var string
      */
     protected $defaultViewObjectName = FusionView::class;
@@ -82,11 +88,11 @@ class BitzerController extends ModuleController
     public function myScheduleAction(): void
     {
         $agents = $this->agentRepository->findCurrent();
-        $tasks = $this->schedule->findForAgents($agents);
+        $groupedTasks = $this->schedule->findPastDueDueAndUpcoming(new \DateInterval($this->upcomingInterval), $agents);
 
         $this->view->setFusionPath('mySchedule');
         $this->view->assignMultiple([
-            'tasks' => $tasks,
+            'groupedTasks' => $groupedTasks,
             'flashMessages' => $this->flashMessageContainer->getMessagesAndFlush()
         ]);
     }

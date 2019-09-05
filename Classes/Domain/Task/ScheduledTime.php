@@ -22,6 +22,11 @@ final class ScheduledTime
         return $scheduledTime;
     }
 
+    public static function now(): \DateTimeImmutable
+    {
+        return new \DateTimeImmutable('now');
+    }
+
     public static function createFromDatabaseValue(string $dateString): \DateTimeImmutable
     {
         $scheduledTime = \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $dateString);

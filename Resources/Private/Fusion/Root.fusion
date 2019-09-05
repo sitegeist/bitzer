@@ -2,5 +2,5 @@ include: 'resource://Neos.Fusion/Private/Fusion/Root.fusion'
 include: 'resource://Neos.Fusion/Private/Fusion/**/*.fusion'
 
 mySchedule = Sitegeist.Bitzer:Application.MySchedule {
-    tasks = ${tasks}
+    groupedTasks = ${groupedTasks}
 }

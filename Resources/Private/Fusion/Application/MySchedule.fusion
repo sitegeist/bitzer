@@ -1,32 +1,49 @@
 prototype(Sitegeist.Bitzer:Application.MySchedule) < prototype(Neos.Fusion:Component) {
-    tasks = ${[]}
+    groupedTasks = ${[]}
 
     renderer = afx`
         <Sitegeist.Bitzer:FlashMessages />
         <table class="neos-table">
             <thead>
-            <tr>
-                <th>[Datum]</th>
-                <th>[Beschreibung]</th>
-                <th>&nbsp;</th>
-            </tr>
+                <tr>
+                    <th>{${Translation.translate('task.scheduledDate.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</th>
+                    <th>{${Translation.translate('task.description.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</th>
+                    <th>{${Translation.translate('actions.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</th>
+                </tr>
             </thead>
-
             <tbody>
-                <Neos.Fusion:Collection collection={props.tasks}>
-                    <tr>
-                        <td>{Date.format(item.scheduledTime, 'Y-m-d H:i:s')}</td>
-                        <td>{item.description}</td>
-                        <td class="neos-action">
-                            <div class="neos-pull-right">
-                                <a data-neos-toggle="tooltip" class="neos-button neos-button-primary" title="" href="" data-original-title="[Start task]" @if.hasTarget={item.target}>
-                                    <i class="fas fa-info-play icon-white"></i>
-                                </a>
-                                <Sitegeist.Bitzer:CommandForm commandName="completeTask" commandArguments={{taskIdentifier: String.toString(item.identifier)}} icon="check" />
-                            </div>
-                        </td>
-                    </tr>
-                </Neos.Fusion:Collection>
+                <Sitegeist.Bitzer:MyScheduleTable tasks={props.groupedTasks.pastDue} groupIdentifier="pastDue" @if.hasPastDueTasks={props.groupedTasks.pastDue} />
+                <Sitegeist.Bitzer:MyScheduleTable tasks={props.groupedTasks.due} groupIdentifier="due" @if.hasDueTasks={props.groupedTasks.due} />
+                <Sitegeist.Bitzer:MyScheduleTable tasks={props.groupedTasks.upcoming} groupIdentifier="upcoming" @if.hasUpcomingTasks={props.groupedTasks.upcoming} />
             </tbody>
-        </table>`
+        </table>
+        <Sitegeist.Bitzer:ToggleScript />
+    `
+}
+
+prototype(Sitegeist.Bitzer:MyScheduleTable) < prototype(Neos.Fusion:Component) {
+    tasks = ${[]}
+    groupIdentifier = ''
+
+    renderer = afx`
+        <tr class="neos-folder">
+            <td class="neos-priority1" colspan="2">{${Translation.translate('taskDueStatusType.' + props.groupIdentifier + '.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</td>
+            <td class="neos-priority1 neos-aRight">
+                <i class="fold-toggle icon-white fas fa-chevron-up" data-toggle={${'fold-tasks_' + props.groupIdentifier}}></i>
+            </td>
+        </tr>
+        <Neos.Fusion:Collection collection={props.tasks}>
+            <tr class={${'fold-tasks_' + props.groupIdentifier}} style="display: table-row">
+                <td>{Date.format(item.scheduledTime, 'Y-m-d H:i')}</td>
+                <td>{item.description}</td>
+                <td class="neos-action">
+                    <div class="neos-pull-right">
+                        <a data-neos-toggle="tooltip" class="neos-button neos-button-primary" title="" href={item.target} target="_blank" data-original-title={${Translation.translate('actions.startTask.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}} @if.hasTarget={item.target}>
+                            <i class="fas fa-play icon-white"></i>
+                        </a>
+                        <Sitegeist.Bitzer:CommandForm commandName="completeTask" commandArguments={{taskIdentifier: String.toString(item.identifier)}} icon="check" />
+                    </div>
+                </td>
+            </tr>
+        </Neos.Fusion:Collection>`
 }
