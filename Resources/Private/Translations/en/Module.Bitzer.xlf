@@ -8,17 +8,44 @@
       <trans-unit id="completeTask.success" xml:space="preserve" approved="yes">
         <source>Task "{0}" was successfully completed.</source>
       </trans-unit>
+      <trans-unit id="cancelTask.label" xml:space="preserve" approved="yes">
+        <source>Cancel task</source>
+      </trans-unit>
+      <trans-unit id="cancelTask.success" xml:space="preserve" approved="yes">
+        <source>Task "{0}" was successfully canceled.</source>
+      </trans-unit>
       <trans-unit id="task.scheduledDate.label" xml:space="preserve" approved="yes">
         <source>Scheduled date</source>
       </trans-unit>
+      <trans-unit id="task.actionStatus.label" xml:space="preserve" approved="yes">
+        <source>Status</source>
+      </trans-unit>
       <trans-unit id="task.description.label" xml:space="preserve" approved="yes">
         <source>Description</source>
+      </trans-unit>
+      <trans-unit id="task.agent.label" xml:space="preserve" approved="yes">
+        <source>Agent</source>
+      </trans-unit>
+      <trans-unit id="actionStatusType.https://schema.org/ActiveActionStatus.label" xml:space="preserve" approved="yes">
+        <source>Active</source>
+      </trans-unit>
+      <trans-unit id="actionStatusType.https://schema.org/CompletedActionStatus.label" xml:space="preserve" approved="yes">
+        <source>Complete</source>
+      </trans-unit>
+      <trans-unit id="actionStatusType.https://schema.org/FailedActionStatus.label" xml:space="preserve" approved="yes">
+        <source>Failed</source>
+      </trans-unit>
+      <trans-unit id="actionStatusType.https://schema.org/PotentialActionStatus.label" xml:space="preserve" approved="yes">
+        <source>Potential</source>
       </trans-unit>
       <trans-unit id="actions.label" xml:space="preserve" approved="yes">
         <source>Actions</source>
       </trans-unit>
       <trans-unit id="actions.startTask.label" xml:space="preserve" approved="yes">
         <source>Start task</source>
+      </trans-unit>
+      <trans-unit id="actions.editTask.label" xml:space="preserve" approved="yes">
+        <source>Edit task</source>
       </trans-unit>
       <trans-unit id="taskDueStatusType.pastDue.label" xml:space="preserve" approved="yes">
         <source>past due</source>

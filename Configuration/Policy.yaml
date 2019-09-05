@@ -3,7 +3,7 @@ privilegeTargets:
     'Sitegeist.Bitzer:Module.Bitzer':
       matcher: 'method(Sitegeist\Bitzer\Application\Controller\BitzerController->(index|mySchedule|completeTask)Action())'
     'Sitegeist.Bitzer:Module.Bitzer.Administration':
-      matcher: 'method(Sitegeist\Bitzer\Application\Controller\BitzerController->(schedule|scheduleTask)Action())'
+      matcher: 'method(Sitegeist\Bitzer\Application\Controller\BitzerController->(schedule|scheduleTask|cancelTask)Action())'
 
 roles:
 

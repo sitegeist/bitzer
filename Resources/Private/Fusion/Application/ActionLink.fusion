@@ -1,0 +1,22 @@
+prototype(Sitegeist.Bitzer:ActionLink) < prototype(Neos.Fusion:Component) {
+    actionName = ''
+    actionArguments = Neos.Fusion:DataStructure
+    icon = ''
+
+    renderer = Neos.Fusion:Tag {
+        tagName = 'a'
+        attributes {
+            href = Neos.Fusion:UriBuilder {
+                package = 'Sitegeist.Bitzer'
+                subpackage = 'Application'
+                controller = 'Bitzer'
+                action = ${props.actionName}
+                arguments = ${props.actionArguments}
+            }
+            class="neos-button neos-button-primary"
+            data-neos-toggle="tooltip"
+            data-original-title = ${Translation.translate('actions.' + props.actionName + '.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}
+        }
+        content = ${'<i class="fas fa-' + props.icon + ' icon-white"></i>'}
+    }
+}

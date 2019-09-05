@@ -74,7 +74,25 @@ class Schedule
 
         return $this->createTasksFromRawDataSet($rawDataSet);
     }
+    /**
+     * @return array|TaskInterface[]
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    final public function findAllOrdered(): array
+    {
+        $rawDataSet = $this->getDatabaseConnection()->executeQuery(
+            'SELECT * FROM ' . self::TABLE_NAME . ' ORDER BY scheduledtime ASC'
+        )->fetchAll();
 
+        return $this->createTasksFromRawDataSet($rawDataSet);
+    }
+
+    /**
+     * @param \DateInterval $upcomingInterval
+     * @param array|null $agentIdentifiers
+     * @return array|TaskInterface[][]
+     * @throws \Doctrine\DBAL\DBALException
+     */
     final public function findPastDueDueAndUpcoming(\DateInterval $upcomingInterval, ?array $agentIdentifiers = null): array
     {
         $now = ScheduledTime::now();

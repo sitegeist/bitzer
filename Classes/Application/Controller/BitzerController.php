@@ -11,6 +11,7 @@ use Neos\Fusion\View\FusionView;
 use Neos\Neos\Controller\Backend\ModuleController;
 use Sitegeist\Bitzer\Application\Bitzer;
 use Sitegeist\Bitzer\Domain\Agent\AgentRepository;
+use Sitegeist\Bitzer\Domain\Task\Command\CancelTask;
 use Sitegeist\Bitzer\Domain\Task\Command\CompleteTask;
 use Sitegeist\Bitzer\Domain\Task\Schedule;
 use Sitegeist\Bitzer\Domain\Task\TaskIdentifier;
@@ -82,7 +83,12 @@ class BitzerController extends ModuleController
 
     public function scheduleAction(): void
     {
-
+        $tasks = $this->schedule->findAllOrdered();
+        $this->view->setFusionPath('schedule');
+        $this->view->assignMultiple([
+            'tasks' => $tasks,
+            'flashMessages' => $this->flashMessageContainer->getMessagesAndFlush()
+        ]);
     }
 
     public function myScheduleAction(): void
@@ -110,6 +116,17 @@ class BitzerController extends ModuleController
         $this->bitzer->handleCompleteTask($command);
 
         $this->addFlashMessage($this->getLabel('completeTask.success', [$task->getDescription()]), '');
+        $this->redirect('index');
+    }
+
+    public function cancelTaskAction(TaskIdentifier $taskIdentifier): void
+    {
+        $task = $this->schedule->findByIdentifier($taskIdentifier);
+
+        $command = new CancelTask($taskIdentifier);
+        $this->bitzer->handleCancelTask($command);
+
+        $this->addFlashMessage($this->getLabel('cancelTask.success', [$task->getDescription()]), '');
         $this->redirect('index');
     }
 
