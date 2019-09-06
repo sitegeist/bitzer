@@ -175,6 +175,19 @@ class Schedule
         );
     }
 
+    final public function reassignTask(TaskIdentifier $taskIdentifier, string $agent): void
+    {
+        $this->getDatabaseConnection()->update(
+            self::TABLE_NAME,
+            [
+                'agent' => $agent,
+            ],
+            [
+                'identifier' => $taskIdentifier,
+            ]
+        );
+    }
+
     final public function cancelTask(TaskIdentifier $taskIdentifier): void
     {
         $this->getDatabaseConnection()->executeQuery('DELETE FROM ' . self::TABLE_NAME . ' WHERE identifier = :identifier', [

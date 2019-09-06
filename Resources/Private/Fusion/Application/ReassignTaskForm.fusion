@@ -1,0 +1,33 @@
+prototype(Sitegeist.Bitzer:ReassignTaskForm) < prototype(Neos.Fusion:Component) {
+    task = null
+    agents = ${[]}
+
+    @context.reassignUri = Neos.Fusion:UriBuilder {
+        package = 'Sitegeist.Bitzer'
+        subpackage = 'Application'
+        controller = 'Bitzer'
+        action = 'reassignTask'
+    }
+
+    renderer = afx`
+        <form action={reassignUri} method="POST">
+            <fieldset class="neos-span5">
+                <legend>[Reassign task]</legend>
+                <input type="hidden" name="__csrfToken" value={${Security.csrfToken()}} />
+                <input type="hidden" name="moduleArguments[taskIdentifier]" value={${String.toString(props.task.identifier)}} />
+                <div class="neos-control-group">
+                    <label class="neos-control-label" for="title">[scheduledTime]</label>
+                    <div class="neos-controls neos-controls-row">
+                        <select id="agent" name="moduleArguments[agent]">
+                            <Neos.Fusion:Collection collection={props.agents} itemName="agentIdentifier">
+                                <option value={agentIdentifier} @if.isNotAssigned={agentIdentifier != props.task.agent}>{agentIdentifier}</option>
+                                <option value={agentIdentifier} selected="selected" @if.isAssigned={agentIdentifier == props.task.agent}>{agentIdentifier}</option>
+                            </Neos.Fusion:Collection>
+                        </select>
+                    </div>
+                    <input class="neos-button neos-button-primary" type="submit" name="" value="[Reassign]" />
+                </div>
+            </fieldset>
+        </form>
+    `
+}

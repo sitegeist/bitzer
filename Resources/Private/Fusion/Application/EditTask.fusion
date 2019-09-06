@@ -6,6 +6,7 @@ prototype(Sitegeist.Bitzer:Application.EditTask) < prototype(Neos.Fusion:Compone
         <Sitegeist.Bitzer:FlashMessages />
         <div class="neos-row-fluid neos-module-container">
             <Sitegeist.Bitzer:RescheduleTaskForm task={props.task} />
+            <Sitegeist.Bitzer:ReassignTaskForm task={props.task} agents={props.agents} />
         </div>
     `
 }

@@ -10,6 +10,7 @@ use Neos\Flow\Annotations as Flow;
 use Sitegeist\Bitzer\Application\Bitzer;
 use Sitegeist\Bitzer\Domain\Task\Command\CancelTask;
 use Sitegeist\Bitzer\Domain\Task\Command\CompleteTask;
+use Sitegeist\Bitzer\Domain\Task\Command\ReassignTask;
 use Sitegeist\Bitzer\Domain\Task\Command\RescheduleTask;
 use Sitegeist\Bitzer\Domain\Task\NodeAddress;
 use Sitegeist\Bitzer\Domain\Task\Schedule;
@@ -79,6 +80,18 @@ class BitzerCommandController extends CommandController
         );
 
         $this->bitzer->handleRescheduleTask($command);
+    }
+
+    public function reassignTaskCommand(
+        TaskIdentifier $taskIdentifier,
+        string $agent
+    ): void {
+        $command = new ReassignTask(
+            $taskIdentifier,
+            $agent
+        );
+
+        $this->bitzer->handleReassignTask($command);
     }
 
     public function cancelTaskCommand(TaskIdentifier $taskIdentifier): void

@@ -132,6 +132,17 @@ class BitzerController extends ModuleController
         $this->redirect('editTask', null, null, ['taskIdentifier' => (string)$taskIdentifier]);
     }
 
+    public function reassignTaskAction(TaskIdentifier $taskIdentifier, string $agent): void
+    {
+        $task = $this->schedule->findByIdentifier($taskIdentifier);
+
+        $command = new ReassignTask($taskIdentifier, $agent);
+        $this->bitzer->handleReassignTask($command);
+
+        $this->addFlashMessage($this->getLabel('reassignTask.success', [$task->getDescription(), $agent]), '');
+        $this->redirect('editTask', null, null, ['taskIdentifier' => (string)$taskIdentifier]);
+    }
+
     public function completeTaskAction(TaskIdentifier $taskIdentifier): void
     {
         $task = $this->schedule->findByIdentifier($taskIdentifier);
