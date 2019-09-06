@@ -6,11 +6,11 @@ namespace Sitegeist\Bitzer\Command;
 use Neos\Flow\Cli\CommandController;
 use Neos\Flow\Http\Uri;
 use Neos\Flow\Reflection\ReflectionService;
-use Psr\Http\Message\UriInterface;
 use Neos\Flow\Annotations as Flow;
 use Sitegeist\Bitzer\Application\Bitzer;
 use Sitegeist\Bitzer\Domain\Task\Command\CancelTask;
 use Sitegeist\Bitzer\Domain\Task\Command\CompleteTask;
+use Sitegeist\Bitzer\Domain\Task\Command\RescheduleTask;
 use Sitegeist\Bitzer\Domain\Task\NodeAddress;
 use Sitegeist\Bitzer\Domain\Task\Schedule;
 use Sitegeist\Bitzer\Domain\Task\ScheduledTime;
@@ -55,7 +55,7 @@ class BitzerCommandController extends CommandController
         string $agent,
         ?NodeAddress $object = null,
         ?Uri $target = null
-    ) {
+    ): void {
         $command = new ScheduleTask(
             TaskIdentifier::create(),
             TaskClassName::fromShortType($shortType, $this->reflectionService),
@@ -67,6 +67,18 @@ class BitzerCommandController extends CommandController
         );
 
         $this->bitzer->handleScheduleTask($command);
+    }
+
+    public function rescheduleTaskCommand(
+        TaskIdentifier $taskIdentifier,
+        string $scheduledTime
+    ): void {
+        $command = new RescheduleTask(
+            $taskIdentifier,
+            ScheduledTime::createFromString($scheduledTime)
+        );
+
+        $this->bitzer->handleRescheduleTask($command);
     }
 
     public function cancelTaskCommand(TaskIdentifier $taskIdentifier): void

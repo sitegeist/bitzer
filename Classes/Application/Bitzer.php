@@ -8,6 +8,7 @@ use Sitegeist\Bitzer\Domain\Agent\AgentRepository;
 use Sitegeist\Bitzer\Domain\Task\ActionStatusType;
 use Sitegeist\Bitzer\Domain\Task\Command\CancelTask;
 use Sitegeist\Bitzer\Domain\Task\Command\CompleteTask;
+use Sitegeist\Bitzer\Domain\Task\Command\RescheduleTask;
 use Sitegeist\Bitzer\Domain\Task\Exception\AgentDoesNotExist;
 use Sitegeist\Bitzer\Domain\Task\Exception\ObjectDoesNotExist;
 use Sitegeist\Bitzer\Domain\Task\NodeAddress;
@@ -55,6 +56,13 @@ class Bitzer
         }
 
         $this->schedule->scheduleTask($command);
+    }
+
+    final public function handleRescheduleTask(RescheduleTask $command): void
+    {
+        $this->requireTaskToExist($command->getIdentifier());
+
+        $this->schedule->rescheduleTask($command->getIdentifier(), $command->getScheduledTime());
     }
 
     final public function handleCancelTask(CancelTask $command): void

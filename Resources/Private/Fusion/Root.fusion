@@ -8,3 +8,8 @@ mySchedule = Sitegeist.Bitzer:Application.MySchedule {
 schedule = Sitegeist.Bitzer:Application.Schedule {
     tasks = ${tasks}
 }
+
+editTask = Sitegeist.Bitzer:Application.EditTask {
+    task = ${task}
+    agents = ${agents}
+}

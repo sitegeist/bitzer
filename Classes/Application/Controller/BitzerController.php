@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Sitegeist\Bitzer\Application\Controller;
 
+use Neos\Error\Messages\Message;
 use Neos\Flow\I18n\Translator;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Mvc\View\ViewInterface;
@@ -13,6 +14,8 @@ use Sitegeist\Bitzer\Application\Bitzer;
 use Sitegeist\Bitzer\Domain\Agent\AgentRepository;
 use Sitegeist\Bitzer\Domain\Task\Command\CancelTask;
 use Sitegeist\Bitzer\Domain\Task\Command\CompleteTask;
+use Sitegeist\Bitzer\Domain\Task\Command\ReassignTask;
+use Sitegeist\Bitzer\Domain\Task\Command\RescheduleTask;
 use Sitegeist\Bitzer\Domain\Task\Schedule;
 use Sitegeist\Bitzer\Domain\Task\TaskIdentifier;
 
@@ -103,9 +106,30 @@ class BitzerController extends ModuleController
         ]);
     }
 
-    public function showTaskAction(TaskIdentifier $taskIdentifier): void
+    public function editTaskAction(TaskIdentifier $taskIdentifier): void
     {
+        $task = $this->schedule->findByIdentifier($taskIdentifier);
+        if (!$task) {
+            $this->addFlashMessage($this->getLabel('editTask.taskWasNotFound', [$task->getDescription()]), '', Message::SEVERITY_WARNING);
+            $this->redirect('index');
+        }
+        $this->view->setFusionPath('editTask');
+        $this->view->assignMultiple([
+            'task' => $task,
+            'agents' => $this->agentRepository->findAll(),
+            'flashMessages' => $this->flashMessageContainer->getMessagesAndFlush()
+        ]);
+    }
 
+    public function rescheduleTaskAction(TaskIdentifier $taskIdentifier, \DateTimeImmutable $scheduledTime): void
+    {
+        $task = $this->schedule->findByIdentifier($taskIdentifier);
+
+        $command = new RescheduleTask($taskIdentifier, $scheduledTime);
+        $this->bitzer->handleRescheduleTask($command);
+
+        $this->addFlashMessage($this->getLabel('rescheduleTask.success', [$task->getDescription(), $scheduledTime->format('c')]), '');
+        $this->redirect('editTask', null, null, ['taskIdentifier' => (string)$taskIdentifier]);
     }
 
     public function completeTaskAction(TaskIdentifier $taskIdentifier): void

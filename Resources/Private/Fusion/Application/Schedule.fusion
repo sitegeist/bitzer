@@ -34,7 +34,7 @@ prototype(Sitegeist.Bitzer:ScheduleTable) < prototype(Neos.Fusion:Component) {
                 <td>{item.agent}</td>
                 <td class="neos-action">
                     <div class="neos-pull-right">
-                        <Sitegeist.Bitzer:ActionLink actionName="editTask" actionArguments={{taskIdentifier: String.toString(item.identifier)}} icon="edit" />
+                        <Sitegeist.Bitzer:ActionLink actionName="editTask" actionArguments={{taskIdentifier: String.toString(item.identifier)}} icon="pencil-alt" />
                         <Sitegeist.Bitzer:CommandForm commandName="completeTask" commandArguments={{taskIdentifier: String.toString(item.identifier)}} icon="check" />
                         <Sitegeist.Bitzer:CommandForm commandName="cancelTask" commandArguments={{taskIdentifier: String.toString(item.identifier)}} icon="times" />
                     </div>

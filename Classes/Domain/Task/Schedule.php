@@ -159,6 +159,22 @@ class Schedule
         );
     }
 
+    final public function rescheduleTask(TaskIdentifier $taskIdentifier, \DateTimeImmutable $scheduledTime): void
+    {
+        $this->getDatabaseConnection()->update(
+            self::TABLE_NAME,
+            [
+                'scheduledtime' => $scheduledTime,
+            ],
+            [
+                'identifier' => $taskIdentifier,
+            ],
+            [
+                'scheduledtime' => Type::DATE_IMMUTABLE
+            ]
+        );
+    }
+
     final public function cancelTask(TaskIdentifier $taskIdentifier): void
     {
         $this->getDatabaseConnection()->executeQuery('DELETE FROM ' . self::TABLE_NAME . ' WHERE identifier = :identifier', [

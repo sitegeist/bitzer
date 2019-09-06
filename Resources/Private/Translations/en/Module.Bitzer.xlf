@@ -14,6 +14,12 @@
       <trans-unit id="cancelTask.success" xml:space="preserve" approved="yes">
         <source>Task "{0}" was successfully canceled.</source>
       </trans-unit>
+      <trans-unit id="rescheduleTask.label" xml:space="preserve" approved="yes">
+        <source>Reschedule task</source>
+      </trans-unit>
+      <trans-unit id="rescheduleTask.success" xml:space="preserve" approved="yes">
+        <source>Task "{0}" was successfully rescheduled to {1}.</source>
+      </trans-unit>
       <trans-unit id="task.scheduledDate.label" xml:space="preserve" approved="yes">
         <source>Scheduled date</source>
       </trans-unit>
