@@ -7,9 +7,37 @@ mySchedule = Sitegeist.Bitzer:Application.MySchedule {
 
 schedule = Sitegeist.Bitzer:Application.Schedule {
     tasks = ${tasks}
+    taskClassNames = ${taskClassNames}
 }
 
-editTask = Sitegeist.Bitzer:Application.EditTask {
-    task = ${task}
-    agents = ${agents}
+prepareTask = Neos.Fusion:Case {
+    default {
+        condition = ${true}
+        renderer = Neos.Fusion:Renderer {
+            type = ${componentName}
+            element {
+                taskClassName = ${taskClassName}
+                agents = ${agents}
+                command = ${command}
+                constraintCheckResult = ${constraintCheckResult}
+                flashMessages = ${flashMessages}
+            }
+        }
+    }
+}
+
+editTask = Neos.Fusion:Case {
+    default {
+        condition = ${true}
+        renderer = Neos.Fusion:Renderer {
+            type = ${componentName}
+            element {
+                task = ${task}
+                agents = ${agents}
+                command = ${command}
+                constraintCheckResult = ${constraintCheckResult}
+                flashMessages = ${flashMessages}
+            }
+        }
+    }
 }

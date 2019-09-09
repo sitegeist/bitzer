@@ -23,7 +23,7 @@ final class GenericTaskFactory implements TaskFactoryInterface
     final public function createFromRawData(
         TaskIdentifier $identifier,
         TaskClassName $className,
-        string $description,
+        array $properties,
         \DateTimeImmutable $scheduledTime,
         ActionStatusType $actionStatus,
         string $agent,
@@ -33,7 +33,7 @@ final class GenericTaskFactory implements TaskFactoryInterface
         $classIdentifier = (string)$className;
         return new $classIdentifier(
             $identifier,
-            $description,
+            $properties,
             $scheduledTime,
             $actionStatus,
             $agent,

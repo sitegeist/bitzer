@@ -16,12 +16,7 @@ final class TaskClassName
      */
     private $value;
 
-    private function __construct(string $value)
-    {
-        $this->value = $value;
-    }
-
-    public static function createFromString(string $value): TaskClassName
+    public function __construct(string $value)
     {
         if (!class_exists($value)) {
             throw new ClassNameIsUnavailable('Given task class name "' . $value . '" is not available in this installation.', 1567428115);
@@ -29,8 +24,17 @@ final class TaskClassName
         if (!in_array(TaskInterface::class, class_implements($value))) {
             throw new ClassNameDefinesNoTask('Given class name "' . $value . '" does not define a task implementation.', 1567428237);
         }
+        $this->value = $value;
+    }
 
+    public static function createFromString(string $value): TaskClassName
+    {
         return new static($value);
+    }
+
+    public static function createFromObject(object $object): TaskClassName
+    {
+        return new static(get_class($object));
     }
 
     public static function fromShortType(string $shortType, ReflectionService $reflectionService): TaskClassName

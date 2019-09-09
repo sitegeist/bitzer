@@ -1,5 +1,6 @@
 prototype(Sitegeist.Bitzer:RescheduleTaskForm) < prototype(Neos.Fusion:Component) {
     task = null
+    constraintCheckResult = null
 
     @context.rescheduleUri = Neos.Fusion:UriBuilder {
         package = 'Sitegeist.Bitzer'
@@ -11,16 +12,25 @@ prototype(Sitegeist.Bitzer:RescheduleTaskForm) < prototype(Neos.Fusion:Component
     renderer = afx`
         <form action={rescheduleUri} method="POST">
             <fieldset class="neos-span5">
-                <legend>[Reschedule]</legend>
+                <legend>{${Translation.translate('rescheduleTask.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</legend>
                 <input type="hidden" name="__csrfToken" value={${Security.csrfToken()}} />
                 <input type="hidden" name="moduleArguments[taskIdentifier]" value={${String.toString(props.task.identifier)}} />
-                <div class="neos-control-group">
-                    <label class="neos-control-label" for="title">[scheduledTime]</label>
+                <div class={${'neos-control-group' + (constraintCheckResult.hasFailedAtPath('scheduledTime') ? ' neos-error' : '')}}>
+                    <label class="neos-control-label" for="scheduledTime.date">{${Translation.translate('task.scheduledTime.date', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</label>
                     <div class="neos-controls neos-controls-row">
-                        <input type="text" class="neos-span4" id="scheduledTime" name="moduleArguments[scheduledTime]" value={${Date.format(props.task.scheduledTime, 'c')}} />
+                        <input type="text" required="required" class="neos-span4" id="scheduledTime.date" name="moduleArguments[scheduledTime][date]" placeholder={${Date.format(Date.now(), 'Y-m-d')}} value={${Date.format(task.scheduledTime, 'Y-m-d')}} />
                     </div>
-                    <input class="neos-button neos-button-primary" type="submit" name="" value="[Reschedule]" />
+                    <ul class="errors" @if.hasFailed={constraintCheckResult.hasFailedAtPath('scheduledTime')}>
+                        <li><span class="neos-help-block">{constraintCheckResult.getMessage('scheduledTime')}</span></li>
+                    </ul>
                 </div>
+                <div class="neos-control-group">
+                    <label class="neos-control-label" for="scheduledTime.time">{${Translation.translate('task.scheduledTime.time', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</label>
+                    <div class="neos-controls neos-controls-row">
+                        <input type="text" class="neos-span4" id="scheduledTime.time" name="moduleArguments[scheduledTime][time]" placeholder={${Date.format(Date.now(), 'H:i:s')}} value={${Date.format(task.scheduledTime, 'H:i:s')}}/>
+                    </div>
+                </div>
+                <input class="neos-button neos-button-primary" type="submit" name="" value={${Translation.translate('rescheduleTask.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}} />
             </fieldset>
         </form>
     `

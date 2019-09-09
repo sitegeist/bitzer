@@ -25,12 +25,12 @@ final class ScheduleTask
     private $className;
 
     /**
-     * @var string
+     * @var array
      */
-    private $description;
+    private $properties;
 
     /**
-     * @var \DateTimeImmutable
+     * @var \DateTimeImmutable|null
      */
     private $scheduledTime;
 
@@ -52,19 +52,19 @@ final class ScheduleTask
     public function __construct(
         TaskIdentifier $identifier,
         TaskClassName $className,
-        string $description,
-        \DateTimeImmutable $scheduledTime,
+        ?\DateTimeImmutable $scheduledTime,
         string $agent,
         ?NodeAddress $object,
-        ?UriInterface $target
+        ?UriInterface $target,
+        array $properties
     ) {
         $this->identifier = $identifier;
         $this->className = $className;
-        $this->description = $description;
         $this->scheduledTime = $scheduledTime;
         $this->agent = $agent;
         $this->object = $object;
         $this->target = $target;
+        $this->properties = $properties;
     }
 
     public function getIdentifier(): TaskIdentifier
@@ -77,12 +77,12 @@ final class ScheduleTask
         return $this->className;
     }
 
-    public function getDescription(): string
+    public function getProperties(): array
     {
-        return $this->description;
+        return $this->properties;
     }
 
-    public function getScheduledTime(): \DateTimeImmutable
+    public function getScheduledTime(): ?\DateTimeImmutable
     {
         return $this->scheduledTime;
     }

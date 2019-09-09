@@ -51,7 +51,7 @@ class BitzerCommandController extends CommandController
 
     public function scheduleTaskCommand(
         string $shortType,
-        string $description,
+        string $properties,
         string $scheduledTime,
         string $agent,
         ?NodeAddress $object = null,
@@ -60,11 +60,11 @@ class BitzerCommandController extends CommandController
         $command = new ScheduleTask(
             TaskIdentifier::create(),
             TaskClassName::fromShortType($shortType, $this->reflectionService),
-            $description,
             ScheduledTime::createFromString($scheduledTime),
             $agent,
             $object,
-            $target
+            $target,
+            json_decode($properties, true)
         );
 
         $this->bitzer->handleScheduleTask($command);

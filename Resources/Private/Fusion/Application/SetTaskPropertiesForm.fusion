@@ -1,0 +1,31 @@
+prototype(Sitegeist.Bitzer:SetTaskPropertiesForm) < prototype(Neos.Fusion:Component) {
+    task = null
+    constraintCheckResult = null
+
+    @context.setTaskPropertiesUri = Neos.Fusion:UriBuilder {
+        package = 'Sitegeist.Bitzer'
+        subpackage = 'Application'
+        controller = 'Bitzer'
+        action = 'setTaskProperties'
+    }
+
+    renderer = afx`
+        <form action={setTaskPropertiesUri} method="POST">
+            <fieldset class="neos-span5">
+                <legend>{${Translation.translate('setTaskProperties.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</legend>
+                <input type="hidden" name="__csrfToken" value={${Security.csrfToken()}} />
+                <input type="hidden" name="moduleArguments[taskIdentifier]" value={${String.toString(props.task.identifier)}} />
+                <div class={${'neos-control-group' + (constraintCheckResult.hasFailedAtPath('properties.description') ? ' neos-error' : '')}}>
+                    <label class="neos-control-label" for="title">{${Translation.translate('task.properties.description.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</label>
+                    <div class="neos-controls neos-controls-row">
+                        <textarea id="description" required="required" class="neos-span4" rows="3" name="moduleArguments[properties][description]" placeholder={${Translation.translate('task.properties.description.placeholder', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}>{props.task.description}</textarea>
+                    </div>
+                    <ul class="errors" @if.hasFailed={constraintCheckResult.hasFailedAtPath('scheduledTime')}>
+                        <li><span class="neos-help-block">{constraintCheckResult.getMessage('scheduledTime')}</span></li>
+                    </ul>
+                </div>
+                <input class="neos-button neos-button-primary" type="submit" name="" value={${Translation.translate('setTaskProperties.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}} />
+            </fieldset>
+        </form>
+    `
+}

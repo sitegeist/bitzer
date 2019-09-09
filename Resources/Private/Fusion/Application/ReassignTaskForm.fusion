@@ -1,6 +1,7 @@
 prototype(Sitegeist.Bitzer:ReassignTaskForm) < prototype(Neos.Fusion:Component) {
     task = null
     agents = ${[]}
+    constraintCheckResult = null
 
     @context.reassignUri = Neos.Fusion:UriBuilder {
         package = 'Sitegeist.Bitzer'
@@ -12,11 +13,11 @@ prototype(Sitegeist.Bitzer:ReassignTaskForm) < prototype(Neos.Fusion:Component) 
     renderer = afx`
         <form action={reassignUri} method="POST">
             <fieldset class="neos-span5">
-                <legend>[Reassign task]</legend>
+                <legend>{${Translation.translate('reassignTask.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</legend>
                 <input type="hidden" name="__csrfToken" value={${Security.csrfToken()}} />
                 <input type="hidden" name="moduleArguments[taskIdentifier]" value={${String.toString(props.task.identifier)}} />
-                <div class="neos-control-group">
-                    <label class="neos-control-label" for="title">[scheduledTime]</label>
+                <div class={${'neos-control-group' + (constraintCheckResult.hasFailedAtPath('agent') ? ' neos-error' : '')}}>
+                    <label class="neos-control-label" for="title">{${Translation.translate('task.agent.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</label>
                     <div class="neos-controls neos-controls-row">
                         <select id="agent" name="moduleArguments[agent]">
                             <Neos.Fusion:Collection collection={props.agents} itemName="agentIdentifier">
@@ -25,8 +26,8 @@ prototype(Sitegeist.Bitzer:ReassignTaskForm) < prototype(Neos.Fusion:Component) 
                             </Neos.Fusion:Collection>
                         </select>
                     </div>
-                    <input class="neos-button neos-button-primary" type="submit" name="" value="[Reassign]" />
                 </div>
+                <input class="neos-button neos-button-primary" type="submit" name="" value={${Translation.translate('reassignTask.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}} />
             </fieldset>
         </form>
     `

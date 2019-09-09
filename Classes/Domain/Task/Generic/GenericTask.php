@@ -24,7 +24,7 @@ final class GenericTask implements TaskInterface
     /**
      * @var string
      */
-    private $description;
+    private $properties;
 
     /**
      * @var \DateTimeImmutable
@@ -49,7 +49,7 @@ final class GenericTask implements TaskInterface
     /**
      * GenericTask constructor.
      * @param TaskIdentifier $identifier
-     * @param string $description
+     * @param array $properties
      * @param \DateTimeImmutable $scheduledTime
      * @param ActionStatusType $actionStatus
      * @param string $agent
@@ -57,7 +57,7 @@ final class GenericTask implements TaskInterface
      */
     public function __construct(
         TaskIdentifier $identifier,
-        string $description,
+        array $properties,
         \DateTimeImmutable $scheduledTime,
         ActionStatusType $actionStatus,
         string $agent,
@@ -65,7 +65,7 @@ final class GenericTask implements TaskInterface
         ?UriInterface $target
     ) {
         $this->identifier = $identifier;
-        $this->description = $description;
+        $this->properties = $properties;
         $this->scheduledTime = $scheduledTime;
         $this->actionStatus = $actionStatus;
         $this->agent = $agent;
@@ -100,7 +100,7 @@ final class GenericTask implements TaskInterface
      */
     public function getDescription(): string
     {
-        return $this->description;
+        return $this->properties['description'] ?? '';
     }
 
     /**

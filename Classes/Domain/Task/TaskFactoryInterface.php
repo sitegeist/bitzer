@@ -13,7 +13,7 @@ interface TaskFactoryInterface
     public function createFromRawData(
         TaskIdentifier $identifier,
         TaskClassName $className,
-        string $description,
+        array $properties,
         \DateTimeImmutable $scheduledTime,
         ActionStatusType $actionStatus,
         string $agent,

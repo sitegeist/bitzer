@@ -2,6 +2,7 @@ prototype(Sitegeist.Bitzer:ActionLink) < prototype(Neos.Fusion:Component) {
     actionName = ''
     actionArguments = Neos.Fusion:DataStructure
     icon = ''
+    contentMode = 'icon'
 
     renderer = Neos.Fusion:Tag {
         tagName = 'a'
@@ -17,6 +18,15 @@ prototype(Sitegeist.Bitzer:ActionLink) < prototype(Neos.Fusion:Component) {
             data-neos-toggle="tooltip"
             data-original-title = ${Translation.translate('actions.' + props.actionName + '.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}
         }
-        content = ${'<i class="fas fa-' + props.icon + ' icon-white"></i>'}
+        content = Neos.Fusion:Case {
+            icon {
+                condition = ${props.contentMode == 'icon'}
+                renderer = ${'<i class="fas fa-' + props.icon + ' icon-white"></i>'}
+            }
+            label {
+                condition = ${props.contentMode == 'label'}
+                renderer = ${Translation.translate('actions.' + props.actionName + '.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}
+            }
+        }
     }
 }

@@ -20,20 +20,62 @@
       <trans-unit id="rescheduleTask.success" xml:space="preserve" approved="yes">
         <source>Task "{0}" was successfully rescheduled to {1}.</source>
       </trans-unit>
+      <trans-unit id="rescheduleTask.failure" xml:space="preserve" approved="yes">
+        <source>Fauled to reschedule task "{0}".</source>
+      </trans-unit>
       <trans-unit id="reassignTask.label" xml:space="preserve" approved="yes">
         <source>Reassign task</source>
       </trans-unit>
       <trans-unit id="reassignTask.success" xml:space="preserve" approved="yes">
         <source>Task "{0}" was successfully reassigned to {1}.</source>
       </trans-unit>
-      <trans-unit id="task.scheduledDate.label" xml:space="preserve" approved="yes">
-        <source>Scheduled date</source>
+      <trans-unit id="reassignTask.failure" xml:space="preserve" approved="yes">
+        <source>Failed to reassign task "{0}".</source>
+      </trans-unit>
+      <trans-unit id="scheduleTask.label" xml:space="preserve" approved="yes">
+        <source>Schedule task</source>
+      </trans-unit>
+      <trans-unit id="scheduleTask.success" xml:space="preserve" approved="yes">
+        <source>Task "{0}" was successfully scheduled.</source>
+      </trans-unit>
+      <trans-unit id="scheduleTask.failure" xml:space="preserve" approved="yes">
+        <source>Failed to schedule Task "{0}".</source>
+      </trans-unit>
+      <trans-unit id="setTaskProperties.label" xml:space="preserve" approved="yes">
+        <source>Set task properties</source>
+      </trans-unit>
+      <trans-unit id="setTaskProperties.success" xml:space="preserve" approved="yes">
+        <source>Properties of Task "{0}" were successfully set.</source>
+      </trans-unit>
+      <trans-unit id="setTaskProperties.failure" xml:space="preserve" approved="yes">
+        <source>Failed to set properties of Task "{0}".</source>
+      </trans-unit>
+      <trans-unit id="task.scheduledTime.label" xml:space="preserve" approved="yes">
+        <source>Scheduled time</source>
+      </trans-unit>
+      <trans-unit id="task.scheduledTime.date" xml:space="preserve" approved="yes">
+        <source>Date</source>
+      </trans-unit>
+      <trans-unit id="task.scheduledTime.time" xml:space="preserve" approved="yes">
+        <source>Time</source>
       </trans-unit>
       <trans-unit id="task.actionStatus.label" xml:space="preserve" approved="yes">
         <source>Status</source>
       </trans-unit>
-      <trans-unit id="task.description.label" xml:space="preserve" approved="yes">
+      <trans-unit id="task.target.label" xml:space="preserve" approved="yes">
+        <source>Target</source>
+      </trans-unit>
+      <trans-unit id="task.target.placeholder" xml:space="preserve" approved="yes">
+        <source>Please enter target</source>
+      </trans-unit>
+      <trans-unit id="task.properties.label" xml:space="preserve" approved="yes">
+        <source>Properties</source>
+      </trans-unit>
+      <trans-unit id="task.properties.description.label" xml:space="preserve" approved="yes">
         <source>Description</source>
+      </trans-unit>
+      <trans-unit id="task.properties.description.placeholder" xml:space="preserve" approved="yes">
+        <source>Please enter description</source>
       </trans-unit>
       <trans-unit id="task.agent.label" xml:space="preserve" approved="yes">
         <source>Agent</source>
@@ -59,6 +101,18 @@
       <trans-unit id="actions.editTask.label" xml:space="preserve" approved="yes">
         <source>Edit task</source>
       </trans-unit>
+      <trans-unit id="actions.prepareTask.label" xml:space="preserve" approved="yes">
+        <source>Create task</source>
+      </trans-unit>
+      <trans-unit id="actions.cancel.label" xml:space="preserve" approved="yes">
+        <source>Cancel</source>
+      </trans-unit>
+      <trans-unit id="actions.back.label" xml:space="preserve" approved="yes">
+        <source>Back</source>
+      </trans-unit>
+      <trans-unit id="actions.scheduleTask.label" xml:space="preserve" approved="yes">
+        <source>Schedule task</source>
+      </trans-unit>
       <trans-unit id="taskDueStatusType.pastDue.label" xml:space="preserve" approved="yes">
         <source>past due</source>
       </trans-unit>
@@ -67,6 +121,9 @@
       </trans-unit>
       <trans-unit id="taskDueStatusType.upcoming.label" xml:space="preserve" approved="yes">
         <source>upcoming</source>
+      </trans-unit>
+      <trans-unit id="taskClassName.Sitegeist\Bitzer\Domain\Task\Generic\GenericTask.label" xml:space="preserve" approved="yes">
+        <source>Generic</source>
       </trans-unit>
     </body>
   </file>

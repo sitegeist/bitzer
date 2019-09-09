@@ -109,7 +109,7 @@ class Schedule
             ]
         ];
         $types = [
-            'referenceDate' => Type::DATE_IMMUTABLE,
+            'referenceDate' => Type::DATETIME_IMMUTABLE,
             'actionStatusTypes' => Connection::PARAM_STR_ARRAY
         ];
 
@@ -146,7 +146,7 @@ class Schedule
             [
                 'identifier' => (string)$command->getIdentifier(),
                 'classname' => (string)$command->getClassName(),
-                'description' => $command->getDescription(),
+                'properties' => $command->getProperties(),
                 'scheduledtime' => $command->getScheduledTime(),
                 'actionstatus' => ActionStatusType::potential(),
                 'agent' => $command->getAgent(),
@@ -154,7 +154,8 @@ class Schedule
                 'target' => $command->getTarget()
             ],
             [
-                'scheduledtime' => Type::DATE_IMMUTABLE
+                'scheduledtime' => Type::DATETIME_IMMUTABLE,
+                'properties' => Type::JSON
             ]
         );
     }
@@ -170,7 +171,7 @@ class Schedule
                 'identifier' => $taskIdentifier,
             ],
             [
-                'scheduledtime' => Type::DATE_IMMUTABLE
+                'scheduledtime' => Type::DATETIME_IMMUTABLE
             ]
         );
     }
@@ -184,6 +185,22 @@ class Schedule
             ],
             [
                 'identifier' => $taskIdentifier,
+            ]
+        );
+    }
+
+    final public function setTaskProperties(TaskIdentifier $taskIdentifier, array $properties): void
+    {
+        $this->getDatabaseConnection()->update(
+            self::TABLE_NAME,
+            [
+                'properties' => $properties,
+            ],
+            [
+                'identifier' => $taskIdentifier,
+            ],
+            [
+                'properties' => Type::JSON
             ]
         );
     }
@@ -235,7 +252,7 @@ class Schedule
         return $factory->createFromRawData(
             new TaskIdentifier($rawData['identifier']),
             $className,
-            $rawData['description'],
+            json_decode($rawData['properties'], true),
             ScheduledTime::createFromDatabaseValue($rawData['scheduledtime']),
             ActionStatusType::createFromString($rawData['actionstatus']),
             $rawData['agent'],

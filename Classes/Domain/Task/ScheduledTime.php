@@ -16,10 +16,27 @@ final class ScheduledTime
     {
         $scheduledTime = \DateTimeImmutable::createFromFormat('Y-m-d\TH:i:sP', $dateString);
         if (!$scheduledTime) {
-            throw new \InvalidArgumentException('Given scheduled time is invalid, must be in format 2004-02-12T15:19:21+02:00, ' . $dateString . ' given');
+            throw new \InvalidArgumentException('Given scheduled time is invalid, must be in format 2004-02-12T15:19:21+02:00, ' . $dateString . ' given', 1568033626);
         }
 
         return $scheduledTime;
+    }
+
+    /**
+     * @param array $dateArray
+     * @return \DateTimeImmutable
+     * @todo properly determine time zone
+     */
+    public static function createFromArray(array $dateArray): \DateTimeImmutable
+    {
+        if (!isset($dateArray['date'])) {
+            throw new \InvalidArgumentException('The scheduled date is mandatory but was not given in  ' . json_encode($dateArray), 1568033617);
+        }
+        $time = '00:00:00';
+        if (isset($dateArray['time']) && !empty($dateArray['time'])) {
+            $time = $dateArray['time'];
+        }
+        return self::createFromString($dateArray['date'] . 'T' . $time . '+00:00');
     }
 
     public static function now(): \DateTimeImmutable

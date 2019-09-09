@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Sitegeist\Bitzer\Application\Controller;
 
 use Neos\Error\Messages\Message;
+use Neos\Flow\Http\Uri;
 use Neos\Flow\I18n\Translator;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Mvc\View\ViewInterface;
@@ -16,8 +17,17 @@ use Sitegeist\Bitzer\Domain\Task\Command\CancelTask;
 use Sitegeist\Bitzer\Domain\Task\Command\CompleteTask;
 use Sitegeist\Bitzer\Domain\Task\Command\ReassignTask;
 use Sitegeist\Bitzer\Domain\Task\Command\RescheduleTask;
+use Sitegeist\Bitzer\Domain\Task\Command\ScheduleTask;
+use Sitegeist\Bitzer\Domain\Task\Command\SetTaskProperties;
+use Sitegeist\Bitzer\Domain\Task\ConstraintCheckResult;
+use Sitegeist\Bitzer\Domain\Task\Exception\ScheduledTimeIsUndefined;
+use Sitegeist\Bitzer\Domain\Task\NodeAddress;
 use Sitegeist\Bitzer\Domain\Task\Schedule;
+use Sitegeist\Bitzer\Domain\Task\ScheduledTime;
+use Sitegeist\Bitzer\Domain\Task\TaskClassName;
+use Sitegeist\Bitzer\Domain\Task\TaskClassNameRepository;
 use Sitegeist\Bitzer\Domain\Task\TaskIdentifier;
+use Sitegeist\Bitzer\Presentation\ComponentName;
 
 /**
  * The bitzer controller for schedule actions
@@ -61,6 +71,12 @@ class BitzerController extends ModuleController
     protected $upcomingInterval;
 
     /**
+     * @Flow\Inject
+     * @var TaskClassNameRepository
+     */
+    protected $taskClassNameRepository;
+
+    /**
      * @var string
      */
     protected $defaultViewObjectName = FusionView::class;
@@ -90,8 +106,54 @@ class BitzerController extends ModuleController
         $this->view->setFusionPath('schedule');
         $this->view->assignMultiple([
             'tasks' => $tasks,
+            'taskClassNames' => $this->taskClassNameRepository->findAll(),
             'flashMessages' => $this->flashMessageContainer->getMessagesAndFlush()
         ]);
+    }
+
+    public function prepareTaskAction(TaskClassName $taskClassName): void
+    {
+        $this->view->setFusionPath('prepareTask');
+        $this->view->assignMultiple([
+            'taskClassName' => $taskClassName,
+            'agents' => $this->agentRepository->findAll(),
+            'componentName' => (string)ComponentName::fromTaskClassName($taskClassName, 'Prepare'),
+            'flashMessages' => $this->flashMessageContainer->getMessagesAndFlush()
+        ]);
+    }
+
+    public function scheduleTaskAction(TaskClassName $taskClassName, array $scheduledTime = [], string $agent = '', NodeAddress $object = null, Uri $target = null, array $properties = []): void
+    {
+        $constraintCheckResult = new ConstraintCheckResult();
+        try {
+            $scheduledTime = ScheduledTime::createFromArray($scheduledTime);
+        } catch (\InvalidArgumentException $exception) {
+            $scheduledTime = null;
+        }
+        $command = new ScheduleTask(
+            TaskIdentifier::create(),
+            $taskClassName,
+            $scheduledTime,
+            $agent,
+            $object,
+            $target,
+            $properties
+        );
+
+        $this->bitzer->handleScheduleTask($command, $constraintCheckResult);
+
+        if ($constraintCheckResult->hasFailed()) {
+            $this->response->setStatusCode(400);
+            $this->addFlashMessage($this->getLabel('scheduleTask.failure', [$properties['description'] ?? '']), '', Message::SEVERITY_WARNING);
+            $this->view->assignMultiple([
+                'command' => $command,
+                'constraintCheckResult' => $constraintCheckResult,
+            ]);
+            $this->prepareTaskAction($taskClassName);
+        } else {
+            $this->addFlashMessage($this->getLabel('scheduleTask.success', [$properties['description'], $scheduledTime->format('c')]), '');
+            $this->redirect('schedule');
+        }
     }
 
     public function myScheduleAction(): void
@@ -116,31 +178,79 @@ class BitzerController extends ModuleController
         $this->view->setFusionPath('editTask');
         $this->view->assignMultiple([
             'task' => $task,
+            'componentName' => (string)ComponentName::fromTaskClassName(TaskClassName::createFromObject($task), 'Edit'),
             'agents' => $this->agentRepository->findAll(),
             'flashMessages' => $this->flashMessageContainer->getMessagesAndFlush()
         ]);
     }
 
-    public function rescheduleTaskAction(TaskIdentifier $taskIdentifier, \DateTimeImmutable $scheduledTime): void
+    public function rescheduleTaskAction(TaskIdentifier $taskIdentifier, array $scheduledTime): void
     {
         $task = $this->schedule->findByIdentifier($taskIdentifier);
+        $constraintCheckResult = new ConstraintCheckResult();
+        try {
+            $scheduledTime = ScheduledTime::createFromArray($scheduledTime);
+            $command = new RescheduleTask($taskIdentifier, $scheduledTime);
+            $this->bitzer->handleRescheduleTask($command);
+        } catch (\InvalidArgumentException $exception) {
+            $constraintCheckResult->registerFailedCheck('scheduledTime', new ScheduledTimeIsUndefined('Scheduled time is undefined', 1568033796));
+        }
 
-        $command = new RescheduleTask($taskIdentifier, $scheduledTime);
-        $this->bitzer->handleRescheduleTask($command);
-
-        $this->addFlashMessage($this->getLabel('rescheduleTask.success', [$task->getDescription(), $scheduledTime->format('c')]), '');
-        $this->redirect('editTask', null, null, ['taskIdentifier' => (string)$taskIdentifier]);
+        if ($constraintCheckResult->hasFailed()) {
+            $this->response->setStatusCode(400);
+            $this->addFlashMessage($this->getLabel('rescheduleTask.failure', [$task->getDescription()]), '', Message::SEVERITY_WARNING);
+            $this->view->assignMultiple([
+                'constraintCheckResult' => $constraintCheckResult,
+            ]);
+            $this->editTaskAction($taskIdentifier);
+        } else {
+            $this->addFlashMessage($this->getLabel('rescheduleTask.success', [$task->getDescription(), $scheduledTime->format('c')]), '');
+            $this->redirect('editTask', null, null, ['taskIdentifier' => (string)$taskIdentifier]);
+        }
     }
 
     public function reassignTaskAction(TaskIdentifier $taskIdentifier, string $agent): void
     {
         $task = $this->schedule->findByIdentifier($taskIdentifier);
 
+        $constraintCheckResult = new ConstraintCheckResult();
         $command = new ReassignTask($taskIdentifier, $agent);
-        $this->bitzer->handleReassignTask($command);
 
-        $this->addFlashMessage($this->getLabel('reassignTask.success', [$task->getDescription(), $agent]), '');
-        $this->redirect('editTask', null, null, ['taskIdentifier' => (string)$taskIdentifier]);
+        $this->bitzer->handleReassignTask($command, $constraintCheckResult);
+
+        if ($constraintCheckResult->hasFailed()) {
+            $this->response->setStatusCode(400);
+            $this->addFlashMessage($this->getLabel('reassignTask.failure', [$task->getDescription()]), '', Message::SEVERITY_WARNING);
+            $this->view->assignMultiple([
+                'constraintCheckResult' => $constraintCheckResult,
+            ]);
+            $this->editTaskAction($taskIdentifier);
+        } else {
+            $this->addFlashMessage($this->getLabel('reassignTask.success', [$task->getDescription(), $agent]), '');
+            $this->redirect('editTask', null, null, ['taskIdentifier' => (string)$taskIdentifier]);
+        }
+    }
+
+    public function setTaskPropertiesAction(TaskIdentifier $taskIdentifier, array $properties): void
+    {
+        $task = $this->schedule->findByIdentifier($taskIdentifier);
+
+        $constraintCheckResult = new ConstraintCheckResult();
+        $command = new SetTaskProperties($taskIdentifier, $properties);
+
+        $this->bitzer->handleSetTaskProperties($command);
+
+        if ($constraintCheckResult->hasFailed()) {
+            $this->response->setStatusCode(400);
+            $this->addFlashMessage($this->getLabel('setTaskProperties.failure', [$task->getDescription()]), '', Message::SEVERITY_WARNING);
+            $this->view->assignMultiple([
+                'constraintCheckResult' => $constraintCheckResult,
+            ]);
+            $this->editTaskAction($taskIdentifier);
+        } else {
+            $this->addFlashMessage($this->getLabel('setTaskProperties.success', [$task->getDescription()]), '');
+            $this->redirect('editTask', null, null, ['taskIdentifier' => (string)$taskIdentifier]);
+        }
     }
 
     public function completeTaskAction(TaskIdentifier $taskIdentifier): void
