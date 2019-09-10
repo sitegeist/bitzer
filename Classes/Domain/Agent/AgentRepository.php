@@ -60,7 +60,9 @@ class AgentRepository
         $agentIdentifiers = [];
 
         foreach ($this->securityContext->getRoles() as $role) {
-            $agentIdentifiers[] = $role->getIdentifier();
+            if (!$role->isAbstract()) {
+                $agentIdentifiers[] = $role->getIdentifier();
+            }
         }
 
         return $agentIdentifiers;
