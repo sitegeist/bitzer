@@ -41,6 +41,15 @@
       <trans-unit id="scheduleTask.failure" xml:space="preserve" approved="yes">
         <source>Failed to schedule Task "{0}".</source>
       </trans-unit>
+      <trans-unit id="setNewTaskTarget.label" xml:space="preserve" approved="yes">
+        <source>Set new target</source>
+      </trans-unit>
+      <trans-unit id="setNewTaskTarget.success" xml:space="preserve" approved="yes">
+        <source>Target of Task "{0}" was successfully set to "{1}".</source>
+      </trans-unit>
+      <trans-unit id="setNewTaskTarget.failure" xml:space="preserve" approved="yes">
+        <source>Failed to set target of Task "{0}".</source>
+      </trans-unit>
       <trans-unit id="setTaskProperties.label" xml:space="preserve" approved="yes">
         <source>Set task properties</source>
       </trans-unit>

@@ -9,6 +9,7 @@ use Neos\ContentRepository\Domain\Service\ContextFactoryInterface;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Http\Uri;
 use Neos\Neos\Domain\Service\ContentDimensionPresetSourceInterface;
+use Psr\Http\Message\UriInterface;
 use Sitegeist\Bitzer\Domain\Task\Command\ScheduleTask;
 use Sitegeist\Bitzer\Domain\Task\Generic\GenericTaskFactory;
 use Sitegeist\Bitzer\Infrastructure\DbalClient;
@@ -182,6 +183,19 @@ class Schedule
             self::TABLE_NAME,
             [
                 'agent' => $agent,
+            ],
+            [
+                'identifier' => $taskIdentifier,
+            ]
+        );
+    }
+
+    final public function setTaskTarget(TaskIdentifier $taskIdentifier, ?UriInterface $target): void
+    {
+        $this->getDatabaseConnection()->update(
+            self::TABLE_NAME,
+            [
+                'target' => $target,
             ],
             [
                 'identifier' => $taskIdentifier,

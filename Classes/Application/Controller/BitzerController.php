@@ -18,6 +18,7 @@ use Sitegeist\Bitzer\Domain\Task\Command\CompleteTask;
 use Sitegeist\Bitzer\Domain\Task\Command\ReassignTask;
 use Sitegeist\Bitzer\Domain\Task\Command\RescheduleTask;
 use Sitegeist\Bitzer\Domain\Task\Command\ScheduleTask;
+use Sitegeist\Bitzer\Domain\Task\Command\SetNewTaskTarget;
 use Sitegeist\Bitzer\Domain\Task\Command\SetTaskProperties;
 use Sitegeist\Bitzer\Domain\Task\ConstraintCheckResult;
 use Sitegeist\Bitzer\Domain\Task\Exception\ScheduledTimeIsUndefined;
@@ -130,6 +131,7 @@ class BitzerController extends ModuleController
         } catch (\InvalidArgumentException $exception) {
             $scheduledTime = null;
         }
+        $target = empty($target->getPath()) && empty($target->getHost()) ? null : $target;
         $command = new ScheduleTask(
             TaskIdentifier::create(),
             $taskClassName,
@@ -227,6 +229,29 @@ class BitzerController extends ModuleController
             $this->editTaskAction($taskIdentifier);
         } else {
             $this->addFlashMessage($this->getLabel('reassignTask.success', [$task->getDescription(), $agent]), '');
+            $this->redirect('editTask', null, null, ['taskIdentifier' => (string)$taskIdentifier]);
+        }
+    }
+
+    public function setNewTaskTargetAction(TaskIdentifier $taskIdentifier, Uri $target): void
+    {
+        $task = $this->schedule->findByIdentifier($taskIdentifier);
+        $target = empty($target->getPath()) && empty($target->getHost()) ? null : $target;
+
+        $constraintCheckResult = new ConstraintCheckResult();
+        $command = new SetNewTaskTarget($taskIdentifier, $target);
+
+        $this->bitzer->handleSetNewTaskTarget($command, $constraintCheckResult);
+
+        if ($constraintCheckResult->hasFailed()) {
+            $this->response->setStatusCode(400);
+            $this->addFlashMessage($this->getLabel('setNewTaskTarget.failure', [$task->getDescription()]), '', Message::SEVERITY_WARNING);
+            $this->view->assignMultiple([
+                'constraintCheckResult' => $constraintCheckResult,
+            ]);
+            $this->editTaskAction($taskIdentifier);
+        } else {
+            $this->addFlashMessage($this->getLabel('setNewTaskTarget.success', [$task->getDescription(), $target]), '');
             $this->redirect('editTask', null, null, ['taskIdentifier' => (string)$taskIdentifier]);
         }
     }

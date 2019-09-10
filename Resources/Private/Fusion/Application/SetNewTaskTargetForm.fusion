@@ -1,0 +1,31 @@
+prototype(Sitegeist.Bitzer:SetNewTaskTargetForm) < prototype(Neos.Fusion:Component) {
+    task = null
+    constraintCheckResult = null
+
+    @context.setNewTaskTargetUri = Neos.Fusion:UriBuilder {
+        package = 'Sitegeist.Bitzer'
+        subpackage = 'Application'
+        controller = 'Bitzer'
+        action = 'setNewTaskTarget'
+    }
+
+    renderer = afx`
+        <form action={setNewTaskTargetUri} method="POST">
+            <fieldset class="neos-span5">
+                <legend>{${Translation.translate('setNewTaskTarget.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</legend>
+                <input type="hidden" name="__csrfToken" value={${Security.csrfToken()}} />
+                <input type="hidden" name="moduleArguments[taskIdentifier]" value={${String.toString(props.task.identifier)}} />
+                <div class={${'neos-control-group' + (constraintCheckResult.hasFailedAtPath('target') ? ' neos-error' : '')}}>
+                    <label class="neos-control-label" for="title">{${Translation.translate('task.target.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</label>
+                    <div class="neos-controls neos-controls-row">
+                        <input type="text" class="neos-span4" id="target" name="moduleArguments[target]" placeholder={${Translation.translate('task.target.placeholder', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}} value={props.task.target}/>
+                    </div>
+                    <ul class="errors" @if.hasFailed={constraintCheckResult.hasFailedAtPath('target')}>
+                        <li><span class="neos-help-block">{constraintCheckResult.getMessage('target')}</span></li>
+                    </ul>
+                </div>
+                <input class="neos-button neos-button-primary" type="submit" name="" value={${Translation.translate('setNewTaskTarget.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}} />
+            </fieldset>
+        </form>
+    `
+}

@@ -4,18 +4,21 @@ declare(strict_types=1);
 namespace Sitegeist\Bitzer\Application;
 
 use Neos\Flow\Annotations as Flow;
+use Psr\Http\Message\UriInterface;
 use Sitegeist\Bitzer\Domain\Agent\AgentRepository;
 use Sitegeist\Bitzer\Domain\Task\ActionStatusType;
 use Sitegeist\Bitzer\Domain\Task\Command\CancelTask;
 use Sitegeist\Bitzer\Domain\Task\Command\CompleteTask;
 use Sitegeist\Bitzer\Domain\Task\Command\ReassignTask;
 use Sitegeist\Bitzer\Domain\Task\Command\RescheduleTask;
+use Sitegeist\Bitzer\Domain\Task\Command\SetNewTaskTarget;
 use Sitegeist\Bitzer\Domain\Task\Command\SetTaskProperties;
 use Sitegeist\Bitzer\Domain\Task\ConstraintCheckResult;
 use Sitegeist\Bitzer\Domain\Task\Exception\AgentDoesNotExist;
 use Sitegeist\Bitzer\Domain\Task\Exception\DescriptionIsInvalid;
 use Sitegeist\Bitzer\Domain\Task\Exception\ObjectDoesNotExist;
 use Sitegeist\Bitzer\Domain\Task\Exception\ScheduledTimeIsUndefined;
+use Sitegeist\Bitzer\Domain\Task\Exception\TargetIsInvalid;
 use Sitegeist\Bitzer\Domain\Task\NodeAddress;
 use Sitegeist\Bitzer\Domain\Task\Schedule;
 use Sitegeist\Bitzer\Domain\Task\Command\ScheduleTask;
@@ -61,6 +64,9 @@ class Bitzer
         if ($command->getObject()) {
             $this->requireObjectToExist($command->getObject(), $constraintCheckResult);
         }
+        if ($command->getTarget()) {
+            $this->requireTargetToBeAbsoluteUri($command->getTarget(), $constraintCheckResult);
+        }
 
         if (!$constraintCheckResult || $constraintCheckResult->hasSucceeded()) {
             $this->schedule->scheduleTask($command);
@@ -81,6 +87,18 @@ class Bitzer
 
         if (!$constraintCheckResult || $constraintCheckResult->hasSucceeded()) {
             $this->schedule->reassignTask($command->getIdentifier(), $command->getAgent());
+        }
+    }
+
+    final public function handleSetNewTaskTarget(SetNewTaskTarget $command, ConstraintCheckResult $constraintCheckResult = null): void
+    {
+        $this->requireTaskToExist($command->getIdentifier(), $constraintCheckResult);
+        if ($command->getTarget()) {
+            $this->requireTargetToBeAbsoluteUri($command->getTarget(), $constraintCheckResult);
+        }
+
+        if (!$constraintCheckResult || $constraintCheckResult->hasSucceeded()) {
+            $this->schedule->setTaskTarget($command->getIdentifier(), $command->getTarget());
         }
     }
 
@@ -164,6 +182,18 @@ class Bitzer
             $exception = new ObjectDoesNotExist('No node with identifier ' . $address->getNodeAggregateIdentifier() . ' could be found in workspace ' . $address->getWorkspaceName() . ' and dimension space point ' . $address->getDimensionSpacePoint(), 1567603391);
             if ($constraintCheckResult) {
                 $constraintCheckResult->registerFailedCheck('object', $exception);
+            } else {
+                throw $exception;
+            }
+        }
+    }
+
+    private function requireTargetToBeAbsoluteUri(UriInterface $target, ConstraintCheckResult $constraintCheckResult = null): void
+    {
+        if (!$target->getHost()) {
+            $exception = new TargetIsInvalid('The target must be an absolute URI.', 1567764586);
+            if ($constraintCheckResult) {
+                $constraintCheckResult->registerFailedCheck('target', $exception);
             } else {
                 throw $exception;
             }

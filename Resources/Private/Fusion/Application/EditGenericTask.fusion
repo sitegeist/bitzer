@@ -18,6 +18,7 @@ prototype(Sitegeist.Bitzer:Application.EditGenericTask) < prototype(Neos.Fusion:
         </div>
         <div class="neos-row-fluid neos-module-container">
             <Sitegeist.Bitzer:SetTaskPropertiesForm task={props.task} constraintCheckResult={props.constraintCheckResult} />
+            <Sitegeist.Bitzer:SetNewTaskTargetForm task={props.task} constraintCheckResult={props.constraintCheckResult} />
         </div>
         <div class="neos-footer">
             <a class="neos-button" href={scheduleUri}>{${Translation.translate('actions.back.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</a>
