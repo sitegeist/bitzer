@@ -21,7 +21,7 @@ final class ReassignTask
      */
     private $agent;
 
-    public function __construct(TaskIdentifier $identifier, $agent)
+    public function __construct(TaskIdentifier $identifier, string $agent)
     {
         $this->identifier = $identifier;
         $this->agent = $agent;

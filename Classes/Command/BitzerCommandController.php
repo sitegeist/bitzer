@@ -23,7 +23,7 @@ use Sitegeist\Bitzer\Domain\Task\TaskIdentifier;
 use Symfony\Component\Console\Helper\Table;
 
 /**
- * The schedule, the repository for tasks
+ * The command line endpoint for sending commands to Bitzer
  */
 class BitzerCommandController extends CommandController
 {

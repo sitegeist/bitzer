@@ -17,7 +17,7 @@ prototype(Sitegeist.Bitzer:ReassignTaskForm) < prototype(Neos.Fusion:Component) 
                 <input type="hidden" name="__csrfToken" value={${Security.csrfToken()}} />
                 <input type="hidden" name="moduleArguments[taskIdentifier]" value={${String.toString(props.task.identifier)}} />
                 <div class={${'neos-control-group' + (constraintCheckResult.hasFailedAtPath('agent') ? ' neos-error' : '')}}>
-                    <label class="neos-control-label" for="title">{${Translation.translate('task.agent.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</label>
+                    <label class="neos-control-label" for="title">{${Translation.translate('task.agent.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}*</label>
                     <div class="neos-controls neos-controls-row">
                         <select id="agent" name="moduleArguments[agent]">
                             <Neos.Fusion:Collection collection={props.agents} itemName="agentIdentifier">

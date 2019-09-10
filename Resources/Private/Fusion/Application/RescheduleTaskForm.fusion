@@ -16,7 +16,7 @@ prototype(Sitegeist.Bitzer:RescheduleTaskForm) < prototype(Neos.Fusion:Component
                 <input type="hidden" name="__csrfToken" value={${Security.csrfToken()}} />
                 <input type="hidden" name="moduleArguments[taskIdentifier]" value={${String.toString(props.task.identifier)}} />
                 <div class={${'neos-control-group' + (constraintCheckResult.hasFailedAtPath('scheduledTime') ? ' neos-error' : '')}}>
-                    <label class="neos-control-label" for="scheduledTime.date">{${Translation.translate('task.scheduledTime.date', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</label>
+                    <label class="neos-control-label" for="scheduledTime.date">{${Translation.translate('task.scheduledTime.date', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}*</label>
                     <div class="neos-controls neos-controls-row">
                         <input type="text" required="required" class="neos-span4" id="scheduledTime.date" name="moduleArguments[scheduledTime][date]" placeholder={${Date.format(Date.now(), 'Y-m-d')}} value={${Date.format(task.scheduledTime, 'Y-m-d')}} />
                     </div>
