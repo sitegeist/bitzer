@@ -78,4 +78,14 @@ final class NodeAddress implements \JsonSerializable
             'nodeAggregateIdentifier' => $this->nodeAggregateIdentifier
         ];
     }
+
+    public function equals(NodeAddress $other): bool
+    {
+        return $this->jsonSerialize() == $other->jsonSerialize();
+    }
+
+    public function __toString(): string
+    {
+        return json_encode($this);
+    }
 }

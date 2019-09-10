@@ -73,4 +73,11 @@ interface TaskInterface
      * @return UriInterface|null
      */
     public function getTarget(): ?UriInterface;
+
+    /**
+     * Returns custom, arbitrary properties of a task.
+     *
+     * @return array
+     */
+    public function getProperties(): array;
 }

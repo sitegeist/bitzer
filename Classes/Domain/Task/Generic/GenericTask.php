@@ -6,7 +6,6 @@ use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\Flow\Annotations as Flow;
 use Psr\Http\Message\UriInterface;
 use Sitegeist\Bitzer\Domain\Task\ActionStatusType;
-use Sitegeist\Bitzer\Domain\Task\NodeAddress;
 use Sitegeist\Bitzer\Domain\Task\TaskIdentifier;
 use Sitegeist\Bitzer\Domain\Task\TaskInterface;
 
@@ -42,6 +41,11 @@ final class GenericTask implements TaskInterface
     private $agent;
 
     /**
+     * @var NodeInterface|null
+     */
+    private $object;
+
+    /**
      * @var UriInterface|null
      */
     private $target;
@@ -53,6 +57,7 @@ final class GenericTask implements TaskInterface
      * @param \DateTimeImmutable $scheduledTime
      * @param ActionStatusType $actionStatus
      * @param string $agent
+     * @param NodeInterface|null $object
      * @param UriInterface $target
      */
     public function __construct(
@@ -61,7 +66,7 @@ final class GenericTask implements TaskInterface
         \DateTimeImmutable $scheduledTime,
         ActionStatusType $actionStatus,
         string $agent,
-        ?NodeAddress $object,
+        ?NodeInterface $object,
         ?UriInterface $target
     ) {
         $this->identifier = $identifier;
@@ -69,6 +74,7 @@ final class GenericTask implements TaskInterface
         $this->scheduledTime = $scheduledTime;
         $this->actionStatus = $actionStatus;
         $this->agent = $agent;
+        $this->object = $object;
         $this->target = $target;
     }
 
@@ -144,7 +150,7 @@ final class GenericTask implements TaskInterface
      */
     public function getObject(): ?NodeInterface
     {
-        return null;
+        return $this->object;
     }
 
     /**
@@ -157,5 +163,10 @@ final class GenericTask implements TaskInterface
     public function getTarget(): ?UriInterface
     {
         return $this->target;
+    }
+
+    public function getProperties(): array
+    {
+        return $this->properties;
     }
 }

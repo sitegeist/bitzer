@@ -64,4 +64,9 @@ final class ActionStatusType
     {
         return $this->value;
     }
+
+    public function equals(ActionStatusType $other): bool
+    {
+        return $this->value === $other->getValue();
+    }
 }
