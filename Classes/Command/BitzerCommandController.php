@@ -19,6 +19,7 @@ use Sitegeist\Bitzer\Domain\Task\ScheduledTime;
 use Sitegeist\Bitzer\Domain\Task\Command\ScheduleTask;
 use Sitegeist\Bitzer\Domain\Task\TaskClassName;
 use Sitegeist\Bitzer\Domain\Task\TaskIdentifier;
+use Symfony\Component\Console\Helper\Table;
 
 /**
  * The schedule, the repository for tasks
@@ -45,9 +46,26 @@ class BitzerCommandController extends CommandController
 
     public function listTasksCommand(): void
     {
-        foreach ($this->schedule->findAll() as $task) {
-            \Neos\Flow\var_dump($task->getIdentifier() . ' : ' . $task->getDescription());
+        $table = new Table($this->output->getOutput());
+
+        $rows = [];
+        foreach ($this->schedule->findAllOrdered() as $task) {
+            $rows[] = [
+                $task->getIdentifier(),
+                $task->getScheduledTime()->format('Y-m-d H:i:s'),
+                $task::getShortType(),
+                implode("\n", \mb_str_split(\mb_substr($task->getDescription(), 0, 90), 30)),
+                $task->getAgent(),
+                $task->getObject() ? $task->getObject()->getLabel() : '',
+                $task->getTarget()
+            ];
         }
+
+        $table
+            ->setHeaders(['Identifier', 'Scheduled Time', 'Class', 'Description', 'Agent', 'Object', 'Target'])
+            ->setRows($rows);
+
+        $table->render();
     }
 
     public function scheduleTaskCommand(
