@@ -7,7 +7,6 @@ privilegeTargets:
 
 roles:
 
-  'Sitegeist.Bitzer:Test': []
   'Sitegeist.Bitzer:Agent':
     abstract: true
     privileges:

@@ -11,7 +11,7 @@ use Sitegeist\Bitzer\Domain\Task\TaskIdentifier;
 use Sitegeist\Bitzer\Domain\Task\TaskInterface;
 
 /**
- * The task identifier value object
+ * The generic task domain entity
  * @Flow\Proxy(false)
  */
 final class GenericTask implements TaskInterface

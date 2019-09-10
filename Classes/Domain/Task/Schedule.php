@@ -5,13 +5,13 @@ namespace Sitegeist\Bitzer\Domain\Task;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 use Neos\ContentRepository\Domain\Model\NodeInterface;
-use Neos\ContentRepository\Domain\Service\ContextFactoryInterface;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Http\Uri;
 use Neos\Neos\Domain\Service\ContentDimensionPresetSourceInterface;
 use Psr\Http\Message\UriInterface;
 use Sitegeist\Bitzer\Domain\Task\Command\ScheduleTask;
 use Sitegeist\Bitzer\Domain\Task\Generic\GenericTaskFactory;
+use Sitegeist\Bitzer\Infrastructure\ContentContextFactory;
 use Sitegeist\Bitzer\Infrastructure\DbalClient;
 
 /**
@@ -36,7 +36,7 @@ class Schedule
 
     /**
      * @Flow\Inject
-     * @var ContextFactoryInterface
+     * @var ContentContextFactory
      */
     protected $contentContextFactory;
 
@@ -277,21 +277,9 @@ class Schedule
 
     private function resolveNode(NodeAddress $nodeAddress): ?NodeInterface
     {
-        $presets = $this->contentDimensionPresetSource->getAllPresets();
-        $contextDimensions = [];
-        foreach ($nodeAddress->getDimensionSpacePoint()->getCoordinates() as $dimensionName => $dimensionValue) {
-            $contextDimensions[$dimensionName] = $presets[$dimensionName]['presets'][$dimensionValue]['values'];
-        }
-        $contentContext = $this->contentContextFactory->create([
-             'workspaceName' => $nodeAddress->getWorkspaceName(),
-             'dimensions' => $contextDimensions,
-             'targetDimensions' => $nodeAddress->getDimensionSpacePoint()->getCoordinates(),
-             'invisibleContentShown' => true,
-             'removedContentShown' => false,
-             'inaccessibleContentShown' => true
-        ]);
+        $contentContext = $this->contentContextFactory->createContentContext($nodeAddress);
 
-        return $contentContext->getNodeByIdentifier($nodeAddress['nodeAggregateIdentifier']);
+        return $contentContext->getNodeByIdentifier((string)$nodeAddress->getNodeAggregateIdentifier());
     }
 
     private function resolveFactory(TaskClassName $className): TaskFactoryInterface

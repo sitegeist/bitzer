@@ -13,6 +13,12 @@ use Sitegeist\Bitzer\Tests\Unit\Domain\Task\Fixtures\InvalidTask;
  */
 class TaskClassNameTest extends UnitTestCase
 {
+    public function setUp()
+    {
+        parent::setUp();
+        require_once ('Fixtures/InvalidTask.php');
+    }
+
     /**
      * @test
      */
@@ -33,7 +39,6 @@ class TaskClassNameTest extends UnitTestCase
      */
     public function fromStringThrowsCorrectExceptionForNonTaskClassNames()
     {
-        require_once ('Fixtures/InvalidTask.php');
         $correctExceptionThrown = false;
         try {
             $className = TaskClassName::createFromString(InvalidTask::class);
