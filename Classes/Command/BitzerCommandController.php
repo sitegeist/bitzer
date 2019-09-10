@@ -13,6 +13,7 @@ use Sitegeist\Bitzer\Domain\Task\Command\CompleteTask;
 use Sitegeist\Bitzer\Domain\Task\Command\ReassignTask;
 use Sitegeist\Bitzer\Domain\Task\Command\RescheduleTask;
 use Sitegeist\Bitzer\Domain\Task\Command\SetNewTaskTarget;
+use Sitegeist\Bitzer\Domain\Task\Command\SetTaskProperties;
 use Sitegeist\Bitzer\Domain\Task\NodeAddress;
 use Sitegeist\Bitzer\Domain\Task\Schedule;
 use Sitegeist\Bitzer\Domain\Task\ScheduledTime;
@@ -123,6 +124,18 @@ class BitzerCommandController extends CommandController
         );
 
         $this->bitzer->handleSetNewTaskTarget($command);
+    }
+
+    public function setTaskPropertiesCommand(
+        TaskIdentifier $taskIdentifier,
+        string $properties
+    ): void {
+        $command = new SetTaskProperties(
+            $taskIdentifier,
+            json_decode($properties, true)
+        );
+
+        $this->bitzer->handleSetTaskProperties($command);
     }
 
     public function cancelTaskCommand(TaskIdentifier $taskIdentifier): void
