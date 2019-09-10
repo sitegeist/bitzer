@@ -21,7 +21,6 @@ use Sitegeist\Bitzer\Domain\Task\Command\ScheduleTask;
 use Sitegeist\Bitzer\Domain\Task\Command\SetNewTaskTarget;
 use Sitegeist\Bitzer\Domain\Task\Command\SetTaskProperties;
 use Sitegeist\Bitzer\Domain\Task\ConstraintCheckResult;
-use Sitegeist\Bitzer\Domain\Task\Exception\ScheduledTimeIsUndefined;
 use Sitegeist\Bitzer\Domain\Task\NodeAddress;
 use Sitegeist\Bitzer\Domain\Task\Schedule;
 use Sitegeist\Bitzer\Domain\Task\ScheduledTime;
@@ -192,11 +191,12 @@ class BitzerController extends ModuleController
         $constraintCheckResult = new ConstraintCheckResult();
         try {
             $scheduledTime = ScheduledTime::createFromArray($scheduledTime);
-            $command = new RescheduleTask($taskIdentifier, $scheduledTime);
-            $this->bitzer->handleRescheduleTask($command);
         } catch (\InvalidArgumentException $exception) {
-            $constraintCheckResult->registerFailedCheck('scheduledTime', new ScheduledTimeIsUndefined('Scheduled time is undefined', 1568033796));
+            $scheduledTime = null;
         }
+
+        $command = new RescheduleTask($taskIdentifier, $scheduledTime);
+        $this->bitzer->handleRescheduleTask($command, $constraintCheckResult);
 
         if ($constraintCheckResult->hasFailed()) {
             $this->response->setStatusCode(400);

@@ -17,11 +17,11 @@ final class RescheduleTask
     private $identifier;
 
     /**
-     * @var \DateTimeImmutable
+     * @var ?\DateTimeImmutable
      */
     private $scheduledTime;
 
-    public function __construct(TaskIdentifier $identifier, $scheduledTime)
+    public function __construct(TaskIdentifier $identifier, ?\DateTimeImmutable $scheduledTime)
     {
         $this->identifier = $identifier;
         $this->scheduledTime = $scheduledTime;
@@ -32,7 +32,7 @@ final class RescheduleTask
         return $this->identifier;
     }
 
-    public function getScheduledTime(): \DateTimeImmutable
+    public function getScheduledTime(): ?\DateTimeImmutable
     {
         return $this->scheduledTime;
     }

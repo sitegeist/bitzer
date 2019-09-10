@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Sitegeist\Bitzer\Application;
 
 use Neos\Flow\Annotations as Flow;
+use Neos\Flow\I18n\Translator;
 use Psr\Http\Message\UriInterface;
 use Sitegeist\Bitzer\Domain\Agent\AgentRepository;
 use Sitegeist\Bitzer\Domain\Task\ActionStatusType;
@@ -55,6 +56,12 @@ class Bitzer
      */
     protected $contentContextFactory;
 
+    /**
+     * @Flow\Inject
+     * @var Translator
+     */
+    protected $translator;
+
     final public function handleScheduleTask(ScheduleTask $command, ConstraintCheckResult $constraintCheckResult = null): void
     {
         $this->requireTaskToNotExist($command->getIdentifier(), $constraintCheckResult);
@@ -73,11 +80,14 @@ class Bitzer
         }
     }
 
-    final public function handleRescheduleTask(RescheduleTask $command): void
+    final public function handleRescheduleTask(RescheduleTask $command, ConstraintCheckResult $constraintCheckResult = null): void
     {
         $this->requireTaskToExist($command->getIdentifier());
+        $this->requireScheduledTimeToBeSet($command->getScheduledTime(), $constraintCheckResult);
 
-        $this->schedule->rescheduleTask($command->getIdentifier(), $command->getScheduledTime());
+        if (!$constraintCheckResult || $constraintCheckResult->hasSucceeded()) {
+            $this->schedule->rescheduleTask($command->getIdentifier(), $command->getScheduledTime());
+        }
     }
 
     final public function handleReassignTask(ReassignTask $command, ConstraintCheckResult $constraintCheckResult = null): void
@@ -129,7 +139,7 @@ class Bitzer
     private function requireTaskToExist(TaskIdentifier $identifier, ConstraintCheckResult $constraintCheckResult = null): void
     {
         if (!$this->schedule->findByIdentifier($identifier)) {
-            $exception = new TaskDoesNotExist('No task with identifier ' . $identifier . ' exists.', 1567600174);
+            $exception = new TaskDoesNotExist($this->getConstraintCheckFailureLabel(1567600174), 1567600174);
             if ($constraintCheckResult) {
                 $constraintCheckResult->registerFailedCheck('identifier', $exception);
             } else {
@@ -141,7 +151,7 @@ class Bitzer
     private function requireTaskToNotExist(TaskIdentifier $identifier, ConstraintCheckResult $constraintCheckResult = null): void
     {
         if ($this->schedule->findByIdentifier($identifier)) {
-            $exception = new TaskDoesExist('Task with identifier ' . $identifier . ' already exists.', 1567600184);
+            $exception = new TaskDoesExist($this->getConstraintCheckFailureLabel(1567600184, [$identifier]), 1567600184);
             if ($constraintCheckResult) {
                 $constraintCheckResult->registerFailedCheck('identifier', $exception);
             } else {
@@ -153,7 +163,7 @@ class Bitzer
     private function requireScheduledTimeToBeSet(?\DateTimeImmutable $scheduledTime, ConstraintCheckResult $constraintCheckResult = null): void
     {
         if (!$scheduledTime) {
-            $exception = new ScheduledTimeIsUndefined('Scheduled time is undefined', 1568033796);
+            $exception = new ScheduledTimeIsUndefined($this->getConstraintCheckFailureLabel(1568033796), 1568033796);
             if ($constraintCheckResult) {
                 $constraintCheckResult->registerFailedCheck('scheduledTime', $exception);
             } else {
@@ -165,7 +175,7 @@ class Bitzer
     private function requireAgentToExist(string $agentIdentifier, ConstraintCheckResult $constraintCheckResult = null): void
     {
         if (!$this->agentRepository->findByIdentifier($agentIdentifier)) {
-            $exception = new AgentDoesNotExist('No agent with identifier ' . $agentIdentifier . ' exists', 1567602522);
+            $exception = new AgentDoesNotExist($this->getConstraintCheckFailureLabel(1567602522, [$agentIdentifier]), 1567602522);
             if ($constraintCheckResult) {
                 $constraintCheckResult->registerFailedCheck('agent', $exception);
             } else {
@@ -179,7 +189,7 @@ class Bitzer
         $contentContext = $this->contentContextFactory->createContentContext($address);
 
         if (!$contentContext->getNodeByIdentifier((string) $address->getNodeAggregateIdentifier())) {
-            $exception = new ObjectDoesNotExist('No node with identifier ' . $address->getNodeAggregateIdentifier() . ' could be found in workspace ' . $address->getWorkspaceName() . ' and dimension space point ' . $address->getDimensionSpacePoint(), 1567603391);
+            $exception = new ObjectDoesNotExist($this->getConstraintCheckFailureLabel(1567603391, [$address->getNodeAggregateIdentifier(), $address->getWorkspaceName(),$address->getDimensionSpacePoint()]), 1567603391);
             if ($constraintCheckResult) {
                 $constraintCheckResult->registerFailedCheck('object', $exception);
             } else {
@@ -191,7 +201,7 @@ class Bitzer
     private function requireTargetToBeAbsoluteUri(UriInterface $target, ConstraintCheckResult $constraintCheckResult = null): void
     {
         if (!$target->getHost()) {
-            $exception = new TargetIsInvalid('The target must be an absolute URI.', 1567764586);
+            $exception = new TargetIsInvalid($this->getConstraintCheckFailureLabel(1567764586), 1567764586);
             if ($constraintCheckResult) {
                 $constraintCheckResult->registerFailedCheck('target', $exception);
             } else {
@@ -203,12 +213,17 @@ class Bitzer
     private function requireDescriptionToBeSet(array $properties, ConstraintCheckResult $constraintCheckResult = null): void
     {
         if (!isset($properties['description']) || empty($properties['description'])) {
-            $exception = new DescriptionIsInvalid('The description of a task must not be empty.', 1567764586);
+            $exception = new DescriptionIsInvalid($this->getConstraintCheckFailureLabel(1567764586), 1567764586);
             if ($constraintCheckResult) {
                 $constraintCheckResult->registerFailedCheck('properties.description', $exception);
             } else {
                 throw $exception;
             }
         }
+    }
+
+    private function getConstraintCheckFailureLabel(int $code, array $arguments = []): string
+    {
+        return $this->translator->translateById('failure.' . $code . '.label', $arguments, null, null, 'ConstraintChecks', 'Sitegeist.Bitzer') ?? '';
     }
 }

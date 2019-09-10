@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="ConstraintChecks" product-name="Sitegeist.Bitzer" source-language="en" datatype="plaintext">
+    <body>
+      <trans-unit id="failure.1567602522.label" xml:space="preserve" approved="yes">
+        <source>No agent with identifier {0} exists.</source>
+      </trans-unit>
+      <trans-unit id="failure.1567764586.label" xml:space="preserve" approved="yes">
+        <source>The description of a task must not be empty.</source>
+      </trans-unit>
+      <trans-unit id="failure.1567603391.label" xml:space="preserve" approved="yes">
+        <source>No node with identifier {0} could be found in workspace {1} and dimension space point {2}</source>
+      </trans-unit>
+      <trans-unit id="failure.1568033796.label" xml:space="preserve" approved="yes">
+        <source>Scheduled time is undefined</source>
+      </trans-unit>
+      <trans-unit id="failure.1567764586.label" xml:space="preserve" approved="yes">
+        <source>The target must be an absolute URI.</source>
+      </trans-unit>
+      <trans-unit id="failure.1567600184.label" xml:space="preserve" approved="yes">
+        <source>Task with identifier {0} already exists.</source>
+      </trans-unit>
+      <trans-unit id="failure.1567600174.label" xml:space="preserve" approved="yes">
+        <source>No task with identifier {0} exists.</source>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
