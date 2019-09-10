@@ -3,8 +3,8 @@ namespace Sitegeist\Bitzer\Tests\Unit\Domain\Task;
 
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Tests\UnitTestCase;
-use Sitegeist\Bitzer\Domain\Task\ClassNameDefinesNoTask;
-use Sitegeist\Bitzer\Domain\Task\ClassNameIsUnavailable;
+use Sitegeist\Bitzer\Domain\Task\Exception\ClassNameDefinesNoTask;
+use Sitegeist\Bitzer\Domain\Task\Exception\ClassNameIsUnavailable;
 use Sitegeist\Bitzer\Domain\Task\TaskClassName;
 use Sitegeist\Bitzer\Tests\Unit\Domain\Task\Fixtures\InvalidTask;
 

@@ -4,6 +4,9 @@ namespace Sitegeist\Bitzer\Domain\Task;
 
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Reflection\ReflectionService;
+use Sitegeist\Bitzer\Domain\Task\Exception\ClassNameDefinesNoTask;
+use Sitegeist\Bitzer\Domain\Task\Exception\ClassNameIsUnavailable;
+use Sitegeist\Bitzer\Domain\Task\Exception\ShortTypeDefinesNoTask;
 
 /**
  * The task class name value object
