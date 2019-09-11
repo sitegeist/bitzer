@@ -19,6 +19,7 @@ use Sitegeist\Bitzer\Domain\Task\Exception\DescriptionIsInvalid;
 use Sitegeist\Bitzer\Domain\Task\Exception\ObjectDoesNotExist;
 use Sitegeist\Bitzer\Domain\Task\Exception\ScheduledTimeIsUndefined;
 use Sitegeist\Bitzer\Domain\Task\Exception\TargetIsInvalid;
+use Sitegeist\Bitzer\Domain\Task\IsCommandToBeExecuted;
 use Sitegeist\Bitzer\Domain\Task\NodeAddress;
 use Sitegeist\Bitzer\Domain\Task\Schedule;
 use Sitegeist\Bitzer\Domain\Task\Command\ScheduleTask;
@@ -68,17 +69,17 @@ class Bitzer
             $this->requireTargetToBeAbsoluteUri($command->getTarget(), $constraintCheckResult);
         }
 
-        if (!$constraintCheckResult || $constraintCheckResult->hasSucceeded()) {
+        if (IsCommandToBeExecuted::isSatisfiedByConstraintCheckResult($constraintCheckResult)) {
             $this->schedule->scheduleTask($command);
         }
     }
 
     final public function handleRescheduleTask(RescheduleTask $command, ConstraintCheckResult $constraintCheckResult = null): void
     {
-        $this->requireTaskToExist($command->getIdentifier());
+        $this->requireTaskToExist($command->getIdentifier(), $constraintCheckResult);
         $this->requireScheduledTimeToBeSet($command->getScheduledTime(), $constraintCheckResult);
 
-        if (!$constraintCheckResult || $constraintCheckResult->hasSucceeded()) {
+        if (IsCommandToBeExecuted::isSatisfiedByConstraintCheckResult($constraintCheckResult)) {
             $this->schedule->rescheduleTask($command->getIdentifier(), $command->getScheduledTime());
         }
     }
@@ -88,7 +89,7 @@ class Bitzer
         $this->requireTaskToExist($command->getIdentifier(), $constraintCheckResult);
         $this->requireAgentToExist($command->getAgent(), $constraintCheckResult);
 
-        if (!$constraintCheckResult || $constraintCheckResult->hasSucceeded()) {
+        if (IsCommandToBeExecuted::isSatisfiedByConstraintCheckResult($constraintCheckResult)) {
             $this->schedule->reassignTask($command->getIdentifier(), $command->getAgent());
         }
     }
@@ -100,7 +101,7 @@ class Bitzer
             $this->requireTargetToBeAbsoluteUri($command->getTarget(), $constraintCheckResult);
         }
 
-        if (!$constraintCheckResult || $constraintCheckResult->hasSucceeded()) {
+        if (IsCommandToBeExecuted::isSatisfiedByConstraintCheckResult($constraintCheckResult)) {
             $this->schedule->setTaskTarget($command->getIdentifier(), $command->getTarget());
         }
     }
@@ -110,23 +111,27 @@ class Bitzer
         $this->requireTaskToExist($command->getIdentifier(), $constraintCheckResult);
         $this->requireDescriptionToBeSet($command->getProperties(), $constraintCheckResult);
 
-        if (!$constraintCheckResult || $constraintCheckResult->hasSucceeded()) {
+        if (IsCommandToBeExecuted::isSatisfiedByConstraintCheckResult($constraintCheckResult)) {
             $this->schedule->setTaskProperties($command->getIdentifier(), $command->getProperties());
         }
     }
 
-    final public function handleCancelTask(CancelTask $command): void
+    final public function handleCancelTask(CancelTask $command, ConstraintCheckResult $constraintCheckResult = null): void
     {
-        $this->requireTaskToExist($command->getIdentifier());
+        $this->requireTaskToExist($command->getIdentifier(), $constraintCheckResult);
 
-        $this->schedule->cancelTask($command->getIdentifier());
+        if (IsCommandToBeExecuted::isSatisfiedByConstraintCheckResult($constraintCheckResult)) {
+            $this->schedule->cancelTask($command->getIdentifier());
+        }
     }
 
-    final public function handleCompleteTask(CompleteTask $command): void
+    final public function handleCompleteTask(CompleteTask $command, ConstraintCheckResult $constraintCheckResult = null): void
     {
-        $this->requireTaskToExist($command->getIdentifier());
+        $this->requireTaskToExist($command->getIdentifier(), $constraintCheckResult);
 
-        $this->schedule->updateTaskActionStatus($command->getIdentifier(), ActionStatusType::completed());
+        if (IsCommandToBeExecuted::isSatisfiedByConstraintCheckResult($constraintCheckResult)) {
+            $this->schedule->updateTaskActionStatus($command->getIdentifier(), ActionStatusType::completed());
+        }
     }
 
     private function requireTaskToExist(TaskIdentifier $identifier, ConstraintCheckResult $constraintCheckResult = null): void

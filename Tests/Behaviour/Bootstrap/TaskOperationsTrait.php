@@ -19,6 +19,7 @@ use Sitegeist\Bitzer\Domain\Task\Command\RescheduleTask;
 use Sitegeist\Bitzer\Domain\Task\Command\ScheduleTask;
 use Sitegeist\Bitzer\Domain\Task\Command\SetNewTaskTarget;
 use Sitegeist\Bitzer\Domain\Task\Command\SetTaskProperties;
+use Sitegeist\Bitzer\Domain\Task\ConstraintCheckResult;
 use Sitegeist\Bitzer\Domain\Task\NodeAddress;
 use Sitegeist\Bitzer\Domain\Task\Schedule;
 use Sitegeist\Bitzer\Domain\Task\ScheduledTime;
@@ -51,6 +52,11 @@ trait TaskOperationsTrait
      */
     private $currentTask;
 
+    /**
+     * @var ConstraintCheckResult
+     */
+    private $constraintCheckResult;
+
     abstract protected function getObjectManager(): ObjectManagerInterface;
 
     protected function setupTaskOperations()
@@ -79,6 +85,14 @@ trait TaskOperationsTrait
     }
 
     /**
+     * @Given /^exceptions are collected in a constraint check result$/
+     */
+    public function exceptionsAreCollectedInAConstraintCheckResult()
+    {
+        $this->constraintCheckResult = new ConstraintCheckResult();
+    }
+
+    /**
      * @When /^the command ScheduleTask is executed with payload:$/
      * @param TableNode $payloadTable
      * @throws Exception
@@ -97,7 +111,11 @@ trait TaskOperationsTrait
             $commandArguments['properties']
         );
 
-        $this->bitzer->handleScheduleTask($command);
+        if ($this->constraintCheckResult) {
+            $this->bitzer->handleScheduleTask($command, $this->constraintCheckResult);
+        } else {
+            $this->bitzer->handleScheduleTask($command);
+        }
     }
 
     /**
@@ -128,7 +146,11 @@ trait TaskOperationsTrait
             isset($commandArguments['scheduledTime']) ? ScheduledTime::createFromString($commandArguments['scheduledTime']) : null
         );
 
-        $this->bitzer->handleRescheduleTask($command);
+        if ($this->constraintCheckResult) {
+            $this->bitzer->handleRescheduleTask($command, $this->constraintCheckResult);
+        } else {
+            $this->bitzer->handleRescheduleTask($command);
+        }
     }
 
     /**
@@ -159,7 +181,11 @@ trait TaskOperationsTrait
             $commandArguments['agent']
         );
 
-        $this->bitzer->handleReassignTask($command);
+        if ($this->constraintCheckResult) {
+            $this->bitzer->handleReassignTask($command, $this->constraintCheckResult);
+        } else {
+            $this->bitzer->handleReassignTask($command);
+        }
     }
 
     /**
@@ -190,7 +216,11 @@ trait TaskOperationsTrait
             $commandArguments['properties']
         );
 
-        $this->bitzer->handleSetTaskProperties($command);
+        if ($this->constraintCheckResult) {
+            $this->bitzer->handleSetTaskProperties($command, $this->constraintCheckResult);
+        } else {
+            $this->bitzer->handleSetTaskProperties($command);
+        }
     }
 
     /**
@@ -220,7 +250,11 @@ trait TaskOperationsTrait
             new TaskIdentifier($commandArguments['taskIdentifier'])
         );
 
-        $this->bitzer->handleCancelTask($command);
+        if ($this->constraintCheckResult) {
+            $this->bitzer->handleCancelTask($command, $this->constraintCheckResult);
+        } else {
+            $this->bitzer->handleCancelTask($command);
+        }
     }
 
     /**
@@ -250,7 +284,11 @@ trait TaskOperationsTrait
             new TaskIdentifier($commandArguments['taskIdentifier'])
         );
 
-        $this->bitzer->handleCompleteTask($command);
+        if ($this->constraintCheckResult) {
+            $this->bitzer->handleCompleteTask($command, $this->constraintCheckResult);
+        } else {
+            $this->bitzer->handleCompleteTask($command);
+        }
     }
 
     /**
@@ -281,7 +319,11 @@ trait TaskOperationsTrait
             isset($commandArguments['target']) ? new Uri($commandArguments['target']) : null
         );
 
-        $this->bitzer->handleSetNewTaskTarget($command);
+        if ($this->constraintCheckResult) {
+            $this->bitzer->handleSetNewTaskTarget($command, $this->constraintCheckResult);
+        } else {
+            $this->bitzer->handleSetNewTaskTarget($command);
+        }
     }
 
     /**
@@ -425,5 +467,18 @@ trait TaskOperationsTrait
             $actualPropertyValue = $actualProperties[$propertyName];
             Assert::assertEquals($expectedPropertyValue, $actualPropertyValue, 'The current task\'s value for property "' . $propertyName . '" is "' . $actualPropertyValue . '", expected was "' . $expectedPropertyValue . '"');
         }
+    }
+
+    /**
+     * @Then /^I expect the constraint check result to contain an exception of type "([^"]*)" at path "([^"]*)"$/
+     * @param string $expectedShortName
+     * @param string $expectedPath
+     * @throws ReflectionException
+     */
+    public function iExpectTheConstraintCheckResultToContainAnExceptionOfTypeAtPath(string $expectedShortName, string $expectedPath)
+    {
+        Assert::assertNotNull($this->constraintCheckResult->getException($expectedPath), 'Constraint check result does not contain an exception at path ' . $expectedPath);
+        $actualShortName = (new ReflectionClass($this->constraintCheckResult->getException($expectedPath)))->getShortName();
+        Assert::assertSame($expectedShortName, $actualShortName, sprintf('Constraint check result contains an exception of type %s at path %s, %s expected', $actualShortName, $expectedPath, $expectedShortName));
     }
 }

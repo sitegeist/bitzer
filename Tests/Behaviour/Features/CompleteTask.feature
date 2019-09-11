@@ -25,6 +25,13 @@ Feature: Schedule task
       | taskIdentifier | "i-do-not-exist" |
     Then the last command should have thrown an exception of type "TaskDoesNotExist"
 
+  Scenario: Try to complete a non-existing task using a constraint check result
+    Given exceptions are collected in a constraint check result
+    When the command CompleteTask is executed with payload:
+      | Key            | Value                                   |
+      | taskIdentifier | "i-do-not-exist"                        |
+    Then I expect the constraint check result to contain an exception of type "TaskDoesNotExist" at path "identifier"
+
   Scenario: Complete an existing task
     When the command CompleteTask is executed with payload:
       | Key            | Value               |

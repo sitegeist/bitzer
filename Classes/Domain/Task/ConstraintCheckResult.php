@@ -4,6 +4,7 @@ namespace Sitegeist\Bitzer\Domain\Task;
 
 use Neos\Eel\ProtectedContextAwareInterface;
 use Neos\Flow\Annotations as Flow;
+use Neos\Neos\Domain\Model\Domain;
 
 /**
  * The constraint check result registry
@@ -30,6 +31,11 @@ final class ConstraintCheckResult implements ProtectedContextAwareInterface
     {
         $this->failedChecks[$path] = $failedConstraintCheck;
         $this->messageArguments[$path] = $messageArguments;
+    }
+
+    public function getException(string $path): ?\DomainException
+    {
+        return $this->failedChecks[$path] ?? null;
     }
 
     public function getCode(string $path): ?int
