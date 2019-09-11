@@ -1,0 +1,10 @@
+prototype(Sitegeist.Bitzer:Application.ConstraintCheckMessages) < prototype(Neos.Fusion:Component) {
+    constraintCheckResult = null
+    path = ''
+
+    renderer = afx`
+        <ul class="errors" @if.hasFailed={props.constraintCheckResult.hasFailedAtPath(props.path)}>
+            <li><span class="neos-help-block">{${Translation.translate('failure.' + props.constraintCheckResult.getCode(props.path) + '.label', null, props.constraintCheckResult.getMessageArguments(props.path), 'ConstraintChecks', 'Sitegeist.Bitzer')}}</span></li>
+        </ul>
+    `
+}

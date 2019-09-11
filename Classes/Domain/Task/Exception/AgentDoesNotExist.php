@@ -7,4 +7,8 @@ namespace Sitegeist\Bitzer\Domain\Task\Exception;
  */
 final class AgentDoesNotExist extends \DomainException
 {
+    public static function althoughExpectedForIdentifier(string $identifier): AgentDoesNotExist
+    {
+        return new static('No agent with identifier ' . $identifier . ' exists.', 1567602522);
+    }
 }

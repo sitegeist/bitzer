@@ -20,9 +20,16 @@ final class ConstraintCheckResult implements ProtectedContextAwareInterface
      */
     private $failedChecks;
 
-    public function registerFailedCheck(string $path, \DomainException $failedConstraintCheck): void
+    /**
+     * The registry for message arguments for the failed constraint checks
+     * @var array
+     */
+    private $messageArguments;
+
+    public function registerFailedCheck(string $path, \DomainException $failedConstraintCheck, array $messageArguments = []): void
     {
         $this->failedChecks[$path] = $failedConstraintCheck;
+        $this->messageArguments[$path] = $messageArguments;
     }
 
     public function getCode(string $path): ?int
@@ -41,6 +48,15 @@ final class ConstraintCheckResult implements ProtectedContextAwareInterface
         }
 
         return $this->failedChecks[$path]->getMessage();
+    }
+
+    public function getMessageArguments(string $path): ?array
+    {
+        if (!isset($this->messageArguments[$path])) {
+            return null;
+        }
+
+        return $this->messageArguments[$path];
     }
 
     public function hasFailedAtPath(string $path): bool

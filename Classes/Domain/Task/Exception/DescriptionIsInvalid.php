@@ -7,4 +7,8 @@ namespace Sitegeist\Bitzer\Domain\Task\Exception;
  */
 final class DescriptionIsInvalid extends \DomainException
 {
+    public static function mustNotBeEmpty(): DescriptionIsInvalid
+    {
+        return new static('The description of a task must not be empty.', 1567764586);
+    }
 }

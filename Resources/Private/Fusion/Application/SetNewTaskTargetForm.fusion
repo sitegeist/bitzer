@@ -20,9 +20,7 @@ prototype(Sitegeist.Bitzer:SetNewTaskTargetForm) < prototype(Neos.Fusion:Compone
                     <div class="neos-controls neos-controls-row">
                         <input type="text" class="neos-span4" id="target" name="moduleArguments[target]" placeholder={${Translation.translate('task.target.placeholder', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}} value={props.task.target}/>
                     </div>
-                    <ul class="errors" @if.hasFailed={constraintCheckResult.hasFailedAtPath('target')}>
-                        <li><span class="neos-help-block">{constraintCheckResult.getMessage('target')}</span></li>
-                    </ul>
+                    <Sitegeist.Bitzer:Application.ConstraintCheckMessages constraintCheckResult={props.constraintCheckResult} path="target" />
                 </div>
                 <input class="neos-button neos-button-primary" type="submit" name="" value={${Translation.translate('setNewTaskTarget.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}} />
             </fieldset>

@@ -20,9 +20,7 @@ prototype(Sitegeist.Bitzer:SetTaskPropertiesForm) < prototype(Neos.Fusion:Compon
                     <div class="neos-controls neos-controls-row">
                         <textarea id="description" required="required" class="neos-span4" rows="3" name="moduleArguments[properties][description]" placeholder={${Translation.translate('task.properties.description.placeholder', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}>{props.task.description}</textarea>
                     </div>
-                    <ul class="errors" @if.hasFailed={constraintCheckResult.hasFailedAtPath('scheduledTime')}>
-                        <li><span class="neos-help-block">{constraintCheckResult.getMessage('scheduledTime')}</span></li>
-                    </ul>
+                    <Sitegeist.Bitzer:Application.ConstraintCheckMessages constraintCheckResult={props.constraintCheckResult} path="description" />
                 </div>
                 <input class="neos-button neos-button-primary" type="submit" name="" value={${Translation.translate('setTaskProperties.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}} />
             </fieldset>

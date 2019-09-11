@@ -7,4 +7,8 @@ namespace Sitegeist\Bitzer\Domain\Task\Exception;
  */
 final class TargetIsInvalid extends \DomainException
 {
+    public static function mustBeAnAbsoluteUri(): TargetIsInvalid
+    {
+        return new static('The target must be an absolute URI.', 1567764586);
+    }
 }

@@ -7,4 +7,8 @@ namespace Sitegeist\Bitzer\Domain\Task\Exception;
  */
 final class ScheduledTimeIsUndefined extends \DomainException
 {
+    public static function althoughExpected(): ScheduledTimeIsUndefined
+    {
+        return new static('Scheduled time is undefined.', 1568033796);
+    }
 }

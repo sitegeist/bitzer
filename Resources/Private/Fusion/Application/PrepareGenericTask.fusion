@@ -1,6 +1,6 @@
 prototype(Sitegeist.Bitzer:Application.PrepareGenericTask) < prototype(Neos.Fusion:Component) {
     agents = ${[]}
-    validationResult = ${[]}
+    constraintCheckResult = ${[]}
     command = null
 
     @context.scheduleCommandUri = Neos.Fusion:UriBuilder {
@@ -31,9 +31,7 @@ prototype(Sitegeist.Bitzer:Application.PrepareGenericTask) < prototype(Neos.Fusi
                             <div class="neos-controls neos-controls-row">
                                 <input type="text" required="required" class="neos-span4" id="scheduledTime.date" name="moduleArguments[scheduledTime][date]" placeholder={${Date.format(Date.now(), 'Y-m-d')}} value={${props.command.scheduledTime ? Date.format(props.command.scheduledTime, 'Y-m-d') : null}} />
                             </div>
-                            <ul class="errors" @if.hasFailed={constraintCheckResult.hasFailedAtPath('scheduledTime')}>
-                                <li><span class="neos-help-block">{constraintCheckResult.getMessage('scheduledTime')}</span></li>
-                            </ul>
+                            <Sitegeist.Bitzer:Application.ConstraintCheckMessages constraintCheckResult={props.constraintCheckResult} path="scheduledTime" />
                         </div>
                         <div class="neos-control-group">
                             <label class="neos-control-label" for="title">{${Translation.translate('task.scheduledTime.time', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</label>
@@ -65,9 +63,7 @@ prototype(Sitegeist.Bitzer:Application.PrepareGenericTask) < prototype(Neos.Fusi
                             <div class="neos-controls neos-controls-row">
                                 <textarea id="description" required="required" class="neos-span4" rows="3" name="moduleArguments[properties][description]" placeholder={${Translation.translate('task.properties.description.placeholder', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}>{${props.command.properties.description}}</textarea>
                             </div>
-                            <ul class="errors" @if.hasFailed={constraintCheckResult.hasFailedAtPath('description')}>
-                                <li><span class="neos-help-block">{constraintCheckResult.getMessage('description')}</span></li>
-                            </ul>
+                            <Sitegeist.Bitzer:Application.ConstraintCheckMessages constraintCheckResult={props.constraintCheckResult} path="description" />
                         </div>
                     </fieldset>
                     <fieldset class="neos-span5">
@@ -77,9 +73,7 @@ prototype(Sitegeist.Bitzer:Application.PrepareGenericTask) < prototype(Neos.Fusi
                             <div class="neos-controls neos-controls-row">
                                 <input type="text" class="neos-span4" id="target" name="moduleArguments[target]" placeholder={${Translation.translate('task.target.placeholder', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}} value={props.command.target}/>
                             </div>
-                            <ul class="errors" @if.hasFailed={constraintCheckResult.hasFailedAtPath('target')}>
-                                <li><span class="neos-help-block">{constraintCheckResult.getMessage('target')}</span></li>
-                            </ul>
+                            <Sitegeist.Bitzer:Application.ConstraintCheckMessages constraintCheckResult={props.constraintCheckResult} path="target" />
                         </div>
                     </fieldset>
                 </div>
