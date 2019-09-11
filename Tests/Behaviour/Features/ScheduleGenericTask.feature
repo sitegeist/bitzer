@@ -31,7 +31,7 @@ Feature: Schedule task
 
   Scenario: Schedule a complete generic task
     Given I have the following content dimensions:
-      | Identifier | Default   |
+      | Identifier | Default |
     And I have the following NodeTypes configuration:
     """
     'unstructured': []
@@ -41,9 +41,9 @@ Feature: Schedule task
           type: string
     """
     Given I have the following nodes:
-      | Identifier                           | Path                    | Node Type                               | Properties        | Workspace |
-      | sites                    | /sites | unstructured | {} | live      |
-      | nody-mc-nodeface                    | /sites/sity-mc-siteface | Sitegeist.Bitzer:Testing.Document | {"title": "Home"} | live      |
+      | Identifier       | Path                    | Node Type                         | Properties        | Workspace |
+      | sites            | /sites                  | unstructured                      | {}                | live      |
+      | nody-mc-nodeface | /sites/sity-mc-siteface | Sitegeist.Bitzer:Testing.Document | {"title": "Home"} | live      |
     When the command ScheduleTask is executed with payload:
       | Key            | Value                                                                                            |
       | taskIdentifier | "tasky-mc-taskface"                                                                              |

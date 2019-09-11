@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Sitegeist\Bitzer\Application;
 
 use Neos\Flow\Annotations as Flow;
+use Neos\Flow\I18n\Locale;
 use Neos\Flow\I18n\Translator;
 use Psr\Http\Message\UriInterface;
 use Sitegeist\Bitzer\Domain\Agent\AgentRepository;
@@ -139,7 +140,7 @@ class Bitzer
     private function requireTaskToExist(TaskIdentifier $identifier, ConstraintCheckResult $constraintCheckResult = null): void
     {
         if (!$this->schedule->findByIdentifier($identifier)) {
-            $exception = new TaskDoesNotExist($this->getConstraintCheckFailureLabel(1567600174), 1567600174);
+            $exception = new TaskDoesNotExist($this->getConstraintCheckFailureLabel(1567600174, [$identifier]), 1567600174);
             if ($constraintCheckResult) {
                 $constraintCheckResult->registerFailedCheck('identifier', $exception);
             } else {
@@ -224,6 +225,6 @@ class Bitzer
 
     private function getConstraintCheckFailureLabel(int $code, array $arguments = []): string
     {
-        return $this->translator->translateById('failure.' . $code . '.label', $arguments, null, null, 'ConstraintChecks', 'Sitegeist.Bitzer') ?? '';
+        return $this->translator->translateById('failure.' . $code . '.label', $arguments, null, new Locale('en'), 'ConstraintChecks', 'Sitegeist.Bitzer') ?? '';
     }
 }

@@ -27,7 +27,7 @@ use Sitegeist\Bitzer\Domain\Task\TaskIdentifier;
 use Sitegeist\Bitzer\Domain\Task\TaskInterface;
 
 /**
- * Features context
+ * The task operations feature trait
  */
 trait TaskOperationsTrait
 {
@@ -375,7 +375,7 @@ trait TaskOperationsTrait
     public function iExpectThisTaskToBeScheduledTo(string $expectedScheduledTime)
     {
         $actualScheduledTime = $this->currentTask->getScheduledTime()->format('c');
-        Assert::assertEquals($expectedScheduledTime, $actualScheduledTime, 'The current task is scheduled to  ' . $expectedScheduledTime . ', expected was ' . $actualScheduledTime);
+        Assert::assertEquals($expectedScheduledTime, $actualScheduledTime, 'The current task is scheduled to  ' . $actualScheduledTime . ', expected was ' . $expectedScheduledTime);
     }
 
     /**
@@ -385,7 +385,7 @@ trait TaskOperationsTrait
     public function iExpectThisTaskToBeAssignedTo(string $expectedAgent)
     {
         $actualAgent = $this->currentTask->getAgent();
-        Assert::assertEquals($expectedAgent, $actualAgent, 'The current task is assigned to  ' . $expectedAgent . ', expected was ' . $expectedAgent);
+        Assert::assertEquals($expectedAgent, $actualAgent, 'The current task is assigned to  ' . $actualAgent . ', expected was ' . $expectedAgent);
     }
 
     /**
