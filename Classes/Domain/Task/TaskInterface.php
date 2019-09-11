@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Task;
 
-use Neos\ContentRepository\Domain\Model\NodeInterface;
+use Neos\ContentRepository\Domain\Projection\Content\TraversableNodeInterface;
 use Psr\Http\Message\UriInterface;
 
 /**
@@ -61,9 +61,9 @@ interface TaskInterface
      *
      * For now, we expect that only nodes are affected by tasks, if at all.
      *
-     * @return NodeInterface|null
+     * @return TraversableNodeInterface|null
      */
-    public function getObject(): ?NodeInterface;
+    public function getObject(): ?TraversableNodeInterface;
 
     /**
      * Indicates a target EntryPoint for an Action.

@@ -4,14 +4,12 @@ namespace Sitegeist\Bitzer\Domain\Task;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
-use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Http\Uri;
 use Neos\Neos\Domain\Service\ContentDimensionPresetSourceInterface;
 use Psr\Http\Message\UriInterface;
 use Sitegeist\Bitzer\Domain\Task\Command\ScheduleTask;
 use Sitegeist\Bitzer\Domain\Task\Generic\GenericTaskFactory;
-use Sitegeist\Bitzer\Infrastructure\ContentContextFactory;
 use Sitegeist\Bitzer\Infrastructure\DbalClient;
 
 /**
@@ -33,12 +31,6 @@ class Schedule
      * @var DbalClient
      */
     protected $databaseClient;
-
-    /**
-     * @Flow\Inject
-     * @var ContentContextFactory
-     */
-    protected $contentContextFactory;
 
     /**
      * @Flow\Inject
@@ -190,6 +182,19 @@ class Schedule
         );
     }
 
+    final public function setTaskObject(TaskIdentifier $taskIdentifier, ?NodeAddress $object): void
+    {
+        $this->getDatabaseConnection()->update(
+            self::TABLE_NAME,
+            [
+                'object' => $object ? json_encode($object) : null,
+            ],
+            [
+                'identifier' => $taskIdentifier,
+            ]
+        );
+    }
+
     final public function setTaskTarget(TaskIdentifier $taskIdentifier, ?UriInterface $target): void
     {
         $this->getDatabaseConnection()->update(
@@ -259,8 +264,7 @@ class Schedule
         $factory = $this->resolveFactory($className);
         $object = null;
         if (isset($rawData['object']) && !empty($rawData['object'])) {
-            $nodeAddress = NodeAddress::fromArray(json_decode($rawData['object'], true));
-            $object = $this->resolveNode($nodeAddress);
+            $object = NodeAddress::fromArray(json_decode($rawData['object'], true));
         }
 
         return $factory->createFromRawData(
@@ -273,13 +277,6 @@ class Schedule
             $object,
             isset($rawData['target']) ? new Uri($rawData['target']) : null
         );
-    }
-
-    private function resolveNode(NodeAddress $nodeAddress): ?NodeInterface
-    {
-        $contentContext = $this->contentContextFactory->createContentContext($nodeAddress);
-
-        return $contentContext->getNodeByIdentifier((string)$nodeAddress->getNodeAggregateIdentifier());
     }
 
     private function resolveFactory(TaskClassName $className): TaskFactoryInterface

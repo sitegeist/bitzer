@@ -18,6 +18,7 @@ use Sitegeist\Bitzer\Domain\Task\Command\CompleteTask;
 use Sitegeist\Bitzer\Domain\Task\Command\ReassignTask;
 use Sitegeist\Bitzer\Domain\Task\Command\RescheduleTask;
 use Sitegeist\Bitzer\Domain\Task\Command\ScheduleTask;
+use Sitegeist\Bitzer\Domain\Task\Command\SetNewTaskObject;
 use Sitegeist\Bitzer\Domain\Task\Command\SetNewTaskTarget;
 use Sitegeist\Bitzer\Domain\Task\Command\SetTaskProperties;
 use Sitegeist\Bitzer\Domain\Task\ConstraintCheckResult;
@@ -252,6 +253,28 @@ class BitzerController extends ModuleController
             $this->editTaskAction($taskIdentifier);
         } else {
             $this->addFlashMessage($this->getLabel('setNewTaskTarget.success', [$task->getDescription(), $target]), '');
+            $this->redirect('editTask', null, null, ['taskIdentifier' => (string)$taskIdentifier]);
+        }
+    }
+
+    public function setNewTaskObjectAction(TaskIdentifier $taskIdentifier, ?NodeAddress $object): void
+    {
+        $task = $this->schedule->findByIdentifier($taskIdentifier);
+
+        $constraintCheckResult = new ConstraintCheckResult();
+        $command = new SetNewTaskObject($taskIdentifier, $object);
+
+        $this->bitzer->handleSetNewTaskObject($command, $constraintCheckResult);
+
+        if ($constraintCheckResult->hasFailed()) {
+            $this->response->setStatusCode(400);
+            $this->addFlashMessage($this->getLabel('setNewTaskObject.failure', [$task->getDescription()]), '', Message::SEVERITY_WARNING);
+            $this->view->assignMultiple([
+                'constraintCheckResult' => $constraintCheckResult,
+            ]);
+            $this->editTaskAction($taskIdentifier);
+        } else {
+            $this->addFlashMessage($this->getLabel('setNewTaskObject.success', [$task->getDescription()]), '');
             $this->redirect('editTask', null, null, ['taskIdentifier' => (string)$taskIdentifier]);
         }
     }

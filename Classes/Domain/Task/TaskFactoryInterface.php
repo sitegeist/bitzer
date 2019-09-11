@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Task;
 
-use Neos\ContentRepository\Domain\Model\NodeInterface;
+use Neos\ContentRepository\Domain\Projection\Content\TraversableNodeInterface;
 use Psr\Http\Message\UriInterface;
 
 /**
@@ -17,7 +17,7 @@ interface TaskFactoryInterface
         \DateTimeImmutable $scheduledTime,
         ActionStatusType $actionStatus,
         string $agent,
-        ?NodeInterface $object,
+        ?NodeAddress $object,
         ?UriInterface $target
     ): TaskInterface;
 }

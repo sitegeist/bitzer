@@ -40,7 +40,7 @@ Feature: Schedule task
         title:
           type: string
     """
-    Given I have the following nodes:
+    And I have the following nodes:
       | Identifier       | Path                    | Node Type                         | Properties        | Workspace |
       | sites            | /sites                  | unstructured                      | {}                | live      |
       | nody-mc-nodeface | /sites/sity-mc-siteface | Sitegeist.Bitzer:Testing.Document | {"title": "Home"} | live      |

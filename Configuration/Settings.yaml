@@ -1,3 +1,5 @@
 Sitegeist:
   Bitzer:
-    upcomingInterval: 'P5D'
+    upcomingInterval: 'P5D' # The interval in which future tasks are considered "upcoming"
+    factories: [] # Here task factories can be registered as $taskClassName: $taskFactoryClassName
+    constraintCheckPlugins: [] # Here constraint check plugins registered as $taskClassName: {$taskFactoryClassName: $active}

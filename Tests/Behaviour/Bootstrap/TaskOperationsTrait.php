@@ -17,6 +17,7 @@ use Sitegeist\Bitzer\Domain\Task\Command\CompleteTask;
 use Sitegeist\Bitzer\Domain\Task\Command\ReassignTask;
 use Sitegeist\Bitzer\Domain\Task\Command\RescheduleTask;
 use Sitegeist\Bitzer\Domain\Task\Command\ScheduleTask;
+use Sitegeist\Bitzer\Domain\Task\Command\SetNewTaskObject;
 use Sitegeist\Bitzer\Domain\Task\Command\SetNewTaskTarget;
 use Sitegeist\Bitzer\Domain\Task\Command\SetTaskProperties;
 use Sitegeist\Bitzer\Domain\Task\ConstraintCheckResult;
@@ -341,6 +342,41 @@ trait TaskOperationsTrait
     }
 
     /**
+     * @When /^the command SetNewTaskObject is executed with payload:$/
+     * @param TableNode $payloadTable
+     * @throws Exception
+     */
+    public function theCommandSetNewTaskObjectIsExecutedWithPayload(TableNode $payloadTable)
+    {
+        $commandArguments = $this->readPayloadTable($payloadTable);
+
+        $command = new SetNewTaskObject(
+            new TaskIdentifier($commandArguments['taskIdentifier']),
+            isset($commandArguments['object']) ? NodeAddress::fromArray($commandArguments['object']) : null
+        );
+
+        if ($this->constraintCheckResult) {
+            $this->bitzer->handleSetNewTaskObject($command, $this->constraintCheckResult);
+        } else {
+            $this->bitzer->handleSetNewTaskObject($command);
+        }
+    }
+
+    /**
+     * @When /^the command SetNewTaskObject is executed with payload and exceptions are caught:$/
+     * @param TableNode $payloadTable
+     * @throws Exception
+     */
+    public function theCommandSetNewTaskObjectIsExecutedWithPayloadAndExceptionsAreCaught(TableNode $payloadTable)
+    {
+        try {
+            $this->theCommandSetNewTaskObjectIsExecutedWithPayload($payloadTable);
+        } catch (\Exception $exception) {
+            $this->lastCommandException = $exception;
+        }
+    }
+
+    /**
      * @Then /^the last command should have thrown an exception of type "([^"]*)"$/
      * @param string $shortExceptionName
      * @throws ReflectionException
@@ -440,6 +476,15 @@ trait TaskOperationsTrait
         Assert::assertInstanceOf(NodeInterface::class, $this->currentTask->getObject(), 'The current task is about nothing, expected was ' . $expectedObject);
         $actualObject = NodeAddress::fromNode($this->currentTask->getObject());
         Assert::assertTrue($expectedObject->equals($actualObject), 'The current task is about  ' . $actualObject . ', expected was ' . $expectedObject);
+    }
+
+    /**
+     * @Then /^I expect this task to be about nothing$/
+     */
+    public function iExpectThisTaskToBeAboutNothing()
+    {
+        $actualObject = $this->currentTask->getObject() ? NodeAddress::fromNode($this->currentTask->getObject()) : null;
+        Assert::assertNull($this->currentTask->getObject(), 'The current task is about ' . $actualObject . ', expected was nothing');
     }
 
     /**

@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 require_once(__DIR__ . '/../../../../../Application/Neos.Behat/Tests/Behat/FlowContext.php');
 require_once(__DIR__ . '/TaskOperationsTrait.php');
+require_once(__DIR__ . '/AgentsTrait.php');
+require_once(__DIR__ . '/ObjectsTrait.php');
 require_once(__DIR__ . '/../../../../../Framework/Neos.Flow/Tests/Behavior/Features/Bootstrap/IsolatedBehatStepsTrait.php');
 require_once(__DIR__ . '/../../../../../Framework/Neos.Flow/Tests/Behavior/Features/Bootstrap/SecurityOperationsTrait.php');
 require_once(__DIR__ . '/../../../../../Application/Neos.ContentRepository/Tests/Behavior/Features/Bootstrap/NodeOperationsTrait.php');
@@ -24,6 +26,7 @@ class FeatureContext extends BehatContext
 {
     use TaskOperationsTrait;
     use AgentsTrait;
+    use ObjectsTrait;
     use SecurityOperationsTrait;
     use NodeOperationsTrait;
 
@@ -52,6 +55,7 @@ class FeatureContext extends BehatContext
         $this->setupSecurity();
         $this->setupTaskOperations();
         $this->isolated = false;
+        putenv('FLOW_REWRITEURLS=1'); // we want to test URI generation
     }
 
     protected function getObjectManager(): ObjectManagerInterface

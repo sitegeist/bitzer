@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Task\Generic;
 
 use Neos\ContentRepository\Domain\Model\NodeInterface;
+use Neos\ContentRepository\Domain\Projection\Content\TraversableNodeInterface;
 use Neos\Flow\Annotations as Flow;
 use Psr\Http\Message\UriInterface;
 use Sitegeist\Bitzer\Domain\Task\ActionStatusType;
@@ -57,7 +58,7 @@ final class GenericTask implements TaskInterface
      * @param \DateTimeImmutable $scheduledTime
      * @param ActionStatusType $actionStatus
      * @param string $agent
-     * @param NodeInterface|null $object
+     * @param TraversableNodeInterface|null $object
      * @param UriInterface $target
      */
     public function __construct(
@@ -66,7 +67,7 @@ final class GenericTask implements TaskInterface
         \DateTimeImmutable $scheduledTime,
         ActionStatusType $actionStatus,
         string $agent,
-        ?NodeInterface $object,
+        ?TraversableNodeInterface $object,
         ?UriInterface $target
     ) {
         $this->identifier = $identifier;
@@ -146,9 +147,9 @@ final class GenericTask implements TaskInterface
      *
      * For now, we expect that only nodes are affected by tasks, if at all.
      *
-     * @return NodeInterface|null
+     * @return TraversableNodeInterface|null
      */
-    public function getObject(): ?NodeInterface
+    public function getObject(): ?TraversableNodeInterface
     {
         return $this->object;
     }

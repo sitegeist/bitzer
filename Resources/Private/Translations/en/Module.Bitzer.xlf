@@ -50,6 +50,15 @@
       <trans-unit id="setNewTaskTarget.failure" xml:space="preserve" approved="yes">
         <source>Failed to set target of Task "{0}".</source>
       </trans-unit>
+      <trans-unit id="setNewTaskObject.label" xml:space="preserve" approved="yes">
+        <source>Set new object</source>
+      </trans-unit>
+      <trans-unit id="setNewTaskObject.success" xml:space="preserve" approved="yes">
+        <source>Object of Task "{0}" was successfully set.</source>
+      </trans-unit>
+      <trans-unit id="setNewTaskObject.failure" xml:space="preserve" approved="yes">
+        <source>Failed to set object of Task "{0}".</source>
+      </trans-unit>
       <trans-unit id="setTaskProperties.label" xml:space="preserve" approved="yes">
         <source>Set task properties</source>
       </trans-unit>
