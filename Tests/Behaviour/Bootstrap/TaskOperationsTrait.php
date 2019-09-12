@@ -520,6 +520,16 @@ trait TaskOperationsTrait
     }
 
     /**
+     * @Then /^I expect this task to have the adjusted target "([^"]*)"$/
+     * @param string $expectedTarget
+     */
+    public function iExpectThisTaskToHaveTheAdjustedTarget(string $expectedTarget)
+    {
+        $actualTarget = str_replace('bin/bin', '', (string)$this->currentTask->getTarget());
+        Assert::assertSame($expectedTarget, $actualTarget, 'The current task has the target  ' . $actualTarget . ', expected was ' . $expectedTarget);
+    }
+
+    /**
      * @Then /^I expect this task to have the properties:$/
      * @param TableNode $expectedProperties
      */
