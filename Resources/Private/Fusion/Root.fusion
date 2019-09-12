@@ -1,6 +1,10 @@
 include: 'resource://Neos.Fusion/Private/Fusion/Root.fusion'
 include: 'resource://Sitegeist.Bitzer/Private/Fusion/**/*.fusion'
 
+index = Sitegeist.Bitzer:Application.Index {
+    taskClassNames = ${taskClassNames}
+}
+
 mySchedule = Sitegeist.Bitzer:Application.MySchedule {
     groupedTasks = ${groupedTasks}
 }

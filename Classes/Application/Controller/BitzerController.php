@@ -95,11 +95,15 @@ class BitzerController extends ModuleController
 
     public function indexAction(array $module = []): void
     {
-        if ($this->securityContext->hasRole('Sitegeist.Bitzer:Administrator')) {
-            $this->forward('schedule');
-        } else {
-            $this->forward('mySchedule');
+        if (!$this->securityContext->hasRole('Sitegeist.Bitzer:Administrator')) {
+            $this->redirect('mySchedule');
         }
+
+        $this->view->setFusionPath('index');
+        $this->view->assignMultiple([
+            'taskClassNames' => $this->taskClassNameRepository->findAll(),
+            'flashMessages' => $this->flashMessageContainer->getMessagesAndFlush()
+        ]);
     }
 
     public function scheduleAction(): void
@@ -178,7 +182,7 @@ class BitzerController extends ModuleController
         $task = $this->schedule->findByIdentifier($taskIdentifier);
         if (!$task) {
             $this->addFlashMessage($this->getLabel('editTask.taskWasNotFound', [$task->getDescription()]), '', Message::SEVERITY_WARNING);
-            $this->redirect('index');
+            $this->redirect('schedule');
         }
         $this->view->setFusionPath('editTask');
         $this->view->assignMultiple([
@@ -327,7 +331,7 @@ class BitzerController extends ModuleController
         $this->bitzer->handleCompleteTask($command);
 
         $this->addFlashMessage($this->getLabel('completeTask.success', [$task->getDescription()]), '');
-        $this->redirect('index');
+        $this->redirect('mySchedule');
     }
 
     public function cancelTaskAction(TaskIdentifier $taskIdentifier): void
@@ -338,7 +342,7 @@ class BitzerController extends ModuleController
         $this->bitzer->handleCancelTask($command);
 
         $this->addFlashMessage($this->getLabel('cancelTask.success', [$task->getDescription()]), '');
-        $this->redirect('index');
+        $this->redirect('schedule');
     }
 
     private function getLabel(string $labelIdentifier, array $arguments = [], $quantity = null): ?string

@@ -1,0 +1,58 @@
+prototype(Sitegeist.Bitzer:Application.Index) < prototype(Neos.Fusion:Component) {
+    taskClassNames = ${[]}
+
+    @context {
+        scheduleUri = Sitegeist.Bitzer:ActionUri {
+            action = 'schedule'
+        }
+        myScheduleUri = Sitegeist.Bitzer:ActionUri {
+            action = 'mySchedule'
+        }
+        prepareTaskUri = Sitegeist.Bitzer:ActionUri {
+            action = 'mySchedule'
+        }
+    }
+
+    renderer = afx`
+        <Sitegeist.Bitzer:FlashMessages />
+        <div class="neos-row-fluid">
+            <div class="neos-span4">
+                <div class="widget has-footer">
+                    <div class="widget-header">
+                        <i class="fas fa-clipboard-list neos-pull-left"></i>
+                        <h3>
+                            <a href={scheduleUri}>{${Translation.translate('schedule.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</a>
+                        </h3>
+                    </div>
+                    <div class="widget-body">
+                        <p>{${Translation.translate('schedule.description', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</p>
+                    </div>
+                    <div class="widget-footer">
+                        <form action={prepareTaskUri} method="GET">
+                            <select id="taskClassName" name="moduleArguments[taskClassName]">
+                                <Neos.Fusion:Collection collection={props.taskClassNames} itemName="taskClassName">
+                                    <option value={taskClassName}>{${Translation.translate('taskClassName.' + String.toString(taskClassName) + '.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</option>
+                                </Neos.Fusion:Collection>
+                            </select>
+                            <input class="neos-button neos-button-primary" type="submit" name="" value={${Translation.translate('actions.prepareTask.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}} />
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="neos-span4">
+                <div class="widget ">
+                    <div class="widget-header">
+                        <i class="fas fa-clipboard-list neos-pull-left"></i>
+                        <h3>
+                            <a href={myScheduleUri}>{${Translation.translate('mySchedule.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</a>
+                        </h3>
+                    </div>
+                    <div class="widget-body">
+                        <p>{${Translation.translate('mySchedule.description', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `
+}
