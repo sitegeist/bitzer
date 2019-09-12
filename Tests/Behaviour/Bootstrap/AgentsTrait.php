@@ -10,7 +10,6 @@ use Neos\Flow\Mvc\ActionRequest;
 use Neos\Flow\ObjectManagement\ObjectManagerInterface;
 use Neos\Flow\Persistence\PersistenceManagerInterface;
 use Neos\Flow\Security\Authentication\AuthenticationManagerInterface;
-use Neos\Flow\Security\Authentication\Provider\TestingProvider;
 use Neos\Flow\Security\Authentication\TokenInterface;
 use Neos\Flow\Security\Context;
 use Neos\Flow\Security\Policy\PolicyService;
@@ -39,6 +38,10 @@ trait AgentsTrait
             $policyService = $this->getObjectManager()->get(PolicyService::class);
             ObjectAccess::setProperty($policyService, 'roles', $this->rolesBackup, true);
         }
+
+        /** @var Context $securityContext */
+        $securityContext = $this->getObjectManager()->get(Context::class);
+        $securityContext->clearContext();
     }
 
     /**
