@@ -101,8 +101,10 @@ class Bitzer
         $this->requireScheduledTimeToBeSet($command->getScheduledTime(), $constraintCheckResult);
 
         $task = $this->schedule->findByIdentifier($command->getIdentifier());
-        foreach ($this->getConstraintCheckPlugins(TaskClassName::createFromObject($task)) as $constraintCheckPlugin) {
-            $constraintCheckPlugin->checkRescheduleTask($command, $constraintCheckResult);
+        if ($task) {
+            foreach ($this->getConstraintCheckPlugins(TaskClassName::createFromObject($task)) as $constraintCheckPlugin) {
+                $constraintCheckPlugin->checkRescheduleTask($command, $constraintCheckResult);
+            }
         }
 
         if (IsCommandToBeExecuted::isSatisfiedByConstraintCheckResult($constraintCheckResult)) {
@@ -116,8 +118,10 @@ class Bitzer
         $this->requireAgentToExist($command->getAgent(), $constraintCheckResult);
 
         $task = $this->schedule->findByIdentifier($command->getIdentifier());
-        foreach ($this->getConstraintCheckPlugins(TaskClassName::createFromObject($task)) as $constraintCheckPlugin) {
-            $constraintCheckPlugin->checkReassignTask($command, $constraintCheckResult);
+        if ($task) {
+            foreach ($this->getConstraintCheckPlugins(TaskClassName::createFromObject($task)) as $constraintCheckPlugin) {
+                $constraintCheckPlugin->checkReassignTask($command, $constraintCheckResult);
+            }
         }
 
         if (IsCommandToBeExecuted::isSatisfiedByConstraintCheckResult($constraintCheckResult)) {
@@ -133,8 +137,10 @@ class Bitzer
         }
 
         $task = $this->schedule->findByIdentifier($command->getIdentifier());
-        foreach ($this->getConstraintCheckPlugins(TaskClassName::createFromObject($task)) as $constraintCheckPlugin) {
-            $constraintCheckPlugin->checkSetNewTaskTarget($command, $constraintCheckResult);
+        if ($task) {
+            foreach ($this->getConstraintCheckPlugins(TaskClassName::createFromObject($task)) as $constraintCheckPlugin) {
+                $constraintCheckPlugin->checkSetNewTaskTarget($command, $constraintCheckResult);
+            }
         }
 
         if (IsCommandToBeExecuted::isSatisfiedByConstraintCheckResult($constraintCheckResult)) {
@@ -150,8 +156,10 @@ class Bitzer
         }
 
         $task = $this->schedule->findByIdentifier($command->getIdentifier());
-        foreach ($this->getConstraintCheckPlugins(TaskClassName::createFromObject($task)) as $constraintCheckPlugin) {
-            $constraintCheckPlugin->checkSetNewTaskObject($command, $constraintCheckResult);
+        if ($task) {
+            foreach ($this->getConstraintCheckPlugins(TaskClassName::createFromObject($task)) as $constraintCheckPlugin) {
+                $constraintCheckPlugin->checkSetNewTaskObject($command, $constraintCheckResult);
+            }
         }
 
         if (IsCommandToBeExecuted::isSatisfiedByConstraintCheckResult($constraintCheckResult)) {
@@ -165,8 +173,10 @@ class Bitzer
         $this->requireDescriptionToBeSet($command->getProperties(), $constraintCheckResult);
 
         $task = $this->schedule->findByIdentifier($command->getIdentifier());
-        foreach ($this->getConstraintCheckPlugins(TaskClassName::createFromObject($task)) as $constraintCheckPlugin) {
-            $constraintCheckPlugin->checkSetTaskProperties($command, $constraintCheckResult);
+        if ($task) {
+            foreach ($this->getConstraintCheckPlugins(TaskClassName::createFromObject($task)) as $constraintCheckPlugin) {
+                $constraintCheckPlugin->checkSetTaskProperties($command, $constraintCheckResult);
+            }
         }
 
         if (IsCommandToBeExecuted::isSatisfiedByConstraintCheckResult($constraintCheckResult)) {
@@ -179,8 +189,10 @@ class Bitzer
         $this->requireTaskToExist($command->getIdentifier(), $constraintCheckResult);
 
         $task = $this->schedule->findByIdentifier($command->getIdentifier());
-        foreach ($this->getConstraintCheckPlugins(TaskClassName::createFromObject($task)) as $constraintCheckPlugin) {
-            $constraintCheckPlugin->checkCancelTask($command, $constraintCheckResult);
+        if ($task) {
+            foreach ($this->getConstraintCheckPlugins(TaskClassName::createFromObject($task)) as $constraintCheckPlugin) {
+                $constraintCheckPlugin->checkCancelTask($command, $constraintCheckResult);
+            }
         }
 
         if (IsCommandToBeExecuted::isSatisfiedByConstraintCheckResult($constraintCheckResult)) {
@@ -193,8 +205,12 @@ class Bitzer
         $this->requireTaskToExist($command->getIdentifier(), $constraintCheckResult);
 
         $task = $this->schedule->findByIdentifier($command->getIdentifier());
-        foreach ($this->getConstraintCheckPlugins(TaskClassName::createFromObject($task)) as $constraintCheckPlugin) {
-            $constraintCheckPlugin->checkCompleteTask($command, $constraintCheckResult);
+        if ($task) {
+            foreach ($this->getConstraintCheckPlugins(TaskClassName::createFromObject($task)) as $constraintCheckPlugin) {
+                $constraintCheckPlugin->checkActivateTask($command, $constraintCheckResult);
+            }
+        }
+
         }
 
         if (IsCommandToBeExecuted::isSatisfiedByConstraintCheckResult($constraintCheckResult)) {
