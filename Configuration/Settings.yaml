@@ -3,3 +3,5 @@ Sitegeist:
     upcomingInterval: 'P5D' # The interval in which future tasks are considered "upcoming"
     factories: [] # Here task factories can be registered as $taskClassName: $taskFactoryClassName
     constraintCheckPlugins: [] # Here constraint check plugins registered as $taskClassName: {$taskFactoryClassName: $active}
+    fusion:
+      autoInclude: [] # Here auto included fusion roots can be configured as $packageKey: $active

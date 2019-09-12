@@ -9,7 +9,6 @@ use Neos\Flow\I18n\Translator;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Mvc\View\ViewInterface;
 use Neos\Flow\Security\Context as SecurityContext;
-use Neos\Fusion\View\FusionView;
 use Neos\Neos\Controller\Backend\ModuleController;
 use Sitegeist\Bitzer\Application\Bitzer;
 use Sitegeist\Bitzer\Domain\Agent\AgentRepository;
@@ -28,6 +27,7 @@ use Sitegeist\Bitzer\Domain\Task\ScheduledTime;
 use Sitegeist\Bitzer\Domain\Task\TaskClassName;
 use Sitegeist\Bitzer\Domain\Task\TaskClassNameRepository;
 use Sitegeist\Bitzer\Domain\Task\TaskIdentifier;
+use Sitegeist\Bitzer\Infrastructure\FusionView;
 use Sitegeist\Bitzer\Presentation\ComponentName;
 
 /**
