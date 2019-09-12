@@ -6,6 +6,7 @@ use Neos\ContentRepository\DimensionSpace\DimensionSpace\DimensionSpacePoint;
 use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\ContentRepository\Domain\NodeAggregate\NodeAggregateIdentifier;
 use Neos\ContentRepository\Domain\Projection\Content\TraversableNodeInterface;
+use Neos\Eel\ProtectedContextAwareInterface;
 use Neos\Flow\Annotations as Flow;
 
 /**
@@ -14,7 +15,7 @@ use Neos\Flow\Annotations as Flow;
  * To be replaced by the actual node address from the new content repository
  * @Flow\Proxy(false)
  */
-final class NodeAddress implements \JsonSerializable
+final class NodeAddress implements \JsonSerializable, ProtectedContextAwareInterface
 {
     /**
      * @var string
@@ -98,5 +99,14 @@ final class NodeAddress implements \JsonSerializable
     public function __toString(): string
     {
         return json_encode($this);
+    }
+
+    /**
+     * @param string $methodName
+     * @return boolean
+     */
+    public function allowsCallOfMethod($methodName)
+    {
+        return true;
     }
 }

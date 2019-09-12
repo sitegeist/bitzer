@@ -86,6 +86,9 @@
       <trans-unit id="task.target.placeholder" xml:space="preserve" approved="yes">
         <source>Please enter target</source>
       </trans-unit>
+        <trans-unit id="task.object.label" xml:space="preserve" approved="yes">
+        <source>Object</source>
+      </trans-unit>
       <trans-unit id="task.properties.label" xml:space="preserve" approved="yes">
         <source>Properties</source>
       </trans-unit>

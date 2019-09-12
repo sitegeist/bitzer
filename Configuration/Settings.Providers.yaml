@@ -1,0 +1,4 @@
+Neos:
+  Fusion:
+    defaultContext:
+      Bitzer.Object: Sitegeist\Bitzer\Application\Object\ObjectProvider

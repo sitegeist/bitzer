@@ -132,7 +132,9 @@ class BitzerController extends ModuleController
         } catch (\InvalidArgumentException $exception) {
             $scheduledTime = null;
         }
-        $target = empty($target->getPath()) && empty($target->getHost()) ? null : $target;
+        if ($target instanceof Uri && empty($target->getPath()) && empty($target->getHost())) {
+            $target = null;
+        }
         $command = new ScheduleTask(
             TaskIdentifier::create(),
             $taskClassName,

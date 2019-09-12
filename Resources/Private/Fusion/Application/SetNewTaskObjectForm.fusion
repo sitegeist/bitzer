@@ -1,0 +1,19 @@
+prototype(Sitegeist.Bitzer:SetNewTaskObjectForm) < prototype(Neos.Fusion:Component) {
+    task = null
+    constraintCheckResult = null
+    objects = ${[]}
+
+    @context.commandUri = Sitegeist.Bitzer:CommandUri {
+        commandName = 'setNewTaskObject'
+    }
+
+    renderer = afx`
+        <form action={commandUri} method="POST">
+            <input type="hidden" name="__csrfToken" value={${Security.csrfToken()}} />
+            <input type="hidden" name="moduleArguments[taskIdentifier]" value={${String.toString(props.task.identifier)}} />
+            <Sitegeist.Bitzer:Component.Object objects={props.objects} assignedObject={${Bitzer.Object.getAddress(task.object)}}>
+                <input class="neos-button neos-button-primary" type="submit" name="" value={${Translation.translate('setNewTaskObject.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}} />
+            </Sitegeist.Bitzer:Component.Object>
+        </form>
+    `
+}
