@@ -45,8 +45,8 @@ prototype(Sitegeist.Bitzer:MyScheduleTable) < prototype(Neos.Fusion:Component) {
                 <td>{task.object.label}</td>
                 <td class="neos-action">
                     <div class="neos-pull-right">
-                        <Sitegeist.Bitzer:CommandForm commandName="activateTask" commandArguments={{taskIdentifier: String.toString(item.identifier)}} icon="play" target={${item.target ? '_blank' : '_self'}} />
-                        <Sitegeist.Bitzer:CommandForm commandName="completeTask" commandArguments={{taskIdentifier: String.toString(item.identifier)}} icon="check" />
+                        <Sitegeist.Bitzer:CommandForm commandName="activateTask" commandArguments={{taskIdentifier: String.toString(task.identifier)}} icon="play" target={${task.target ? '_blank' : '_self'}} />
+                        <Sitegeist.Bitzer:CommandForm commandName="completeTask" commandArguments={{taskIdentifier: String.toString(task.identifier)}} icon="check" />
                     </div>
                 </td>
             </tr>
