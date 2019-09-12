@@ -1,0 +1,12 @@
+prototype(Sitegeist.Bitzer:ActionUri) < prototype(Neos.Fusion:Component) {
+    action = ''
+    arguments = Neos.Fusion:DataStructure
+
+    renderer = Neos.Fusion:UriBuilder {
+        package = 'Sitegeist.Bitzer'
+        subpackage = 'Application'
+        controller = 'Bitzer'
+        action = ${props.action}
+        arguments = ${props.arguments}
+    }
+}

@@ -2,6 +2,7 @@ prototype(Sitegeist.Bitzer:CommandForm) < prototype(Neos.Fusion:Component) {
     commandName = ''
     commandArguments = Neos.Fusion:DataStructure
     icon = ''
+    target = '_self'
 
     renderer = Neos.Fusion:Tag {
         tagName = 'form'
@@ -11,13 +12,11 @@ prototype(Sitegeist.Bitzer:CommandForm) < prototype(Neos.Fusion:Component) {
             data-neos-toggle = 'tooltip'
             data-original-title = ${Translation.translate(props.commandName + '.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}
             style = 'display: inline-block'
+            target = ${props.target}
 
-            action = Neos.Fusion:UriBuilder {
-                package = 'Sitegeist.Bitzer'
-                subpackage = 'Application'
-                controller = 'Bitzer'
-                action = ${props.commandName}
-                arguments = ${props.commandArguments}
+            action = Sitegeist.Bitzer:CommandUri {
+                commandName = ${props.commandName}
+                commandArguments = ${props.commandArguments}
             }
         }
         content = afx`
