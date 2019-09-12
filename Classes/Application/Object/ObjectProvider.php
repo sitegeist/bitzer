@@ -29,7 +29,7 @@ class ObjectProvider implements ProtectedContextAwareInterface
         $objects = [];
         foreach ($flowQuery->find('[instanceof Neos.Neos:Document]')->get() as $document) {
             /** @var TraversableNodeInterface $document */
-            $objects[] = new LabeledObjectAddress(NodeAddress::fromNode($document), $document->getLabel());
+            $objects[] = new LabeledObjectAddress(NodeAddress::createFromNode($document), $document->getLabel());
         }
 
         return $objects;
@@ -37,7 +37,7 @@ class ObjectProvider implements ProtectedContextAwareInterface
 
     public function getAddress(?TraversableNodeInterface $object): ?NodeAddress
     {
-        return $object ? NodeAddress::fromNode($object) : null;
+        return $object ? NodeAddress::createFromNode($object) : null;
     }
 
     /**

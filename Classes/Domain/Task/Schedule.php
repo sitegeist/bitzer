@@ -264,7 +264,7 @@ class Schedule
         $factory = $this->resolveFactory($className);
         $object = null;
         if (isset($rawData['object']) && !empty($rawData['object'])) {
-            $object = NodeAddress::fromArray(json_decode($rawData['object'], true));
+            $object = NodeAddress::createFromArray(json_decode($rawData['object'], true));
         }
 
         return $factory->createFromRawData(

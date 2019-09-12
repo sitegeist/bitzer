@@ -109,7 +109,7 @@ trait TaskOperationsTrait
             new TaskClassName($commandArguments['taskClassName']),
             isset($commandArguments['scheduledTime']) ? ScheduledTime::createFromString($commandArguments['scheduledTime']) : null,
             $commandArguments['agent'],
-            isset($commandArguments['object']) ? NodeAddress::fromArray($commandArguments['object']) : null,
+            isset($commandArguments['object']) ? NodeAddress::createFromArray($commandArguments['object']) : null,
             isset($commandArguments['target']) ? new Uri($commandArguments['target']) : null,
             $commandArguments['properties']
         );
@@ -372,7 +372,7 @@ trait TaskOperationsTrait
 
         $command = new SetNewTaskObject(
             new TaskIdentifier($commandArguments['taskIdentifier']),
-            isset($commandArguments['object']) ? NodeAddress::fromArray($commandArguments['object']) : null
+            isset($commandArguments['object']) ? NodeAddress::createFromArray($commandArguments['object']) : null
         );
 
         $this->getSecurityContext()->withoutAuthorizationChecks(function() use($command) {
@@ -493,9 +493,9 @@ trait TaskOperationsTrait
      */
     public function iExpectThisTaskToBeAbout(string $expectedObject)
     {
-        $expectedObject = NodeAddress::fromArray(json_decode($expectedObject, true));
+        $expectedObject = NodeAddress::createFromArray(json_decode($expectedObject, true));
         Assert::assertInstanceOf(NodeInterface::class, $this->currentTask->getObject(), 'The current task is about nothing, expected was ' . $expectedObject);
-        $actualObject = NodeAddress::fromNode($this->currentTask->getObject());
+        $actualObject = NodeAddress::createFromNode($this->currentTask->getObject());
         Assert::assertTrue($expectedObject->equals($actualObject), 'The current task is about  ' . $actualObject . ', expected was ' . $expectedObject);
     }
 
@@ -504,7 +504,7 @@ trait TaskOperationsTrait
      */
     public function iExpectThisTaskToBeAboutNothing()
     {
-        $actualObject = $this->currentTask->getObject() ? NodeAddress::fromNode($this->currentTask->getObject()) : null;
+        $actualObject = $this->currentTask->getObject() ? NodeAddress::createFromNode($this->currentTask->getObject()) : null;
         Assert::assertNull($this->currentTask->getObject(), 'The current task is about ' . $actualObject . ', expected was nothing');
     }
 

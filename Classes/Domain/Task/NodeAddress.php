@@ -39,7 +39,7 @@ final class NodeAddress implements \JsonSerializable, ProtectedContextAwareInter
         $this->nodeAggregateIdentifier = $nodeAggregateIdentifier;
     }
 
-    public static function fromNode(TraversableNodeInterface $node): NodeAddress
+    public static function createFromNode(TraversableNodeInterface $node): NodeAddress
     {
         /** @var NodeInterface $node */
         return new static(
@@ -49,7 +49,17 @@ final class NodeAddress implements \JsonSerializable, ProtectedContextAwareInter
         );
     }
 
-    public static function fromArray(array $serialization): NodeAddress
+    public static function createLiveFromNode(TraversableNodeInterface $node): NodeAddress
+    {
+        /** @var NodeInterface $node */
+        return new static(
+            'live',
+            DimensionSpacePoint::fromLegacyDimensionArray($node->getContext()->getDimensions()),
+            NodeAggregateIdentifier::fromString($node->getIdentifier())
+        );
+    }
+
+    public static function createFromArray(array $serialization): NodeAddress
     {
         return new static(
             $serialization['workspaceName'],
