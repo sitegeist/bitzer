@@ -132,6 +132,57 @@ class Schedule
         return $groupedTasks;
     }
 
+    /**
+     * @param TaskClassName $taskClassName
+     * @param NodeAddress $object
+     * @return array|TaskInterface[]
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    final public function findPotentialTasksOfClassForObject(TaskClassName $taskClassName, NodeAddress $object): array
+    {
+        $rawDataSet = $this->getDatabaseConnection()->executeQuery(
+            'SELECT * FROM ' . self::TABLE_NAME . '
+ WHERE classname = :taskClassName
+    AND object = :object
+    AND actionstatus = :actionStatusType',
+            [
+                'taskClassName' => $taskClassName,
+                'object' => $object,
+                'actionStatusType' => ActionStatusType::TYPE_POTENTIAL
+            ]
+        )->fetchAll();
+
+        $tasks = $this->createTasksFromRawDataSet($rawDataSet);
+        return $tasks;
+    }
+
+    /**
+     * @param NodeAddress $object
+     * @return array|TaskInterface[]
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    final public function findActiveOrPotentialTasksForObject(NodeAddress $object): array
+    {
+        $rawDataSet = $this->getDatabaseConnection()->executeQuery(
+            'SELECT * FROM ' . self::TABLE_NAME . '
+    WHERE object = :object
+ AND actionstatus IN (:actionStatusTypes)',
+            [
+                'object' => $object,
+                'actionStatusTypes' => [
+                    ActionStatusType::TYPE_POTENTIAL,
+                    ActionStatusType::TYPE_ACTIVE
+                ]
+            ],
+            [
+                'actionStatusTypes' => Connection::PARAM_STR_ARRAY
+            ]
+        )->fetchAll();
+
+        $tasks = $this->createTasksFromRawDataSet($rawDataSet);
+        return $tasks;
+    }
+
     final public function scheduleTask(ScheduleTask $command): void
     {
         $this->getDatabaseConnection()->insert(
