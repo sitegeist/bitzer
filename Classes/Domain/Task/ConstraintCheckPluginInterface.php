@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Task;
 
 use Neos\Flow\Annotations as Flow;
+use Sitegeist\Bitzer\Domain\Task\Command\ActivateTask;
 use Sitegeist\Bitzer\Domain\Task\Command\CancelTask;
 use Sitegeist\Bitzer\Domain\Task\Command\CompleteTask;
 use Sitegeist\Bitzer\Domain\Task\Command\ReassignTask;
@@ -34,6 +35,8 @@ interface ConstraintCheckPluginInterface
     public function checkSetTaskProperties(SetTaskProperties $command, ConstraintCheckResult $constraintCheckResult = null): void;
 
     public function checkCancelTask(CancelTask $command, ConstraintCheckResult $constraintCheckResult = null): void;
+
+    public function checkActivateTask(ActivateTask $command, ConstraintCheckResult $constraintCheckResult = null): void;
 
     public function checkCompleteTask(CompleteTask $command, ConstraintCheckResult $constraintCheckResult = null): void;
 }

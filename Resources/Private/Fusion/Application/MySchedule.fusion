@@ -24,6 +24,9 @@ prototype(Sitegeist.Bitzer:Application.MySchedule) < prototype(Neos.Fusion:Compo
 prototype(Sitegeist.Bitzer:MyScheduleTable) < prototype(Neos.Fusion:Component) {
     tasks = ${[]}
     groupIdentifier = ''
+    @context.activateTaskUri = Sitegeist.Bitzer:ActionUri {
+        action = 'activateTask'
+    }
 
     renderer = afx`
         <tr class="neos-folder">
@@ -38,9 +41,7 @@ prototype(Sitegeist.Bitzer:MyScheduleTable) < prototype(Neos.Fusion:Component) {
                 <td>{item.description}</td>
                 <td class="neos-action">
                     <div class="neos-pull-right">
-                        <a data-neos-toggle="tooltip" class="neos-button neos-button-primary" title="" href={item.target} target="_blank" data-original-title={${Translation.translate('actions.startTask.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}} @if.hasTarget={item.target}>
-                            <i class="fas fa-play icon-white"></i>
-                        </a>
+                        <Sitegeist.Bitzer:CommandForm commandName="activateTask" commandArguments={{taskIdentifier: String.toString(item.identifier)}} icon="play" target={${item.target ? '_blank' : '_self'}} />
                         <Sitegeist.Bitzer:CommandForm commandName="completeTask" commandArguments={{taskIdentifier: String.toString(item.identifier)}} icon="check" />
                     </div>
                 </td>

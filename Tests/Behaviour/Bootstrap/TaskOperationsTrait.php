@@ -13,6 +13,7 @@ use Neos\Flow\Security\Context;
 use PHPUnit\Framework\Assert;
 use Sitegeist\Bitzer\Application\Bitzer;
 use Sitegeist\Bitzer\Domain\Task\ActionStatusType;
+use Sitegeist\Bitzer\Domain\Task\Command\ActivateTask;
 use Sitegeist\Bitzer\Domain\Task\Command\CancelTask;
 use Sitegeist\Bitzer\Domain\Task\Command\CompleteTask;
 use Sitegeist\Bitzer\Domain\Task\Command\ReassignTask;
@@ -290,6 +291,38 @@ trait TaskOperationsTrait
     {
         try {
             $this->theCommandCompleteTaskIsExecutedWithPayload($payloadTable);
+        } catch (\Exception $exception) {
+            $this->lastCommandException = $exception;
+        }
+    }
+
+    /**
+     * @When /^the command ActivateTask is executed with payload:$/
+     * @param TableNode $payloadTable
+     * @throws Exception
+     */
+    public function theCommandActivateTaskIsExecutedWithPayload(TableNode $payloadTable)
+    {
+        $commandArguments = $this->readPayloadTable($payloadTable);
+
+        $command = new ActivateTask(
+            new TaskIdentifier($commandArguments['taskIdentifier'])
+        );
+
+        $this->getSecurityContext()->withoutAuthorizationChecks(function() use($command) {
+            $this->bitzer->handleActivateTask($command, $this->constraintCheckResult);
+        });
+    }
+
+    /**
+     * @When /^the command ActivateTask is executed with payload and exceptions are caught:$/
+     * @param TableNode $payloadTable
+     * @throws Exception
+     */
+    public function theCommandActivateTaskIsExecutedWithPayloadAndExceptionsAreCaught(TableNode $payloadTable)
+    {
+        try {
+            $this->theCommandActivateTaskIsExecutedWithPayload($payloadTable);
         } catch (\Exception $exception) {
             $this->lastCommandException = $exception;
         }

@@ -12,6 +12,7 @@ use Neos\Flow\Security\Context as SecurityContext;
 use Neos\Neos\Controller\Backend\ModuleController;
 use Sitegeist\Bitzer\Application\Bitzer;
 use Sitegeist\Bitzer\Domain\Agent\AgentRepository;
+use Sitegeist\Bitzer\Domain\Task\Command\ActivateTask;
 use Sitegeist\Bitzer\Domain\Task\Command\CancelTask;
 use Sitegeist\Bitzer\Domain\Task\Command\CompleteTask;
 use Sitegeist\Bitzer\Domain\Task\Command\ReassignTask;
@@ -298,6 +299,21 @@ class BitzerController extends ModuleController
         } else {
             $this->addFlashMessage($this->getLabel('setTaskProperties.success', [$task->getDescription()]), '');
             $this->redirect('editTask', null, null, ['taskIdentifier' => (string)$taskIdentifier]);
+        }
+    }
+
+    public function activateTaskAction(TaskIdentifier $taskIdentifier): void
+    {
+        $task = $this->schedule->findByIdentifier($taskIdentifier);
+
+        $command = new ActivateTask($taskIdentifier);
+        $this->bitzer->handleActivateTask($command);
+
+        if ($task->getTarget()) {
+            $this->redirectToUri($task->getTarget());
+        } else {
+            $this->addFlashMessage($this->getLabel('activateTask.success', [$task->getDescription()]), '');
+            $this->redirect('mySchedule');
         }
     }
 

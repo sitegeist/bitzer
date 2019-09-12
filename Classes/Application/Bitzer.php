@@ -8,6 +8,7 @@ use Neos\Flow\ObjectManagement\ObjectManagerInterface;
 use Psr\Http\Message\UriInterface;
 use Sitegeist\Bitzer\Domain\Agent\AgentRepository;
 use Sitegeist\Bitzer\Domain\Task\ActionStatusType;
+use Sitegeist\Bitzer\Domain\Task\Command\ActivateTask;
 use Sitegeist\Bitzer\Domain\Task\Command\CancelTask;
 use Sitegeist\Bitzer\Domain\Task\Command\CompleteTask;
 use Sitegeist\Bitzer\Domain\Task\Command\ReassignTask;
@@ -200,7 +201,7 @@ class Bitzer
         }
     }
 
-    final public function handleCompleteTask(CompleteTask $command, ConstraintCheckResult $constraintCheckResult = null): void
+    final public function handleActivateTask(ActivateTask $command, ?ConstraintCheckResult $constraintCheckResult = null): void
     {
         $this->requireTaskToExist($command->getIdentifier(), $constraintCheckResult);
 
@@ -211,6 +212,20 @@ class Bitzer
             }
         }
 
+        if (IsCommandToBeExecuted::isSatisfiedByConstraintCheckResult($constraintCheckResult)) {
+            $this->schedule->updateTaskActionStatus($command->getIdentifier(), ActionStatusType::active());
+        }
+    }
+
+    final public function handleCompleteTask(CompleteTask $command, ?ConstraintCheckResult $constraintCheckResult = null): void
+    {
+        $this->requireTaskToExist($command->getIdentifier(), $constraintCheckResult);
+
+        $task = $this->schedule->findByIdentifier($command->getIdentifier());
+        if ($task) {
+            foreach ($this->getConstraintCheckPlugins(TaskClassName::createFromObject($task)) as $constraintCheckPlugin) {
+                $constraintCheckPlugin->checkCompleteTask($command, $constraintCheckResult);
+            }
         }
 
         if (IsCommandToBeExecuted::isSatisfiedByConstraintCheckResult($constraintCheckResult)) {
