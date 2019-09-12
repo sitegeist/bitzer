@@ -9,6 +9,7 @@ use Behat\Gherkin\Node\TableNode;
 use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\Flow\Http\Uri;
 use Neos\Flow\ObjectManagement\ObjectManagerInterface;
+use Neos\Flow\Security\Context;
 use PHPUnit\Framework\Assert;
 use Sitegeist\Bitzer\Application\Bitzer;
 use Sitegeist\Bitzer\Domain\Task\ActionStatusType;
@@ -112,11 +113,9 @@ trait TaskOperationsTrait
             $commandArguments['properties']
         );
 
-        if ($this->constraintCheckResult) {
+        $this->getSecurityContext()->withoutAuthorizationChecks(function() use($command) {
             $this->bitzer->handleScheduleTask($command, $this->constraintCheckResult);
-        } else {
-            $this->bitzer->handleScheduleTask($command);
-        }
+        });
     }
 
     /**
@@ -147,11 +146,9 @@ trait TaskOperationsTrait
             isset($commandArguments['scheduledTime']) ? ScheduledTime::createFromString($commandArguments['scheduledTime']) : null
         );
 
-        if ($this->constraintCheckResult) {
+        $this->getSecurityContext()->withoutAuthorizationChecks(function() use($command) {
             $this->bitzer->handleRescheduleTask($command, $this->constraintCheckResult);
-        } else {
-            $this->bitzer->handleRescheduleTask($command);
-        }
+        });
     }
 
     /**
@@ -182,11 +179,9 @@ trait TaskOperationsTrait
             $commandArguments['agent']
         );
 
-        if ($this->constraintCheckResult) {
+        $this->getSecurityContext()->withoutAuthorizationChecks(function() use($command) {
             $this->bitzer->handleReassignTask($command, $this->constraintCheckResult);
-        } else {
-            $this->bitzer->handleReassignTask($command);
-        }
+        });
     }
 
     /**
@@ -217,11 +212,9 @@ trait TaskOperationsTrait
             $commandArguments['properties']
         );
 
-        if ($this->constraintCheckResult) {
+        $this->getSecurityContext()->withoutAuthorizationChecks(function() use($command) {
             $this->bitzer->handleSetTaskProperties($command, $this->constraintCheckResult);
-        } else {
-            $this->bitzer->handleSetTaskProperties($command);
-        }
+        });
     }
 
     /**
@@ -251,11 +244,9 @@ trait TaskOperationsTrait
             new TaskIdentifier($commandArguments['taskIdentifier'])
         );
 
-        if ($this->constraintCheckResult) {
+        $this->getSecurityContext()->withoutAuthorizationChecks(function() use($command) {
             $this->bitzer->handleCancelTask($command, $this->constraintCheckResult);
-        } else {
-            $this->bitzer->handleCancelTask($command);
-        }
+        });
     }
 
     /**
@@ -285,11 +276,9 @@ trait TaskOperationsTrait
             new TaskIdentifier($commandArguments['taskIdentifier'])
         );
 
-        if ($this->constraintCheckResult) {
+        $this->getSecurityContext()->withoutAuthorizationChecks(function() use($command) {
             $this->bitzer->handleCompleteTask($command, $this->constraintCheckResult);
-        } else {
-            $this->bitzer->handleCompleteTask($command);
-        }
+        });
     }
 
     /**
@@ -320,11 +309,9 @@ trait TaskOperationsTrait
             isset($commandArguments['target']) ? new Uri($commandArguments['target']) : null
         );
 
-        if ($this->constraintCheckResult) {
+        $this->getSecurityContext()->withoutAuthorizationChecks(function() use($command) {
             $this->bitzer->handleSetNewTaskTarget($command, $this->constraintCheckResult);
-        } else {
-            $this->bitzer->handleSetNewTaskTarget($command);
-        }
+        });
     }
 
     /**
@@ -355,11 +342,9 @@ trait TaskOperationsTrait
             isset($commandArguments['object']) ? NodeAddress::fromArray($commandArguments['object']) : null
         );
 
-        if ($this->constraintCheckResult) {
+        $this->getSecurityContext()->withoutAuthorizationChecks(function() use($command) {
             $this->bitzer->handleSetNewTaskObject($command, $this->constraintCheckResult);
-        } else {
-            $this->bitzer->handleSetNewTaskObject($command);
-        }
+        });
     }
 
     /**
@@ -391,12 +376,15 @@ trait TaskOperationsTrait
     /**
      * @Then /^I expect the task "([^"]*)" to exist$/
      * @param string $taskIdentifier
+     * @throws Exception
      */
     public function iExpectTheTaskToExist(string $taskIdentifier): void
     {
         $taskIdentifier = new TaskIdentifier($taskIdentifier);
 
-        $this->currentTask = $this->schedule->findByIdentifier($taskIdentifier);
+        $this->getSecurityContext()->withoutAuthorizationChecks(function() use($taskIdentifier) {
+            $this->currentTask = $this->schedule->findByIdentifier($taskIdentifier);
+        });
 
         Assert::assertNotNull($this->currentTask, sprintf('Task "%s" was not found in the schedule.', $taskIdentifier));
     }
@@ -525,5 +513,10 @@ trait TaskOperationsTrait
         Assert::assertNotNull($this->constraintCheckResult->getException($expectedPath), 'Constraint check result does not contain an exception at path ' . $expectedPath);
         $actualShortName = (new ReflectionClass($this->constraintCheckResult->getException($expectedPath)))->getShortName();
         Assert::assertSame($expectedShortName, $actualShortName, sprintf('Constraint check result contains an exception of type %s at path %s, %s expected', $actualShortName, $expectedPath, $expectedShortName));
+    }
+
+    protected function getSecurityContext(): Context
+    {
+        return $this->getObjectManager()->get(Context::class);
     }
 }

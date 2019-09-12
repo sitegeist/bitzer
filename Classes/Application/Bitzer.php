@@ -73,7 +73,7 @@ class Bitzer
      */
     protected $objectManager;
 
-    final public function handleScheduleTask(ScheduleTask $command, ConstraintCheckResult $constraintCheckResult = null): void
+    final public function handleScheduleTask(ScheduleTask $command, ?ConstraintCheckResult $constraintCheckResult = null): void
     {
         $this->requireTaskToNotExist($command->getIdentifier(), $constraintCheckResult);
         $this->requireAgentToExist($command->getAgent(), $constraintCheckResult);
@@ -95,7 +95,7 @@ class Bitzer
         }
     }
 
-    final public function handleRescheduleTask(RescheduleTask $command, ConstraintCheckResult $constraintCheckResult = null): void
+    final public function handleRescheduleTask(RescheduleTask $command, ?ConstraintCheckResult $constraintCheckResult = null): void
     {
         $this->requireTaskToExist($command->getIdentifier(), $constraintCheckResult);
         $this->requireScheduledTimeToBeSet($command->getScheduledTime(), $constraintCheckResult);
@@ -110,7 +110,7 @@ class Bitzer
         }
     }
 
-    final public function handleReassignTask(ReassignTask $command, ConstraintCheckResult $constraintCheckResult = null): void
+    final public function handleReassignTask(ReassignTask $command, ?ConstraintCheckResult $constraintCheckResult = null): void
     {
         $this->requireTaskToExist($command->getIdentifier(), $constraintCheckResult);
         $this->requireAgentToExist($command->getAgent(), $constraintCheckResult);
@@ -125,7 +125,7 @@ class Bitzer
         }
     }
 
-    final public function handleSetNewTaskTarget(SetNewTaskTarget $command, ConstraintCheckResult $constraintCheckResult = null): void
+    final public function handleSetNewTaskTarget(SetNewTaskTarget $command, ?ConstraintCheckResult $constraintCheckResult = null): void
     {
         $this->requireTaskToExist($command->getIdentifier(), $constraintCheckResult);
         if ($command->getTarget()) {
@@ -142,7 +142,7 @@ class Bitzer
         }
     }
 
-    final public function handleSetNewTaskObject(SetNewTaskObject $command, ConstraintCheckResult $constraintCheckResult = null): void
+    final public function handleSetNewTaskObject(SetNewTaskObject $command, ?ConstraintCheckResult $constraintCheckResult = null): void
     {
         $this->requireTaskToExist($command->getIdentifier(), $constraintCheckResult);
         if ($command->getObject()) {
@@ -159,7 +159,7 @@ class Bitzer
         }
     }
 
-    final public function handleSetTaskProperties(SetTaskProperties $command, ConstraintCheckResult $constraintCheckResult = null): void
+    final public function handleSetTaskProperties(SetTaskProperties $command, ?ConstraintCheckResult $constraintCheckResult = null): void
     {
         $this->requireTaskToExist($command->getIdentifier(), $constraintCheckResult);
         $this->requireDescriptionToBeSet($command->getProperties(), $constraintCheckResult);
@@ -174,7 +174,7 @@ class Bitzer
         }
     }
 
-    final public function handleCancelTask(CancelTask $command, ConstraintCheckResult $constraintCheckResult = null): void
+    final public function handleCancelTask(CancelTask $command, ?ConstraintCheckResult $constraintCheckResult = null): void
     {
         $this->requireTaskToExist($command->getIdentifier(), $constraintCheckResult);
 
