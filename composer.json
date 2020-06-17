@@ -3,10 +3,10 @@
   "type": "neos-package",
   "description": "A content lifecycle task manager for Neos CMS",
   "require": {
-    "neos/neos": "~4.3",
-    "neos/fusion": "~4.3",
-    "neos/content-repository": "~4.3",
-    "neos/fusion-afx": "~1.2",
+    "neos/neos": "~5.0",
+    "neos/fusion": "~5.0",
+    "neos/content-repository": "~5.0",
+    "neos/fusion-afx": "~1.4",
     "doctrine/dbal": "*",
     "doctrine/migrations": "*",
     "neos/content-repository-dimensionspace": "dev-master"
