@@ -351,8 +351,8 @@ class BitzerController extends ModuleController
         $this->redirect('schedule');
     }
 
-    private function getLabel(string $labelIdentifier, array $arguments = [], $quantity = null): ?string
+    private function getLabel(string $labelIdentifier, array $arguments = [], $quantity = null): string
     {
-        return $this->translator->translateById($labelIdentifier, $arguments, $quantity, null, 'Module.Bitzer', 'Sitegeist.Bitzer');
+        return $this->translator->translateById($labelIdentifier, $arguments, $quantity, null, 'Module.Bitzer', 'Sitegeist.Bitzer') ?? 'not-found-'.$labelIdentifier;
     }
 }
