@@ -4,6 +4,7 @@ namespace Sitegeist\Bitzer\Domain\Task;
 
 use Neos\ContentRepository\Domain\Projection\Content\TraversableNodeInterface;
 use Psr\Http\Message\UriInterface;
+use Sitegeist\Bitzer\Domain\Agent\Agent;
 
 /**
  * The interface to be implemented by tasks, according to https://schema.org/ScheduleAction
@@ -51,9 +52,9 @@ interface TaskInterface
      * The direct performer or driver of the action (animate or inanimate). e.g. John wrote a book.
      * In our case, as tasks are assigned to user groups, this is a Flow policy role identifier.
      *
-     * @return string
+     * @return Agent
      */
-    public function getAgent(): string;
+    public function getAgent(): Agent;
 
     /**
      * The object upon which the action is carried out, whose state is kept intact or changed.

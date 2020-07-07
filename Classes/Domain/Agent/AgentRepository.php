@@ -6,6 +6,10 @@ use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Security\Context as SecurityContext;
 use Neos\Flow\Security\Exception\NoSuchRoleException;
 use Neos\Flow\Security\Policy\PolicyService;
+use Neos\Neos\Domain\Repository\UserRepository;
+use Neos\Flow\Persistence\PersistenceManagerInterface;
+use Neos\Party\Domain\Service\PartyService;
+use Neos\Neos\Domain\Model\User;
 
 /**
  * The agent repository
@@ -25,25 +29,52 @@ class AgentRepository
      */
     protected $securityContext;
 
+    /**
+     * @Flow\Inject
+     * @var UserRepository
+     */
+    protected $userRepository;
+
+    /**
+     * @Flow\Inject
+     * @var PersistenceManagerInterface
+     */
+    protected $persistenceManager;
+
+    /**
+     * @Flow\Inject
+     * @var PartyService
+     */
+    protected $partyService;
+
+    /**
+     * @return Agent[]|array
+     */
     public function findAll(): array
     {
-        $agentIdentifiers = [];
+        $agents = [];
 
         foreach ($this->policyService->getRoles(false) as $role) {
-            $agentIdentifiers[] = $role->getIdentifier();
+            $agents[] = Agent::fromRoleIdentifier($role->getIdentifier());
         }
 
-        return $agentIdentifiers;
+        foreach ($this->userRepository->findAll() as $user) {
+            $agents[] = Agent::fromUserIdentifier($this->persistenceManager->getIdentifierByObject($user));
+        }
+        return $agents;
     }
 
-    public function findByIdentifier(string $agentIdentifier): ?string
+    /**
+     * @param string $agentIdentifier
+     * @return Agent|null
+     */
+    public function findByIdentifier(string $agentIdentifier): ?Agent
     {
         try {
             $role = $this->policyService->getRole($agentIdentifier);
-
-            return !$role->isAbstract() ? $agentIdentifier : null;
+            return !$role->isAbstract() ? Agent::fromRoleIdentifier($agentIdentifier) : null;
         } catch (NoSuchRoleException $e) {
-            return null;
+            return  Agent::fromUserIdentifier($agentIdentifier);
         }
     }
 
@@ -51,7 +82,7 @@ class AgentRepository
      * Returns the currently authenticated agents.
      * Note that a single user can represent multiple agents by their assigned roles.
      *
-     * @return array
+     * @return Agent[]|array
      * @throws NoSuchRoleException
      * @throws \Neos\Flow\Security\Exception
      */
@@ -61,8 +92,13 @@ class AgentRepository
 
         foreach ($this->securityContext->getRoles() as $role) {
             if (!$role->isAbstract()) {
-                $agentIdentifiers[] = $role->getIdentifier();
+                $agentIdentifiers[] = Agent::fromRoleIdentifier($role->getIdentifier());
             }
+        }
+
+        $user = $this->partyService->getAssignedPartyOfAccount($this->securityContext->getAccount());
+        if ($user instanceof User) {
+            $agentIdentifiers[] = Agent::fromUserIdentifier($this->persistenceManager->getIdentifierByObject($user));
         }
 
         return $agentIdentifiers;

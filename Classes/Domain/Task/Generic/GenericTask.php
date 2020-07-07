@@ -9,6 +9,7 @@ use Psr\Http\Message\UriInterface;
 use Sitegeist\Bitzer\Domain\Task\ActionStatusType;
 use Sitegeist\Bitzer\Domain\Task\TaskIdentifier;
 use Sitegeist\Bitzer\Domain\Task\TaskInterface;
+use Sitegeist\Bitzer\Domain\Agent\Agent;
 
 /**
  * The generic task domain entity
@@ -37,7 +38,7 @@ final class GenericTask implements TaskInterface
     private $actionStatus;
 
     /**
-     * @var string
+     * @var Agent
      */
     private $agent;
 
@@ -66,7 +67,7 @@ final class GenericTask implements TaskInterface
         array $properties,
         \DateTimeImmutable $scheduledTime,
         ActionStatusType $actionStatus,
-        string $agent,
+        Agent $agent,
         ?TraversableNodeInterface $object,
         ?UriInterface $target
     ) {
@@ -134,9 +135,9 @@ final class GenericTask implements TaskInterface
      * The direct performer or driver of the action (animate or inanimate). e.g. John wrote a book.
      * In our case, as tasks are assigned to user groups, this is a Flow policy role identifier.
      *
-     * @return string
+     * @return Agent
      */
-    public function getAgent(): string
+    public function getAgent(): Agent
     {
         return $this->agent;
     }

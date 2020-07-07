@@ -4,6 +4,7 @@ namespace Sitegeist\Bitzer\Domain\Task;
 
 use Neos\ContentRepository\Domain\Projection\Content\TraversableNodeInterface;
 use Psr\Http\Message\UriInterface;
+use Sitegeist\Bitzer\Domain\Agent\Agent;
 
 /**
  * The interface to be implemented by task factories
@@ -16,7 +17,7 @@ interface TaskFactoryInterface
         array $properties,
         \DateTimeImmutable $scheduledTime,
         ActionStatusType $actionStatus,
-        string $agent,
+        Agent $agent,
         ?NodeAddress $object,
         ?UriInterface $target
     ): TaskInterface;

@@ -11,7 +11,7 @@ use Psr\Http\Message\UriInterface;
 use Sitegeist\Bitzer\Domain\Task\Command\ScheduleTask;
 use Sitegeist\Bitzer\Domain\Task\Generic\GenericTaskFactory;
 use Sitegeist\Bitzer\Infrastructure\DbalClient;
-
+use Sitegeist\Bitzer\Domain\Agent\Agent;
 /**
  * The schedule, the repository for tasks
  * @Flow\Scope("singleton")
@@ -323,6 +323,7 @@ class Schedule
     {
         $className = TaskClassName::createFromString($rawData['classname']);
         $factory = $this->resolveFactory($className);
+        $agent = '';
         $object = null;
         if (isset($rawData['object']) && !empty($rawData['object'])) {
             $object = NodeAddress::createFromArray(json_decode($rawData['object'], true));
@@ -334,7 +335,7 @@ class Schedule
             json_decode($rawData['properties'], true),
             ScheduledTime::createFromDatabaseValue($rawData['scheduledtime']),
             ActionStatusType::createFromString($rawData['actionstatus']),
-            $rawData['agent'],
+            Agent::fromRawData($rawData),
             $object,
             isset($rawData['target']) ? new Uri($rawData['target']) : null
         );
