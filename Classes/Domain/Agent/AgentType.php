@@ -10,11 +10,11 @@ use Neos\Flow\Annotations as Flow;
  */
 final class AgentType implements \JsonSerializable
 {
-    const ROLE = 1;
-    const USER = 2;
+    const ROLE = 'role';
+    const USER = 'user';
 
     /**
-     * @var int
+     * @var string
      */
     private $value;
 
@@ -22,7 +22,7 @@ final class AgentType implements \JsonSerializable
      * AgentType constructor.
      * @param int $value
      */
-    public function __construct(int $value)
+    public function __construct(string $value)
     {
         if (!in_array($value, self::getValues())) {
             throw AgentTypeIsInvalid::becauseAgentTypeHasInvalidValue($value, self::getValues());
@@ -42,7 +42,7 @@ final class AgentType implements \JsonSerializable
         ];
     }
 
-    public static function fromInteger(int $value): self
+    public static function fromString(string $value): self
     {
         return new self($value);
     }
@@ -67,7 +67,7 @@ final class AgentType implements \JsonSerializable
         return $this->value === self::USER;
     }
 
-    public function getValue(): int
+    public function getValue(): string
     {
         return $this->value;
     }

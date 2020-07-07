@@ -41,9 +41,11 @@ final class Agent
         return new self($identifier, AgentType::user());
     }
 
-    public static function fromRawData(array $rawData): self
+    public static function fromString(string $string): self
     {
-        return new self($rawData['agent'], AgentType::fromInteger((int) $rawData['agenttype']));
+        list($type, $identifier) = explode(':', $string, 2);
+
+        return new self($identifier, AgentType::fromString($type));
     }
 
     /**
@@ -62,8 +64,11 @@ final class Agent
         return $this->type;
     }
 
-    public function __toString()
+    /**
+     * @return string
+     */
+    public function __toString(): string
     {
-        return $this->identifier;
+        return join(':', [$this->type, $this->identifier]);
     }
 }

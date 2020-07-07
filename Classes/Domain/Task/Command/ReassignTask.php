@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Task\Command;
 
 use Neos\Flow\Annotations as Flow;
+use Sitegeist\Bitzer\Domain\Agent\Agent;
 use Sitegeist\Bitzer\Domain\Task\TaskIdentifier;
 
 /**
@@ -17,11 +18,11 @@ final class ReassignTask
     private $identifier;
 
     /**
-     * @var string
+     * @var Agent
      */
     private $agent;
 
-    public function __construct(TaskIdentifier $identifier, string $agent)
+    public function __construct(TaskIdentifier $identifier, Agent $agent)
     {
         $this->identifier = $identifier;
         $this->agent = $agent;
@@ -32,7 +33,7 @@ final class ReassignTask
         return $this->identifier;
     }
 
-    public function getAgent(): string
+    public function getAgent(): Agent
     {
         return $this->agent;
     }

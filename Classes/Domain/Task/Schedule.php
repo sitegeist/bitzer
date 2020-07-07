@@ -220,7 +220,7 @@ class Schedule
         );
     }
 
-    final public function reassignTask(TaskIdentifier $taskIdentifier, string $agent): void
+    final public function reassignTask(TaskIdentifier $taskIdentifier, Agent $agent): void
     {
         $this->getDatabaseConnection()->update(
             self::TABLE_NAME,
@@ -335,7 +335,7 @@ class Schedule
             json_decode($rawData['properties'], true),
             ScheduledTime::createFromDatabaseValue($rawData['scheduledtime']),
             ActionStatusType::createFromString($rawData['actionstatus']),
-            Agent::fromRawData($rawData),
+            Agent::fromString($rawData['agent']),
             $object,
             isset($rawData['target']) ? new Uri($rawData['target']) : null
         );

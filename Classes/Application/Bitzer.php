@@ -6,6 +6,7 @@ namespace Sitegeist\Bitzer\Application;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\ObjectManagement\ObjectManagerInterface;
 use Psr\Http\Message\UriInterface;
+use Sitegeist\Bitzer\Domain\Agent\Agent;
 use Sitegeist\Bitzer\Domain\Agent\AgentRepository;
 use Sitegeist\Bitzer\Domain\Task\ActionStatusType;
 use Sitegeist\Bitzer\Domain\Task\Command\ActivateTask;
@@ -269,12 +270,12 @@ class Bitzer
         }
     }
 
-    private function requireAgentToExist(string $agentIdentifier, ConstraintCheckResult $constraintCheckResult = null): void
+    private function requireAgentToExist(Agent $agent, ConstraintCheckResult $constraintCheckResult = null): void
     {
-        if (!$this->agentRepository->findByIdentifier($agentIdentifier)) {
-            $exception = AgentDoesNotExist::althoughExpectedForIdentifier($agentIdentifier);
+        if (!$this->agentRepository->findByIdentifier($agent->getIdentifier())) {
+            $exception = AgentDoesNotExist::althoughExpectedForIdentifier($agent->getIdentifier());
             if ($constraintCheckResult) {
-                $constraintCheckResult->registerFailedCheck('agent', $exception, [$agentIdentifier]);
+                $constraintCheckResult->registerFailedCheck('agent', $exception, [$agent->getIdentifier()]);
             } else {
                 throw $exception;
             }
