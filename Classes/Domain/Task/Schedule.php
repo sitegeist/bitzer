@@ -12,6 +12,9 @@ use Sitegeist\Bitzer\Domain\Task\Command\ScheduleTask;
 use Sitegeist\Bitzer\Domain\Task\Generic\GenericTaskFactory;
 use Sitegeist\Bitzer\Infrastructure\DbalClient;
 use Sitegeist\Bitzer\Domain\Agent\Agent;
+use Sitegeist\Bitzer\Domain\Agent\AgentRepository;
+use Sitegeist\Bitzer\Domain\Task\Exception\AgentDoesNotExist;
+
 /**
  * The schedule, the repository for tasks
  * @Flow\Scope("singleton")
@@ -37,6 +40,12 @@ class Schedule
      * @var ContentDimensionPresetSourceInterface
      */
     protected $contentDimensionPresetSource;
+
+    /**
+     * @Flow\Inject
+     * @var AgentRepository
+     */
+    protected $agentRepository;
 
     final public function findByIdentifier(TaskIdentifier $identifier): ?TaskInterface
     {
@@ -323,7 +332,11 @@ class Schedule
     {
         $className = TaskClassName::createFromString($rawData['classname']);
         $factory = $this->resolveFactory($className);
-        $agent = '';
+        $agent = $this->agentRepository->findByString($rawData['agent']);
+        if (!$agent) {
+            throw AgentDoesNotExist::althoughExpectedForIdentifier($rawData['agent']);
+        }
+
         $object = null;
         if (isset($rawData['object']) && !empty($rawData['object'])) {
             $object = NodeAddress::createFromArray(json_decode($rawData['object'], true));
@@ -335,7 +348,7 @@ class Schedule
             json_decode($rawData['properties'], true),
             ScheduledTime::createFromDatabaseValue($rawData['scheduledtime']),
             ActionStatusType::createFromString($rawData['actionstatus']),
-            Agent::fromString($rawData['agent']),
+            $agent,
             $object,
             isset($rawData['target']) ? new Uri($rawData['target']) : null
         );

@@ -2,6 +2,8 @@
 namespace Sitegeist\Bitzer\Domain\Agent;
 
 use Neos\Flow\Annotations as Flow;
+use Neos\Flow\Security\Policy\Role;
+use Neos\Neos\Domain\Model\User;
 
 /**
  * @Flow\Proxy(false)
@@ -16,6 +18,11 @@ final class Agent
     private $identifier;
 
     /**
+     * @var string
+     */
+    private $label;
+
+    /**
      * @var AgentType
      */
     private $type;
@@ -23,29 +30,32 @@ final class Agent
     /**
      * Agent constructor.
      * @param string $identifier
+     * @param string $label
      * @param AgentType $type
      */
-    public function __construct(string $identifier, AgentType $type)
+    public function __construct(string $identifier, string $label, AgentType $type)
     {
         $this->identifier = $identifier;
+        $this->label = $label;
         $this->type = $type;
     }
 
-    public static function fromRoleIdentifier(string $identifier): self
+    public static function fromRole(Role $role): self
     {
-        return new self($identifier, AgentType::role());
+        return new self(
+            $role->getIdentifier(),
+            $role->getName(),
+            AgentType::role()
+        );
     }
 
-    public static function fromUserIdentifier(string $identifier): self
+    public static function fromUser(User $user, string $identifier): self
     {
-        return new self($identifier, AgentType::user());
-    }
-
-    public static function fromString(string $string): self
-    {
-        list($type, $identifier) = explode(':', $string, 2);
-
-        return new self($identifier, AgentType::fromString($type));
+        return new self(
+            $identifier,
+            $user->getName()->getFullName(),
+            AgentType::user()
+        );
     }
 
     /**
@@ -62,6 +72,22 @@ final class Agent
     public function getType(): AgentType
     {
         return $this->type;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLabel(): string
+    {
+        return $this->label;
+    }
+
+    public function equals(Agent $other): bool
+    {
+        return (
+            $this->getIdentifier() === $other->getIdentifier()
+            && $this->getType()->equals($other->getType())
+        );
     }
 
     /**

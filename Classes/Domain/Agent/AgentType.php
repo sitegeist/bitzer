@@ -72,6 +72,11 @@ final class AgentType implements \JsonSerializable
         return $this->value;
     }
 
+    public function equals(AgentType $other): bool
+    {
+        return $this->getValue() === $other->getValue();
+    }
+
     public function __toString(): string
     {
         return (string) $this->value;

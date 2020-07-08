@@ -1,0 +1,15 @@
+'Sitegeist.Bitzer:Mixin.Setting.Agent':
+  abstract: true
+  superTypes:
+    'Sitegeist.Bitzer:Mixin.Inspector': true
+  properties:
+    bitzerTaskAgent:
+      ui:
+        label: i18n
+        inspector:
+          group: bitzer-settings
+          editor: 'Content/Inspector/Editors/SelectBoxEditor'
+          editorOptions:
+            allowEmpty: true
+            placeholder: i18n
+            dataSourceIdentifier: 'sitegeist-bitzer-agent'

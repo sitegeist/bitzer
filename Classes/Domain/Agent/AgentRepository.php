@@ -6,9 +6,11 @@ use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Security\Context as SecurityContext;
 use Neos\Flow\Security\Exception\NoSuchRoleException;
 use Neos\Flow\Security\Policy\PolicyService;
+use Neos\Flow\Security\AccountRepository;
 use Neos\Neos\Domain\Repository\UserRepository;
 use Neos\Flow\Persistence\PersistenceManagerInterface;
 use Neos\Party\Domain\Service\PartyService;
+use Neos\Flow\Security\Policy\Role;
 use Neos\Neos\Domain\Model\User;
 
 /**
@@ -48,6 +50,22 @@ class AgentRepository
     protected $partyService;
 
     /**
+     * @Flow\Inject
+     * @var AccountRepository
+     */
+    protected $accountRepository;
+
+    /**
+     * @var Role
+     */
+    protected $bitzerAgentRole;
+
+    public function initializeObject()
+    {
+        $this->bitzerAgentRole = $this->policyService->getRole('Sitegeist.Bitzer:Agent');
+    }
+
+    /**
      * @return Agent[]|array
      */
     public function findAll(): array
@@ -55,27 +73,63 @@ class AgentRepository
         $agents = [];
 
         foreach ($this->policyService->getRoles(false) as $role) {
-            $agents[] = Agent::fromRoleIdentifier($role->getIdentifier());
+            if ($this->roleIsEligibleAgent($role)) {
+                $agents[] = Agent::fromRole($role);
+            }
         }
 
         foreach ($this->userRepository->findAll() as $user) {
-            $agents[] = Agent::fromUserIdentifier($this->persistenceManager->getIdentifierByObject($user));
+            if ($this->userIsEligibleAgent($user)) {
+                $agents[] = Agent::fromUser($user, $this->persistenceManager->getIdentifierByObject($user));
+            }
         }
         return $agents;
     }
 
     /**
-     * @param string $agentIdentifier
+     * @param string $string
      * @return Agent|null
      */
-    public function findByIdentifier(string $agentIdentifier): ?Agent
+    public function findByString(string $string): ?Agent
     {
-        try {
-            $role = $this->policyService->getRole($agentIdentifier);
-            return !$role->isAbstract() ? Agent::fromRoleIdentifier($agentIdentifier) : null;
-        } catch (NoSuchRoleException $e) {
-            return  Agent::fromUserIdentifier($agentIdentifier);
+        if (strpos($string, ':') === false) {
+            return null;
         }
+
+        list($type, $identifier) = explode(':', $string, 2);
+
+        return $this->findByTypeAndIdentifier(
+            AgentType::fromString($type),
+            $identifier
+        );
+    }
+
+    /**
+     * @param AgentType $type
+     * @param string $identifier
+     * @return Agent|null
+     */
+    public function findByTypeAndIdentifier(AgentType $type, string $identifier): ?Agent
+    {
+        if ($type->getIsRole()) {
+            try {
+                $role = $this->policyService->getRole($identifier);
+                if ($this->roleIsEligibleAgent($role)) {
+                    return Agent::fromRole($role);
+                }
+            } catch (NoSuchRoleException $e) {
+                return null;
+            }
+        } elseif ($type->getIsUser()) {
+            $user = $this->userRepository->findByIdentifier($identifier);
+            if ($user) {
+                if ($this->userIsEligibleAgent($user)) {
+                    return Agent::fromUser($user, $identifier);
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -88,19 +142,49 @@ class AgentRepository
      */
     public function findCurrent(): array
     {
-        $agentIdentifiers = [];
-
-        foreach ($this->securityContext->getRoles() as $role) {
-            if (!$role->isAbstract()) {
-                $agentIdentifiers[] = Agent::fromRoleIdentifier($role->getIdentifier());
-            }
-        }
+        $agents = [];
 
         $user = $this->partyService->getAssignedPartyOfAccount($this->securityContext->getAccount());
         if ($user instanceof User) {
-            $agentIdentifiers[] = Agent::fromUserIdentifier($this->persistenceManager->getIdentifierByObject($user));
+            if ($this->userIsEligibleAgent($user)) {
+                $agents[] = Agent::fromUser($user, $this->persistenceManager->getIdentifierByObject($user));
+            }
         }
 
-        return $agentIdentifiers;
+        foreach ($this->securityContext->getRoles() as $role) {
+            if ($this->roleIsEligibleAgent($role)) {
+                $agents[] = Agent::fromRole($role);
+            }
+        }
+
+        return $agents;
+    }
+
+    public function roleIsEligibleAgent(Role $role): bool
+    {
+        if ($role->getIdentifier() === $this->bitzerAgentRole->getIdentifier()) {
+            return true;
+        } else {
+            foreach ($role->getAllParentRoles() as $parentRole) {
+                if ($this->roleIsEligibleAgent($parentRole)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    public function userIsEligibleAgent(User $user): bool
+    {
+        foreach ($user->getAccounts() as $account) {
+            foreach ($account->getRoles() as $role) {
+                if ($this->roleIsEligibleAgent($role)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

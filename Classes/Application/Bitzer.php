@@ -272,7 +272,7 @@ class Bitzer
 
     private function requireAgentToExist(Agent $agent, ConstraintCheckResult $constraintCheckResult = null): void
     {
-        if (!$this->agentRepository->findByIdentifier($agent->getIdentifier())) {
+        if (!$this->agentRepository->findByTypeAndIdentifier($agent->getType(), $agent->getIdentifier())) {
             $exception = AgentDoesNotExist::althoughExpectedForIdentifier($agent->getIdentifier());
             if ($constraintCheckResult) {
                 $constraintCheckResult->registerFailedCheck('agent', $exception, [$agent->getIdentifier()]);
