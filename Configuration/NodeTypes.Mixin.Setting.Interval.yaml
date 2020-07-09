@@ -1,3 +1,31 @@
 'Sitegeist.Bitzer:Mixin.Setting.Interval':
   abstract: true
-
+  superTypes:
+    'Sitegeist.Bitzer:Mixin.Inspector': true
+  properties:
+    bitzerTaskInterval:
+      type: string
+      defaultValue: P1M
+      validation:
+        'Neos.Neos/Validation/NotEmptyValidator': []
+      ui:
+        label: i18n
+        inspector:
+          group: bitzer-settings
+          editor: 'Content/Inspector/Editors/SelectBoxEditor'
+          editorOptions:
+            allowEmpty: false
+            placeholder: i18n
+            values:
+              PT1M:
+                label: '1 Minute'
+              PT1H:
+                label: '1 Hour'
+              P1D:
+                label: '1 Day'
+              P1W:
+                label: '1 Week'
+              P1M:
+                label: '1 Month'
+              P1Y:
+                label: '1 Year'
