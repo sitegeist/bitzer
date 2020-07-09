@@ -160,6 +160,28 @@ class AgentRepository
         return $agents;
     }
 
+    /**
+     * @param AgentType $agentType
+     * @return Agent|null
+     */
+    public function findCurrentByAgentType(AgentType $agentType): ?Agent
+    {
+        if ($agentType->getIsRole()) {
+            foreach ($this->securityContext->getRoles() as $role) {
+                if ($this->roleIsEligibleAgent($role)) {
+                    return Agent::fromRole($role);
+                }
+            }
+        } elseif ($agentType->getIsUser()) {
+            $user = $this->partyService->getAssignedPartyOfAccount($this->securityContext->getAccount());
+            if ($user instanceof User) {
+                if ($this->userIsEligibleAgent($user)) {
+                    return Agent::fromUser($user, $this->persistenceManager->getIdentifierByObject($user));
+                }
+            }
+        }
+    }
+
     public function roleIsEligibleAgent(Role $role): bool
     {
         if ($role->getIdentifier() === $this->bitzerAgentRole->getIdentifier()) {
