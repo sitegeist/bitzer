@@ -14,7 +14,7 @@
           group: bitzer-settings
           editor: 'Content/Inspector/Editors/SelectBoxEditor'
           editorOptions:
-            allowEmpty: false
+            allowEmpty: true
             placeholder: i18n
             values:
               PT1M:
