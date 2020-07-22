@@ -141,6 +141,112 @@ class Schedule
         return $groupedTasks;
     }
 
+    final function countDue(?array $agentIdentifiers = null): int
+    {
+        $sql = 'SELECT COUNT(*) FROM ' . self::TABLE_NAME . '
+            WHERE
+                actionstatus IN (:actionStatusTypes)
+            AND TO_DAYS(scheduledTime) = TO_DAYS(NOW())';
+
+        $parameters = [
+            'actionStatusTypes' => [
+                ActionStatusType::TYPE_POTENTIAL,
+                ActionStatusType::TYPE_ACTIVE
+            ]
+        ];
+
+        $types = [
+            'actionStatusTypes' => Connection::PARAM_STR_ARRAY
+        ];
+
+        if ($agentIdentifiers) {
+            $parameters['agentIdentifiers'] = $agentIdentifiers;
+            $types['agentIdentifiers'] = Connection::PARAM_STR_ARRAY;
+            $sql .= ' AND agent IN (:agentIdentifiers)';
+        }
+
+        $rawDataSet = $this->getDatabaseConnection()->executeQuery(
+            $sql,
+            $parameters,
+            $types
+        )->fetchAll();
+
+        return (int) $rawDataSet[0]['COUNT(*)'];
+    }
+
+    final function countPastDue(?array $agentIdentifiers = null): int
+    {
+        $sql = 'SELECT COUNT(*) FROM ' . self::TABLE_NAME . '
+            WHERE
+                actionstatus IN (:actionStatusTypes)
+            AND scheduledTime < NOW()
+            AND TO_DAYS(scheduledTime) <> TO_DAYS(NOW())';
+
+        $parameters = [
+            'actionStatusTypes' => [
+                ActionStatusType::TYPE_POTENTIAL,
+                ActionStatusType::TYPE_ACTIVE
+            ]
+        ];
+
+        $types = [
+            'actionStatusTypes' => Connection::PARAM_STR_ARRAY
+        ];
+
+        if ($agentIdentifiers) {
+            $parameters['agentIdentifiers'] = $agentIdentifiers;
+            $types['agentIdentifiers'] = Connection::PARAM_STR_ARRAY;
+            $sql .= ' AND agent IN (:agentIdentifiers)';
+        }
+
+        $rawDataSet = $this->getDatabaseConnection()->executeQuery(
+            $sql,
+            $parameters,
+            $types
+        )->fetchAll();
+
+        return (int) $rawDataSet[0]['COUNT(*)'];
+    }
+
+    final function countUpcoming(\DateInterval $upcomingInterval, ?array $agentIdentifiers = null): int
+    {
+        $now = ScheduledTime::now();
+        $referenceDate = $now->sub($upcomingInterval);
+
+        $sql = 'SELECT COUNT(*) FROM ' . self::TABLE_NAME . '
+            WHERE
+                actionstatus IN (:actionStatusTypes)
+            AND scheduledTime >= :referenceDate
+            AND TO_DAYS(scheduledTime) <> TO_DAYS(NOW())';
+
+        $parameters = [
+            'referenceDate' => $referenceDate,
+            'actionStatusTypes' => [
+                ActionStatusType::TYPE_POTENTIAL,
+                ActionStatusType::TYPE_ACTIVE
+                ]
+            ];
+
+            $types = [
+            'referenceDate' => Type::DATETIME_IMMUTABLE,
+            'actionStatusTypes' => Connection::PARAM_STR_ARRAY
+        ];
+
+        if ($agentIdentifiers) {
+            $parameters['agentIdentifiers'] = $agentIdentifiers;
+            $types['agentIdentifiers'] = Connection::PARAM_STR_ARRAY;
+            $sql .= ' AND agent IN (:agentIdentifiers)';
+        }
+
+        $rawDataSet = $this->getDatabaseConnection()->executeQuery(
+            $sql,
+            $parameters,
+            $types
+        )->fetchAll();
+
+        return (int) $rawDataSet[0]['COUNT(*)'];
+    }
+
     /**
      * @param TaskClassName $taskClassName
      * @param NodeAddress $object

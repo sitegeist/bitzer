@@ -1,0 +1,6 @@
+Neos:
+  Flow:
+    mvc:
+      routes:
+        'Sitegeist.Bitzer':
+          position: 'before Neos.Neos'

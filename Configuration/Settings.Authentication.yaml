@@ -5,7 +5,7 @@ Neos:
         providers:
           'Neos.Neos:Backend':
             requestPatterns:
-              'Sitegeist.Bitzer:ModuleControllers':
+              'Sitegeist.Bitzer:BackendControllers':
                 pattern: 'ControllerObjectName'
                 patternOptions:
-                  controllerObjectNamePattern: 'Sitegeist\Bitzer\Application\Controller\BitzerController'
+                  controllerObjectNamePattern: 'Sitegeist\Bitzer\Application\Controller\.*'
