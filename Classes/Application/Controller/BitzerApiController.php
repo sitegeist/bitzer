@@ -25,6 +25,12 @@ class BitzerApiController extends RestController
     protected $schedule;
 
     /**
+     * @Flow\InjectConfiguration(path="upcomingInterval")
+     * @var string
+     */
+    protected $upcomingInterval;
+
+    /**
      * @var array
      */
     protected $supportedMediaTypes = ['application/json'];
@@ -39,12 +45,22 @@ class BitzerApiController extends RestController
      */
     public function dueTasksAction(): void
     {
+        $uriBuilder = $this->getControllerContext()->getUriBuilder();
         $agents = $this->agentRepository->findCurrent();
+
 
         $this->view->assign('value', [
             'numberOfTasksDue' => $this->schedule->countDue($agents),
             'numberOfTasksPastDue' => $this->schedule->countPastDue($agents),
-            'numberOfUpcomingTasks' => $this->schedule->countPastDue($agents)
+            'numberOfUpcomingTasks' => $this->schedule->countUpcoming(new \DateInterval($this->upcomingInterval), $agents),
+            'links' => [
+                'module' => $uriBuilder->reset()->uriFor(
+                    'index',
+                    ['module' => 'management/task'],
+                    'Backend\\Module',
+                    'Neos.Neos'
+                )
+            ]
         ]);
     }
 }

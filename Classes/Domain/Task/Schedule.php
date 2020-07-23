@@ -211,12 +211,13 @@ class Schedule
     final function countUpcoming(\DateInterval $upcomingInterval, ?array $agentIdentifiers = null): int
     {
         $now = ScheduledTime::now();
-        $referenceDate = $now->sub($upcomingInterval);
+        $referenceDate = $now->add($upcomingInterval);
 
         $sql = 'SELECT COUNT(*) FROM ' . self::TABLE_NAME . '
             WHERE
                 actionstatus IN (:actionStatusTypes)
-            AND scheduledTime >= :referenceDate
+            AND scheduledTime <= :referenceDate
+            AND scheduledTime > NOW()
             AND TO_DAYS(scheduledTime) <> TO_DAYS(NOW())';
 
         $parameters = [
@@ -224,8 +225,8 @@ class Schedule
             'actionStatusTypes' => [
                 ActionStatusType::TYPE_POTENTIAL,
                 ActionStatusType::TYPE_ACTIVE
-                ]
-            ];
+            ]
+        ];
 
             $types = [
             'referenceDate' => Type::DATETIME_IMMUTABLE,
