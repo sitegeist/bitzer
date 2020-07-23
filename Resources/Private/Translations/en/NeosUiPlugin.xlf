@@ -71,6 +71,15 @@
             <trans-unit id="intervalEditor.unit.years" xml:space="preserve" approved="yes">
                 <source>Years</source>
             </trans-unit>
+            <trans-unit id="intervalEditor.message.empty" xml:space="preserve" approved="yes">
+                <source>No interval has been set.</source>
+            </trans-unit>
+            <trans-unit id="intervalEditor.action.initialize" xml:space="preserve" approved="yes">
+                <source>Set interval now</source>
+            </trans-unit>
+            <trans-unit id="intervalEditor.action.clear" xml:space="preserve" approved="yes">
+                <source>Clear interval</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>

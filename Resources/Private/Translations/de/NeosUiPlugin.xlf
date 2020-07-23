@@ -95,6 +95,18 @@
                 <source>Years</source>
                 <target state="translated">Jahre</target>
             </trans-unit>
+            <trans-unit id="intervalEditor.message.empty" xml:space="preserve" approved="yes">
+                <source>No interval has been set.</source>
+                <target state="translated">Es wurde kein Intervall festgelegt</target>
+            </trans-unit>
+            <trans-unit id="intervalEditor.action.initialize" xml:space="preserve" approved="yes">
+                <source>Set interval now</source>
+                <target state="translated">Jetzt Intervall festlegen</target>
+            </trans-unit>
+            <trans-unit id="intervalEditor.action.clear" xml:space="preserve" approved="yes">
+                <source>Clear interval</source>
+                <target state="translated">Intervall löschen</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
