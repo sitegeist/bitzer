@@ -6,6 +6,10 @@
                 <source>Agent</source>
                 <target state="translated">Zuständigkeit</target>
             </trans-unit>
+            <trans-unit id="properties.bitzerTaskAgent.selectBoxEditor.placeholder" xml:space="preserve" approved="yes">
+                <source>Role or User</source>
+                <target state="translated">Gruppe oder Benutzer/in</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

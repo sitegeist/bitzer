@@ -12,5 +12,5 @@
           editor: 'Content/Inspector/Editors/SelectBoxEditor'
           editorOptions:
             allowEmpty: true
-            placeholder: i18n
+            placeholder: Sitegeist.Bitzer:NodeTypes.Mixin.Setting.Agent:properties.bitzerTaskAgent.selectBoxEditor.placeholder
             dataSourceIdentifier: 'sitegeist-bitzer-agent'

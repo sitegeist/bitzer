@@ -5,6 +5,9 @@
             <trans-unit id="properties.bitzerTaskAgent" xml:space="preserve" approved="yes">
                 <source>Agent</source>
             </trans-unit>
+            <trans-unit id="properties.bitzerTaskAgent.selectBoxEditor.placeholder" xml:space="preserve" approved="yes">
+                <source>Role or User</source>
+            </trans-unit>
         </body>
     </file>
 </xliff>
