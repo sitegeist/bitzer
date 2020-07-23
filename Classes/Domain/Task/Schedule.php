@@ -98,11 +98,11 @@ class Schedule
     final public function findPastDueDueAndUpcoming(\DateInterval $upcomingInterval, ?array $agentIdentifiers = null): array
     {
         $now = ScheduledTime::now();
-        $referenceDate = $now->sub($upcomingInterval);
+        $referenceDate = $now->add($upcomingInterval);
 
         $query = 'SELECT * FROM ' . self::TABLE_NAME . '
- WHERE scheduledtime >= :referenceDate
- AND actionstatus IN (:actionStatusTypes)';
+            WHERE scheduledtime <= :referenceDate
+            AND actionstatus IN (:actionStatusTypes)';
         $parameters = [
             'referenceDate' => $referenceDate,
             'actionStatusTypes' => [
