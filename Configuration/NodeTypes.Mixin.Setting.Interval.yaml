@@ -13,19 +13,3 @@
         inspector:
           group: bitzer-settings
           editor: 'Sitegeist.Bitzer/Inspector/Editors/IntervalEditor'
-          editorOptions:
-            allowEmpty: true
-            placeholder: i18n
-            values:
-              PT1M:
-                label: '1 Minute'
-              PT1H:
-                label: '1 Hour'
-              P1D:
-                label: '1 Day'
-              P1W:
-                label: '1 Week'
-              P1M:
-                label: '1 Month'
-              P1Y:
-                label: '1 Year'
