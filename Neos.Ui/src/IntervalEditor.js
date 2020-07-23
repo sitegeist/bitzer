@@ -102,7 +102,7 @@ export class IntervalEditor extends React.Component {
                         ]}
                     />
                 </div>
-                {this.props.options.allowEmpty ? (
+                {(this.props.options || {}).allowEmpty ? (
                     <div>
                         <Button onClick={() => this.props.commit('')}>
                             {i18n.translate('Sitegeist.Bitzer:NeosUiPlugin:intervalEditor.action.clear')}
