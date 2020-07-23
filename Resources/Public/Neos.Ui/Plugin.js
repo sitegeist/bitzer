@@ -4439,7 +4439,7 @@ var IntervalEditor = exports.IntervalEditor = function (_React$Component) {
                         }]
                     })
                 ),
-                this.props.options.allowEmpty ? _react2.default.createElement(
+                (this.props.options || {}).allowEmpty ? _react2.default.createElement(
                     "div",
                     null,
                     _react2.default.createElement(
