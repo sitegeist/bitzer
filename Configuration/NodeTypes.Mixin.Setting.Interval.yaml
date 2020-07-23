@@ -12,7 +12,7 @@
         label: i18n
         inspector:
           group: bitzer-settings
-          editor: 'Content/Inspector/Editors/SelectBoxEditor'
+          editor: 'Sitegeist.Bitzer/Inspector/Editors/IntervalEditor'
           editorOptions:
             allowEmpty: true
             placeholder: i18n
