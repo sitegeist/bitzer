@@ -1,14 +1,214 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file original="Module.Bitzer" product-name="Sitegeist.Bitzer" source-language="en" datatype="plaintext" target-language="de">
+  <file original="Module.Bitzer" product-name="Sitegeist.Bitzer" source-language="en" datatype="plaintext">
     <body>
-      <trans-unit id="label" xml:space="preserve" approved="yes">
+      <trans-unit id="schedule.label" xml:space="preserve" approved="yes">
         <source>Schedule</source>
         <target state="translated">Zeitplan</target>
       </trans-unit>
-      <trans-unit id="description" xml:space="preserve" approved="yes">
-        <source>The management module for editorial tasks</source>
-        <target state="translated">Das Verwaltungsmodul für redaktionelle Aufgaben</target>
+      <trans-unit id="schedule.description" xml:space="preserve" approved="yes">
+        <source>The global schedule containing all tasks. Here you can schedule new tasks and change or cancel existing ones.</source>
+        <target state="translated">Der globale Zeitplan mit allen Aufgaben. Hier können Sie neue Aufgaben anlegen und bestehende Aufgaben ändern oder abbrechen.</target>
+      </trans-unit>
+      <trans-unit id="mySchedule.label" xml:space="preserve" approved="yes">
+        <source>My Schedule</source>
+        <target state="translated">Mein Zeitplan</target>
+      </trans-unit>
+      <trans-unit id="mySchedule.description" xml:space="preserve" approved="yes">
+        <source>Your personal schedule listing tasks you can start or continue working on.</source>
+        <target state="translated">Ihr persönlicher Zeitplan mit einer Liste an Aufgaben, die Sie beginnen oder weiterführen können.</target>
+      </trans-unit>
+      <trans-unit id="completeTask.label" xml:space="preserve" approved="yes">
+        <source>Complete task</source>
+        <target state="translated">Aufgabe abschließen.</target>
+      </trans-unit>
+      <trans-unit id="completeTask.success" xml:space="preserve" approved="yes">
+        <source>Task "{0}" was successfully completed.</source>
+        <target state="translated">Aufgabe "{0}" wurde erfolgreich abgeschlossen.</target>
+      </trans-unit>
+      <trans-unit id="cancelTask.label" xml:space="preserve" approved="yes">
+        <source>Cancel task</source>
+        <target state="translated">Aufgabe abbrechen.</target>
+      </trans-unit>
+      <trans-unit id="cancelTask.success" xml:space="preserve" approved="yes">
+        <source>Task "{0}" was successfully cancelled.</source>
+        <target state="translated">Aufgabe "{0}" wurde erfolgreich abgebrochen.</target>
+      </trans-unit>
+      <trans-unit id="rescheduleTask.label" xml:space="preserve" approved="yes">
+        <source>Reschedule task</source>
+        <target state="translated">Aufgabentermin verschieben.</target>
+      </trans-unit>
+      <trans-unit id="rescheduleTask.success" xml:space="preserve" approved="yes">
+        <source>Task "{0}" was successfully rescheduled to {1}.</source>
+        <target state="translated">Termin für Aufgabe "{0}" wurde erfolgreich auf {1} verschoben.</target>
+      </trans-unit>
+      <trans-unit id="rescheduleTask.failure" xml:space="preserve" approved="yes">
+        <source>Failed to reschedule task "{0}".</source>
+        <target state="translated">Termin für Aufgabe "{0}" konnte nicht verschoben werden.</target>
+      </trans-unit>
+      <trans-unit id="reassignTask.label" xml:space="preserve" approved="yes">
+        <source>Reassign task</source>
+        <target state="translated">Aufgabe neu zuweisen.</target>
+      </trans-unit>
+      <trans-unit id="reassignTask.success" xml:space="preserve" approved="yes">
+        <source>Task "{0}" was successfully reassigned to {1}.</source>
+        <target state="translated">Aufgabe "{0}" wurde {1} erfolgreich zugewiesen.</target>
+      </trans-unit>
+      <trans-unit id="reassignTask.failure" xml:space="preserve" approved="yes">
+        <source>Failed to reassign task "{0}".</source>
+        <target state="translated">Aufgabe "{0}" konnte nicht neu zugewiesen werden.</target>
+      </trans-unit>
+      <trans-unit id="scheduleTask.label" xml:space="preserve" approved="yes">
+        <source>Schedule task</source>
+        <target state="translated">Aufgabe anlegen</target>
+      </trans-unit>
+      <trans-unit id="scheduleTask.success" xml:space="preserve" approved="yes">
+        <source>Task "{0}" was successfully scheduled.</source>
+        <target state="translated">Aufgabe "{0}" wurde erfolgreich angelegt.</target>
+      </trans-unit>
+      <trans-unit id="scheduleTask.failure" xml:space="preserve" approved="yes">
+        <source>Failed to schedule Task "{0}".</source>
+        <target state="translated">Aufgabe "{0}" konnte nicht angelegt werden.</target>
+      </trans-unit>
+      <trans-unit id="setNewTaskTarget.label" xml:space="preserve" approved="yes">
+        <source>Set new target</source>
+        <target state="translated">Neues Ziel setzen</target>
+      </trans-unit>
+      <trans-unit id="setNewTaskTarget.success" xml:space="preserve" approved="yes">
+        <source>Target of Task "{0}" was successfully set to "{1}".</source>
+        <target state="translated">Ziel der Aufgabe "{0}" wurde erfolgreich auf "{1}" gesetzt.</target>
+      </trans-unit>
+      <trans-unit id="setNewTaskTarget.failure" xml:space="preserve" approved="yes">
+        <source>Failed to set target of Task "{0}".</source>
+        <target state="translated">Ziel der Aufgabe "{0}" konnte nicht gesetzt werden.</target>
+      </trans-unit>
+      <trans-unit id="setNewTaskObject.label" xml:space="preserve" approved="yes">
+        <source>Set new object</source>
+        <target state="translated">Neues Objekt setzen</target>
+      </trans-unit>
+      <trans-unit id="setNewTaskObject.success" xml:space="preserve" approved="yes">
+        <source>Object of Task "{0}" was successfully set.</source>
+        <target state="translated">Objekt der Aufgabe "{0}" wurde erfolgreich gesetzt.</target>
+      </trans-unit>
+      <trans-unit id="setNewTaskObject.failure" xml:space="preserve" approved="yes">
+        <source>Failed to set object of Task "{0}".</source>
+        <target state="translated">Objekt der Aufgabe "{0}" konnte nicht gesetzt werden.</target>
+      </trans-unit>
+      <trans-unit id="setTaskProperties.label" xml:space="preserve" approved="yes">
+        <source>Set task properties</source>
+        <target state="translated">Aufgabeneigenschaften setzen</target>
+      </trans-unit>
+      <trans-unit id="setTaskProperties.success" xml:space="preserve" approved="yes">
+        <source>Properties of Task "{0}" were successfully set.</source>
+        <target state="translated">Eigenschaften der Aufgabe "{0}" wurden erfolgreich gesetzt.</target>
+      </trans-unit>
+      <trans-unit id="setTaskProperties.failure" xml:space="preserve" approved="yes">
+        <source>Failed to set properties of Task "{0}".</source>
+        <target state="translated">Eigenschaften der Aufgabe "{0}" konnten nicht gesetzt werden.</target>
+      </trans-unit>
+      <trans-unit id="task.scheduledTime.label" xml:space="preserve" approved="yes">
+        <source>Scheduled time</source>
+        <target state="translated">Geplante Zeit</target>
+      </trans-unit>
+      <trans-unit id="task.scheduledTime.date" xml:space="preserve" approved="yes">
+        <source>Date</source>
+        <target state="translated">Datum</target>
+      </trans-unit>
+      <trans-unit id="task.scheduledTime.time" xml:space="preserve" approved="yes">
+        <source>Time</source>
+        <target state="translated">Uhrzeit</target>
+      </trans-unit>
+      <trans-unit id="task.actionStatus.label" xml:space="preserve" approved="yes">
+        <source>Status</source>
+        <target state="translated">Status</target>
+      </trans-unit>
+      <trans-unit id="task.target.label" xml:space="preserve" approved="yes">
+        <source>Target</source>
+        <target state="translated">Ziel</target>
+      </trans-unit>
+      <trans-unit id="task.target.placeholder" xml:space="preserve" approved="yes">
+        <source>Please enter target</source>
+        <target state="translated">Bitte Ziel eingeben</target>
+      </trans-unit>
+      <trans-unit id="task.object.label" xml:space="preserve" approved="yes">
+        <source>Object</source>
+        <target state="translated">Objekt</target>
+      </trans-unit>
+      <trans-unit id="task.properties.label" xml:space="preserve" approved="yes">
+        <source>Properties</source>
+        <target state="translated">Eigenschaften</target>
+      </trans-unit>
+      <trans-unit id="task.properties.description.label" xml:space="preserve" approved="yes">
+        <source>Description</source>
+        <target state="translated">Beschreibung</target>
+      </trans-unit>
+      <trans-unit id="task.properties.description.placeholder" xml:space="preserve" approved="yes">
+        <source>Please enter description</source>
+        <target state="translated">Bitte Beschreibung eingeben</target>
+      </trans-unit>
+      <trans-unit id="task.agent.label" xml:space="preserve" approved="yes">
+        <source>Agent</source>
+        <target state="translated">Zuständigkeit</target>
+      </trans-unit>
+      <trans-unit id="actionStatusType.https://schema.org/ActiveActionStatus.label" xml:space="preserve" approved="yes">
+        <source>Active</source>
+        <target state="translated">Aktiv</target>
+      </trans-unit>
+      <trans-unit id="actionStatusType.https://schema.org/CompletedActionStatus.label" xml:space="preserve" approved="yes">
+        <source>Complete</source>
+        <target state="translated">Fertig</target>
+      </trans-unit>
+      <trans-unit id="actionStatusType.https://schema.org/FailedActionStatus.label" xml:space="preserve" approved="yes">
+        <source>Failed</source>
+        <target state="translated">Fehlgeschlagen</target>
+      </trans-unit>
+      <trans-unit id="actionStatusType.https://schema.org/PotentialActionStatus.label" xml:space="preserve" approved="yes">
+        <source>Potential</source>
+        <target state="translated">Potentiell</target>
+      </trans-unit>
+      <trans-unit id="actions.label" xml:space="preserve" approved="yes">
+        <source>Actions</source>
+        <target state="translated">Aktionen</target>
+      </trans-unit>
+      <trans-unit id="actions.startTask.label" xml:space="preserve" approved="yes">
+        <source>Start task</source>
+        <target state="translated">Aufgabe beginnen</target>
+      </trans-unit>
+      <trans-unit id="actions.editTask.label" xml:space="preserve" approved="yes">
+        <source>Edit task</source>
+        <target state="translated">Aufgabe bearbeiten</target>
+      </trans-unit>
+      <trans-unit id="actions.prepareTask.label" xml:space="preserve" approved="yes">
+        <source>Create task</source>
+        <target state="translated">Aufgabe erstellen</target>
+      </trans-unit>
+      <trans-unit id="actions.cancel.label" xml:space="preserve" approved="yes">
+        <source>Cancel</source>
+        <target state="translated">Aufgabe abbrechen</target>
+      </trans-unit>
+      <trans-unit id="actions.back.label" xml:space="preserve" approved="yes">
+        <source>Back</source>
+        <target state="translated">Zurück</target>
+      </trans-unit>
+      <trans-unit id="actions.scheduleTask.label" xml:space="preserve" approved="yes">
+        <source>Schedule task</source>
+        <target state="translated">Termin für Aufgabe vergeben</target>
+      </trans-unit>
+      <trans-unit id="taskDueStatusType.pastDue.label" xml:space="preserve" approved="yes">
+        <source>past due</source>
+        <target state="translated">überfällig</target>
+      </trans-unit>
+      <trans-unit id="taskDueStatusType.due.label" xml:space="preserve" approved="yes">
+        <source>due</source>
+        <target state="translated">heute fällig</target>
+      </trans-unit>
+      <trans-unit id="taskDueStatusType.upcoming.label" xml:space="preserve" approved="yes">
+        <source>upcoming</source>
+        <target state="translated">demnächst fällig</target>
+      </trans-unit>
+      <trans-unit id="taskClassName.Sitegeist\Bitzer\Domain\Task\Generic\GenericTask.label" xml:space="preserve" approved="yes">
+        <source>Generic</source>
+        <target state="translated">Generisch</target>
       </trans-unit>
     </body>
   </file>
