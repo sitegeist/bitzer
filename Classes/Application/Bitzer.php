@@ -82,7 +82,8 @@ class Bitzer
         $this->requireScheduledTimeToBeSet($command->getScheduledTime(), $constraintCheckResult);
         $this->requireDescriptionToBeSet($command->getProperties(), $constraintCheckResult);
         if ($command->getObject()) {
-            $this->requireObjectToExist($command->getObject(), $constraintCheckResult);
+            // @todo find some way to enforce this; recently published nodes are not yet known to the new content context
+            //$this->requireObjectToExist($command->getObject(), $command->getAgent(), $constraintCheckResult);
         }
         if ($command->getTarget()) {
             $this->requireTargetToBeAbsoluteUri($command->getTarget(), $constraintCheckResult);
