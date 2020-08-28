@@ -160,10 +160,6 @@ class AgentRepository
         return $agents;
     }
 
-    /**
-     * @param AgentType $agentType
-     * @return Agent|null
-     */
     public function findCurrentByAgentType(AgentType $agentType): ?Agent
     {
         if ($agentType->getIsRole()) {
@@ -180,6 +176,8 @@ class AgentRepository
                 }
             }
         }
+
+        return null;
     }
 
     public function roleIsEligibleAgent(Role $role): bool
