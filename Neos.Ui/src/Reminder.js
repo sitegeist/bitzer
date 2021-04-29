@@ -59,7 +59,9 @@ export class Reminder extends React.Component {
         const {storage} = this.state;
 
         if (!storage.latestUpdate || storage.latestUpdate !== TODAY) {
-            const result = await fetch('/sitegeist/bitzer/api/due-tasks');
+            const result = await fetch('/sitegeist/bitzer/api/due-tasks', {
+                credentials: 'include'
+            });
             const json = await result.json();
 
             this.setState({data: json});

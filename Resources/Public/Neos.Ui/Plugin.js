@@ -4590,7 +4590,9 @@ var Reminder = exports.Reminder = function (_React$Component) {
                                 }
 
                                 _context.next = 4;
-                                return fetch('/sitegeist/bitzer/api/due-tasks');
+                                return fetch('/sitegeist/bitzer/api/due-tasks', {
+                                    credentials: 'include'
+                                });
 
                             case 4:
                                 result = _context.sent;
