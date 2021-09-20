@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Neos\Flow\Persistence\Doctrine\Migrations;
 
-use Doctrine\DBAL\Migrations\AbstractMigration;
+use Doctrine\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
 
 /**
@@ -16,7 +16,7 @@ class Version20200707164857 extends AbstractMigration
         return 'The migration for adding the agenttype field to basic task table structure';
     }
 
-    public function up(Schema $schema)
+    public function up(Schema $schema): void
     {
         $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'mysql',
             'Migration can only be executed safely on "mysql".');
@@ -25,7 +25,7 @@ class Version20200707164857 extends AbstractMigration
         $this->addSql('UPDATE sitegeist_bitzer_domain_task_task SET agenttype = 1');
     }
 
-    public function down(Schema $schema)
+    public function down(Schema $schema): void
     {
         $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'mysql',
             'Migration can only be executed safely on "mysql".');
