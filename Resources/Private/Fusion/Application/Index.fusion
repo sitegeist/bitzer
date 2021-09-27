@@ -21,7 +21,7 @@ prototype(Sitegeist.Bitzer:Application.Index) < prototype(Neos.Fusion:Component)
                     <div class="widget-header">
                         <i class="fas fa-clipboard-list neos-pull-left"></i>
                         <h3>
-                            <a href={scheduleUri}>{${Translation.translate('schedule.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</a>
+                            <a href={scheduleUri}>{${Translation.translate('schedule.label', null, [], 'Module/Bitzer', 'Sitegeist.Bitzer')}}</a>
                         </h3>
                     </div>
                     <div class="widget-body">
