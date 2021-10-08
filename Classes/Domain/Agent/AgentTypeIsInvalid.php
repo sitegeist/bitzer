@@ -13,7 +13,7 @@ use Neos\Flow\Annotations as Flow;
  */
 final class AgentTypeIsInvalid extends \DomainException
 {
-    public static function becauseAgentTypeHasInvalidValue(int $attemptedValue, array $validValues): self
+    public static function becauseAgentTypeHasInvalidValue(string $attemptedValue, array $validValues): self
     {
         return new self('"' . $attemptedValue . '" is no valid value for AgentType, must be one of '.join(', ', $validValues), 1591622975);
     }
