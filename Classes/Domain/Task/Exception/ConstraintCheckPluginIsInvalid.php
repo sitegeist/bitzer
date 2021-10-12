@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Task\Exception;
 
 /**
@@ -7,13 +6,13 @@ namespace Sitegeist\Bitzer\Domain\Task\Exception;
  */
 final class ConstraintCheckPluginIsInvalid extends \DomainException
 {
-    public static function becauseItDoesNotImplementTheRequiredInterface(string $className): ConstraintCheckPluginIsInvalid
+    public static function becauseItDoesNotImplementTheRequiredInterface(string $className): self
     {
-        return new static('Given constraint check plugin ' . $className . ' does not implement the required interface.', 1568213486);
+        return new self('Given constraint check plugin ' . $className . ' does not implement the required interface.', 1568213486);
     }
 
-    public static function becauseItIsNotImplemented(string $className): ConstraintCheckPluginIsInvalid
+    public static function becauseItIsNotImplemented(string $className): self
     {
-        return new static('Given constraint check plugin ' . $className . ' is not implemented.', 1568213523);
+        return new self('Given constraint check plugin ' . $className . ' is not implemented.', 1568213523);
     }
 }

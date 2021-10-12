@@ -1,6 +1,4 @@
-<?php
-declare(strict_types=1);
-
+<?php declare(strict_types=1);
 namespace Sitegeist\Bitzer\Application\Object;
 
 use Neos\Flow\Annotations as Flow;
@@ -11,18 +9,14 @@ use Sitegeist\Bitzer\Domain\Task\NodeAddress;
  */
 final class LabeledObjectAddress
 {
-    /**
-     * @var NodeAddress
-     */
-    private $identifier;
+    private NodeAddress $identifier;
 
-    /**
-     * @var string
-     */
-    private $label;
+    private string $label;
 
-    public function __construct(NodeAddress $identifier, string $label)
-    {
+    public function __construct(
+        NodeAddress $identifier,
+        string $label
+    ) {
         $this->identifier = $identifier;
         $this->label = $label;
     }

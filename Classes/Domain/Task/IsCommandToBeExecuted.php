@@ -1,11 +1,11 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Task;
 
 use Neos\Flow\Annotations as Flow;
 
 /**
  * The specification for whether a command is to be executed
+ *
  * @Flow\Proxy(false)
  */
 final class IsCommandToBeExecuted

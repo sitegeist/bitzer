@@ -1,77 +1,53 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Agent;
 
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Security\Context as SecurityContext;
 use Neos\Flow\Security\Exception\NoSuchRoleException;
 use Neos\Flow\Security\Policy\PolicyService;
-use Neos\Flow\Security\AccountRepository;
 use Neos\Neos\Domain\Repository\UserRepository;
 use Neos\Flow\Persistence\PersistenceManagerInterface;
-use Neos\Party\Domain\Service\PartyService;
 use Neos\Flow\Security\Policy\Role;
 use Neos\Neos\Domain\Model\User;
+use Neos\Neos\Domain\Service\UserService;
 
 /**
- * The agent repository
+ * The agent domain repository
+ *
  * @Flow\Scope("singleton")
  */
-class AgentRepository
+final class AgentRepository
 {
-    /**
-     * @Flow\Inject
-     * @var PolicyService
-     */
-    protected $policyService;
+    private PolicyService $policyService;
 
-    /**
-     * @Flow\Inject
-     * @var SecurityContext
-     */
-    protected $securityContext;
+    private SecurityContext $securityContext;
 
-    /**
-     * @Flow\Inject
-     * @var UserRepository
-     */
-    protected $userRepository;
+    private UserRepository $userRepository;
 
-    /**
-     * @Flow\Inject
-     * @var PersistenceManagerInterface
-     */
-    protected $persistenceManager;
+    private PersistenceManagerInterface $persistenceManager;
 
-    /**
-     * @Flow\Inject
-     * @var PartyService
-     */
-    protected $partyService;
+    private UserService $userService;
 
-    /**
-     * @Flow\Inject
-     * @var AccountRepository
-     */
-    protected $accountRepository;
+    private Role $bitzerAgentRole;
 
-    /**
-     * @var Role
-     */
-    protected $bitzerAgentRole;
-
-    public function initializeObject()
-    {
-        $this->bitzerAgentRole = $this->policyService->getRole('Sitegeist.Bitzer:Agent');
+    public function __construct(
+        PolicyService $policyService,
+        SecurityContext $securityContext,
+        UserRepository $userRepository,
+        PersistenceManagerInterface $persistenceManager,
+        UserService $userService
+    ) {
+        $this->policyService = $policyService;
+        $this->securityContext = $securityContext;
+        $this->userRepository = $userRepository;
+        $this->persistenceManager = $persistenceManager;
+        $this->userService = $userService;
+        $this->bitzerAgentRole = $policyService->getRole('Sitegeist.Bitzer:Agent');
     }
 
-    /**
-     * @return Agent[]|array
-     */
-    public function findAll(): array
+    public function findAll(): Agents
     {
         $agents = [];
-
         foreach ($this->policyService->getRoles(false) as $role) {
             if ($this->roleIsEligibleAgent($role)) {
                 $agents[] = Agent::fromRole($role);
@@ -83,13 +59,10 @@ class AgentRepository
                 $agents[] = Agent::fromUser($user, $this->persistenceManager->getIdentifierByObject($user));
             }
         }
-        return $agents;
+
+        return new Agents($agents);
     }
 
-    /**
-     * @param string $string
-     * @return Agent|null
-     */
     public function findByString(string $string): ?Agent
     {
         if (strpos($string, ':') === false) {
@@ -104,11 +77,6 @@ class AgentRepository
         );
     }
 
-    /**
-     * @param AgentType $type
-     * @param string $identifier
-     * @return Agent|null
-     */
     public function findByTypeAndIdentifier(AgentType $type, string $identifier): ?Agent
     {
         if ($type->getIsRole()) {
@@ -121,6 +89,7 @@ class AgentRepository
                 return null;
             }
         } elseif ($type->getIsUser()) {
+            /** @var User $user */
             $user = $this->userRepository->findByIdentifier($identifier);
             if ($user) {
                 if ($this->userIsEligibleAgent($user)) {
@@ -135,16 +104,12 @@ class AgentRepository
     /**
      * Returns the currently authenticated agents.
      * Note that a single user can represent multiple agents by their assigned roles.
-     *
-     * @return Agent[]|array
-     * @throws NoSuchRoleException
-     * @throws \Neos\Flow\Security\Exception
      */
-    public function findCurrent(): array
+    public function findCurrent(): Agents
     {
         $agents = [];
 
-        $user = $this->partyService->getAssignedPartyOfAccount($this->securityContext->getAccount());
+        $user = $this->userService->getCurrentUser();
         if ($user instanceof User) {
             if ($this->userIsEligibleAgent($user)) {
                 $agents[] = Agent::fromUser($user, $this->persistenceManager->getIdentifierByObject($user));
@@ -157,7 +122,7 @@ class AgentRepository
             }
         }
 
-        return $agents;
+        return new Agents($agents);
     }
 
     public function findCurrentByAgentType(AgentType $agentType): ?Agent
@@ -169,7 +134,7 @@ class AgentRepository
                 }
             }
         } elseif ($agentType->getIsUser()) {
-            $user = $this->partyService->getAssignedPartyOfAccount($this->securityContext->getAccount());
+            $user = $this->userService->getCurrentUser();
             if ($user instanceof User) {
                 if ($this->userIsEligibleAgent($user)) {
                     return Agent::fromUser($user, $this->persistenceManager->getIdentifierByObject($user));

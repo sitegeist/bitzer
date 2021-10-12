@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Task\Exception;
 
 /**
@@ -7,8 +6,8 @@ namespace Sitegeist\Bitzer\Domain\Task\Exception;
  */
 final class ScheduledTimeIsUndefined extends \DomainException
 {
-    public static function althoughExpected(): ScheduledTimeIsUndefined
+    public static function althoughExpected(): self
     {
-        return new static('Scheduled time is undefined.', 1568033796);
+        return new self('Scheduled time is undefined.', 1568033796);
     }
 }

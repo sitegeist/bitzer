@@ -5,6 +5,7 @@ use Neos\Flow\Annotations as Flow;
 
 /**
  * The task domain entity collection
+ *
  * @Flow\Proxy(false)
  * @implements \IteratorAggregate<int,TaskInterface>
  */
@@ -13,7 +14,7 @@ final class Tasks implements \IteratorAggregate, \Countable
     /**
      * @var array<int,TaskInterface>
      */
-    private array $approvalAssignments;
+    private array $tasks;
 
     /**
      * @param array<int,mixed> $items
@@ -25,7 +26,7 @@ final class Tasks implements \IteratorAggregate, \Countable
                 throw new \InvalidArgumentException(self::class . ' can only consist of ' . TaskInterface::class);
             }
         }
-        $this->approvalAssignments = $items;
+        $this->tasks = $items;
     }
 
     /**
@@ -33,11 +34,11 @@ final class Tasks implements \IteratorAggregate, \Countable
      */
     public function getIterator(): \ArrayIterator
     {
-        return new \ArrayIterator($this->approvalAssignments);
+        return new \ArrayIterator($this->tasks);
     }
 
     public function count(): int
     {
-        return count($this->approvalAssignments);
+        return count($this->tasks);
     }
 }

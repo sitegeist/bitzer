@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Task\Exception;
 
 /**
@@ -7,8 +6,8 @@ namespace Sitegeist\Bitzer\Domain\Task\Exception;
  */
 final class TargetIsInvalid extends \DomainException
 {
-    public static function mustBeAnAbsoluteUri(): TargetIsInvalid
+    public static function mustBeAnAbsoluteUri(): self
     {
-        return new static('The target must be an absolute URI.', 1567764586);
+        return new self('The target must be an absolute URI.', 1567764586);
     }
 }

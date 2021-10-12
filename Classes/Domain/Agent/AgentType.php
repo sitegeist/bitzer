@@ -13,15 +13,8 @@ final class AgentType implements \JsonSerializable
     const ROLE = 'role';
     const USER = 'user';
 
-    /**
-     * @var string
-     */
-    private $value;
+    private string $value;
 
-    /**
-     * AgentType constructor.
-     * @param int $value
-     */
     public function __construct(string $value)
     {
         if (!in_array($value, self::getValues())) {
@@ -32,7 +25,7 @@ final class AgentType implements \JsonSerializable
     }
 
     /**
-     * @return array|int[]
+     * @return array<int,string>
      */
     public static function getValues(): array
     {
@@ -79,7 +72,7 @@ final class AgentType implements \JsonSerializable
 
     public function __toString(): string
     {
-        return (string) $this->value;
+        return $this->value;
     }
 
     public function jsonSerialize()

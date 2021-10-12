@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Task\Exception;
 
 use Sitegeist\Bitzer\Domain\Task\NodeAddress;
@@ -9,8 +8,8 @@ use Sitegeist\Bitzer\Domain\Task\NodeAddress;
  */
 final class ObjectDoesNotExist extends \DomainException
 {
-    public static function althoughExpectedForAddress(NodeAddress $nodeAddress): ObjectDoesNotExist
+    public static function althoughExpectedForAddress(NodeAddress $nodeAddress): self
     {
-        return new static('No node with identifier ' . $nodeAddress->getNodeAggregateIdentifier() . ' could be found in workspace ' . $nodeAddress->getWorkspaceName() . ' and dimension space point ' .  $nodeAddress->getDimensionSpacePoint() . '.', 1567603391);
+        return new self('No node with identifier ' . $nodeAddress->getNodeAggregateIdentifier() . ' could be found in workspace ' . $nodeAddress->getWorkspaceName() . ' and dimension space point ' .  $nodeAddress->getDimensionSpacePoint() . '.', 1567603391);
     }
 }

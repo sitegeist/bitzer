@@ -1,10 +1,8 @@
-<?php
-declare(strict_types=1);
-
+<?php declare(strict_types=1);
 namespace Sitegeist\Bitzer\Command;
 
+use GuzzleHttp\Psr7\Uri;
 use Neos\Flow\Cli\CommandController;
-use Neos\Flow\Http\Uri;
 use Neos\Flow\Reflection\ReflectionService;
 use Neos\Flow\Annotations as Flow;
 use Sitegeist\Bitzer\Application\Bitzer;
@@ -24,26 +22,24 @@ use Symfony\Component\Console\Helper\Table;
 
 /**
  * The command line endpoint for sending commands to Bitzer
+ *
+ * @Flow\Scope("singleton")
  */
-class BitzerCommandController extends CommandController
+final class BitzerCommandController extends CommandController
 {
-    /**
-     * @Flow\Inject
-     * @var Schedule
-     */
-    protected $schedule;
+    private Schedule $schedule;
 
-    /**
-     * @Flow\Inject
-     * @var Bitzer
-     */
-    protected $bitzer;
+    private Bitzer $bitzer;
 
-    /**
-     * @Flow\Inject
-     * @var ReflectionService
-     */
-    protected $reflectionService;
+    private ReflectionService $reflectionService;
+
+    public function __construct(Schedule $schedule, Bitzer $bitzer, ReflectionService $reflectionService)
+    {
+        parent::__construct();
+        $this->schedule = $schedule;
+        $this->bitzer = $bitzer;
+        $this->reflectionService = $reflectionService;
+    }
 
     public function listTasksCommand(): void
     {

@@ -1,33 +1,29 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Task;
 
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Reflection\ReflectionService;
 
 /**
- * The task class name repository
+ * The task class name domain repository
+ *
  * @Flow\Scope("singleton")
  */
 final class TaskClassNameRepository
 {
-    /**
-     * @Flow\Inject
-     * @var ReflectionService
-     */
-    protected $reflectionService;
+    private ReflectionService $reflectionService;
 
-    /**
-     * @return array|TaskClassName[]
-     */
-    public function findAll(): array
+    public function __construct(ReflectionService $reflectionService)
     {
-        $taskClassNames = [];
-        $implementationClassNames = $this->reflectionService->getAllImplementationClassNamesForInterface(TaskInterface::class);
-        foreach ($implementationClassNames as $implementationClassName) {
-            $taskClassNames[] = TaskClassName::createFromString($implementationClassName);
-        }
+        $this->reflectionService = $reflectionService;
+    }
 
-        return $taskClassNames;
+    public function findAll(): TaskClassNames
+    {
+        $implementationClassNames = $this->reflectionService->getAllImplementationClassNamesForInterface(TaskInterface::class);
+
+        return new TaskClassNames(array_map(function (string $implementationClassName): TaskClassName {
+            return TaskClassName::createFromString($implementationClassName);
+        }, $implementationClassNames));
     }
 }

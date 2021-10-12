@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Object;
 
 use Neos\ContentRepository\Domain\Projection\Content\TraversableNodeInterface;
@@ -9,15 +8,17 @@ use Sitegeist\Bitzer\Infrastructure\ContentContextFactory;
 
 /**
  * The object repository. Don't call it content graph!
+ *
  * @Flow\Scope("singleton")
  */
-class ObjectRepository
+final class ObjectRepository
 {
-    /**
-     * @Flow\Inject
-     * @var ContentContextFactory
-     */
-    protected $contentContextFactory;
+    private ContentContextFactory $contentContextFactory;
+
+    public function __construct(ContentContextFactory $contentContextFactory)
+    {
+        $this->contentContextFactory = $contentContextFactory;
+    }
 
     public function findByAddress(NodeAddress $nodeAddress): ?TraversableNodeInterface
     {

@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Task;
 
 use Neos\Flow\Annotations as Flow;
@@ -10,14 +9,12 @@ use Sitegeist\Bitzer\Domain\Task\Exception\ShortTypeDefinesNoTask;
 
 /**
  * The task class name value object
+ *
  * @Flow\Proxy(false)
  */
 final class TaskClassName
 {
-    /**
-     * @var string
-     */
-    private $value;
+    private string $value;
 
     public function __construct(string $value)
     {
@@ -32,12 +29,12 @@ final class TaskClassName
 
     public static function createFromString(string $value): TaskClassName
     {
-        return new static($value);
+        return new self($value);
     }
 
     public static function createFromObject(object $object): TaskClassName
     {
-        return new static(get_class($object));
+        return new self(get_class($object));
     }
 
     public static function fromShortType(string $shortType, ReflectionService $reflectionService): TaskClassName
@@ -45,7 +42,7 @@ final class TaskClassName
         $classNames = $reflectionService->getAllImplementationClassNamesForInterface(TaskInterface::class);
         foreach ($classNames as $className) {
             if ($className::getShortType() === $shortType) {
-                return new static($className);
+                return new self($className);
             }
         }
 

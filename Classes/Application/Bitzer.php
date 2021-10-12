@@ -1,6 +1,4 @@
-<?php
-declare(strict_types=1);
-
+<?php declare(strict_types=1);
 namespace Sitegeist\Bitzer\Application;
 
 use Neos\Flow\Annotations as Flow;
@@ -43,37 +41,48 @@ use Sitegeist\Bitzer\Infrastructure\ContentContextFactory;
  * @Flow\Scope("singleton")
  * @api
  */
-class Bitzer
+final class Bitzer
 {
-    /**
-     * @Flow\Inject
-     * @var Schedule
-     */
-    protected $schedule;
+    private Schedule $schedule;
+
+    private AgentRepository $agentRepository;
+
+    private ContentContextFactory $contentContextFactory;
 
     /**
-     * @Flow\Inject
-     * @var AgentRepository
+     * The constraint check plugins, indexed by task type
+     * @var array<string,array<int,ConstraintCheckPluginInterface>>
      */
-    protected $agentRepository;
+    private array $constraintCheckPlugins;
 
-    /**
-     * @Flow\Inject
-     * @var ContentContextFactory
-     */
-    protected $contentContextFactory;
+    public function __construct(
+        Schedule $schedule,
+        AgentRepository $agentRepository,
+        ContentContextFactory $contentContextFactory,
+        ObjectManagerInterface $objectManager,
+        array $constraintCheckPluginMapping
+    ) {
+        $this->schedule = $schedule;
+        $this->agentRepository = $agentRepository;
+        $this->contentContextFactory = $contentContextFactory;
+        $constraintCheckPlugins = [];
+        foreach ($constraintCheckPluginMapping as $taskClassName => $constraintCheckPluginNames) {
+            foreach ($constraintCheckPluginNames as $pluginClassName => $isActive) {
+                if ($isActive) {
+                    if (!class_exists($pluginClassName)) {
+                        throw ConstraintCheckPluginIsInvalid::becauseItIsNotImplemented($pluginClassName);
+                    }
+                    if (!in_array(ConstraintCheckPluginInterface::class, class_implements($pluginClassName))) {
+                        throw ConstraintCheckPluginIsInvalid::becauseItDoesNotImplementTheRequiredInterface($pluginClassName);
+                    }
 
-    /**
-     * @Flow\InjectConfiguration(path="constraintCheckPlugins")
-     * @var array
-     */
-    protected $constraintCheckPlugins;
+                    $constraintCheckPlugins[$taskClassName][] = $objectManager->get($pluginClassName);
+                }
+            }
+        }
+        $this->constraintCheckPlugins = $constraintCheckPlugins;
+    }
 
-    /**
-     * @Flow\Inject
-     * @var ObjectManagerInterface
-     */
-    protected $objectManager;
 
     final public function handleScheduleTask(ScheduleTask $command, ?ConstraintCheckResult $constraintCheckResult = null): void
     {
@@ -322,28 +331,10 @@ class Bitzer
     }
 
     /**
-     * @param TaskClassName $taskClassName
-     * @return array|ConstraintCheckPluginInterface[]
+     * @return array<int,ConstraintCheckPluginInterface>
      */
     private function getConstraintCheckPlugins(TaskClassName $taskClassName): array
     {
-        $plugins = [];
-
-        if (isset($this->constraintCheckPlugins[(string) $taskClassName])) {
-            foreach ($this->constraintCheckPlugins[(string) $taskClassName] as $pluginClassName => $active) {
-                if ($active) {
-                    if (!class_exists($pluginClassName)) {
-                        throw ConstraintCheckPluginIsInvalid::becauseItIsNotImplemented($pluginClassName);
-                    }
-                    if (!in_array(ConstraintCheckPluginInterface::class, class_implements($pluginClassName))) {
-                        throw ConstraintCheckPluginIsInvalid::becauseItDoesNotImplementTheRequiredInterface($pluginClassName);
-                    }
-
-                    $plugins[] = $this->objectManager->get($pluginClassName);
-                }
-            }
-        }
-
-        return $plugins;
+        return $this->constraintCheckPlugins[(string)$taskClassName] ?? [];
     }
 }

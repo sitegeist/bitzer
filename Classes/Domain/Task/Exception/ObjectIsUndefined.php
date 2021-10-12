@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Task\Exception;
 
 /**
@@ -7,8 +6,8 @@ namespace Sitegeist\Bitzer\Domain\Task\Exception;
  */
 final class ObjectIsUndefined extends \DomainException
 {
-    public static function althoughExpected(): ObjectIsUndefined
+    public static function althoughExpected(): self
     {
-        return new static('Object is undefined.', 1568206358);
+        return new self('Object is undefined.', 1568206358);
     }
 }

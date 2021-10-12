@@ -1,14 +1,11 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Task;
 
 use Neos\Eel\ProtectedContextAwareInterface;
 use Neos\Flow\Annotations as Flow;
-use Neos\Neos\Domain\Model\Domain;
 
 /**
  * The constraint check result registry
- *
  * Collects exceptions that otherwise would have been
  *
  * @Flow\Proxy(false)
@@ -17,15 +14,15 @@ final class ConstraintCheckResult implements ProtectedContextAwareInterface
 {
     /**
      * The registry for failed constraint checks
-     * @var array|\DomainException[]
+     * @var array<string,\DomainException>
      */
-    private $failedChecks;
+    private array $failedChecks = [];
 
     /**
      * The registry for message arguments for the failed constraint checks
-     * @var array
+     * @var array<string,array<mixed,mixed>>
      */
-    private $messageArguments;
+    private array $messageArguments = [];
 
     public function registerFailedCheck(string $path, \DomainException $failedConstraintCheck, array $messageArguments = []): void
     {

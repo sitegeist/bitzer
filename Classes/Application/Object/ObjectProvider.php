@@ -1,6 +1,4 @@
-<?php
-declare(strict_types=1);
-
+<?php declare(strict_types=1);
 namespace Sitegeist\Bitzer\Application\Object;
 
 use Neos\ContentRepository\Domain\Projection\Content\TraversableNodeInterface;
@@ -13,14 +11,16 @@ use Sitegeist\Bitzer\Domain\Task\NodeAddress;
 
 /**
  * The object provider
+ * @Flow\Scope("singleton")
  */
-class ObjectProvider implements ProtectedContextAwareInterface
+final class ObjectProvider implements ProtectedContextAwareInterface
 {
-    /**
-     * @Flow\Inject
-     * @var ContextFactoryInterface
-     */
-    protected $contentContextFactory;
+    private ContextFactoryInterface $contentContextFactory;
+
+    public function __construct(ContextFactoryInterface $contentContextFactory)
+    {
+        $this->contentContextFactory = $contentContextFactory;
+    }
 
     public function getObjects(): array
     {
@@ -42,7 +42,6 @@ class ObjectProvider implements ProtectedContextAwareInterface
 
     /**
      * @todo add dimension support
-     * @return ContentContext
      */
     private function getContentContext(): ContentContext
     {
@@ -56,7 +55,6 @@ class ObjectProvider implements ProtectedContextAwareInterface
      * All methods are considered safe
      *
      * @param string $methodName
-     * @return boolean
      */
     public function allowsCallOfMethod($methodName): bool
     {

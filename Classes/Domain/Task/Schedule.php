@@ -2,56 +2,59 @@
 namespace Sitegeist\Bitzer\Domain\Task;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Driver\Exception as DriverException;
+use Doctrine\DBAL\Exception as DbalException;
 use Doctrine\DBAL\Types\Types;
 use GuzzleHttp\Psr7\Uri;
 use Neos\Flow\Annotations as Flow;
+use Neos\Flow\Persistence\Doctrine\ConnectionFactory;
 use Neos\Neos\Domain\Service\ContentDimensionPresetSourceInterface;
 use Psr\Http\Message\UriInterface;
+use Sitegeist\Bitzer\Domain\Agent\Agents;
 use Sitegeist\Bitzer\Domain\Task\Command\ScheduleTask;
 use Sitegeist\Bitzer\Domain\Task\Generic\GenericTaskFactory;
-use Sitegeist\Bitzer\Infrastructure\DbalClient;
 use Sitegeist\Bitzer\Domain\Agent\Agent;
 use Sitegeist\Bitzer\Domain\Agent\AgentRepository;
 use Sitegeist\Bitzer\Domain\Task\Exception\AgentDoesNotExist;
 
 /**
  * The schedule, the repository for tasks
+ *
  * @Flow\Scope("singleton")
  */
-class Schedule
+final class Schedule
 {
     const TABLE_NAME = 'sitegeist_bitzer_domain_task_task';
 
-    /**
-     * @Flow\InjectConfiguration(path="factories")
-     * @var array
-     */
-    protected $factoryMapping;
+    private array $factoryMapping;
+
+    private Connection $databaseConnection;
+
+    protected ContentDimensionPresetSourceInterface $contentDimensionPresetSource;
+
+    protected AgentRepository $agentRepository;
+
+    public function __construct(
+        array $factoryMapping,
+        ConnectionFactory $connectionFactory,
+        ContentDimensionPresetSourceInterface $contentDimensionPresetSource,
+        AgentRepository $agentRepository
+    ) {
+        $this->factoryMapping = $factoryMapping;
+        $this->databaseConnection = $connectionFactory->create();
+        $this->contentDimensionPresetSource = $contentDimensionPresetSource;
+        $this->agentRepository = $agentRepository;
+    }
 
     /**
-     * @Flow\Inject
-     * @var DbalClient
+     * @throws DriverException
+     * @throws DbalException
      */
-    protected $databaseClient;
-
-    /**
-     * @Flow\Inject
-     * @var ContentDimensionPresetSourceInterface
-     */
-    protected $contentDimensionPresetSource;
-
-    /**
-     * @Flow\Inject
-     * @var AgentRepository
-     */
-    protected $agentRepository;
-
     final public function findByIdentifier(TaskIdentifier $identifier): ?TaskInterface
     {
-        $tableRow = $this->getDatabaseConnection()->executeQuery(
+        $tableRow = $this->databaseConnection->executeQuery(
             'SELECT * FROM ' . self::TABLE_NAME . '
- WHERE identifier = :identifier',
+                    WHERE identifier = :identifier',
             [
                 'identifier' => (string)$identifier
             ]
@@ -62,39 +65,46 @@ class Schedule
             : null;
     }
 
+    /**
+     * @throws DriverException
+     * @throws DbalException
+     */
     final public function findAll(): Tasks
     {
-        $rawDataSet = $this->getDatabaseConnection()->executeQuery(
+        $rawDataSet = $this->databaseConnection->executeQuery(
             'SELECT * FROM ' . self::TABLE_NAME
         )->fetchAllAssociative();
 
         return $this->createTasksFromTableRows($rawDataSet);
     }
 
+    /**
+     * @throws DriverException
+     * @throws DbalException
+     */
     final public function findAllOrdered(): Tasks
     {
-        $rawDataSet = $this->getDatabaseConnection()->executeQuery(
+        $rawDataSet = $this->databaseConnection->executeQuery(
             'SELECT * FROM ' . self::TABLE_NAME . '
-                ORDER BY scheduledtime ASC'
+                    ORDER BY scheduledtime ASC'
         )->fetchAllAssociative();
 
         return $this->createTasksFromTableRows($rawDataSet);
     }
 
     /**
-     * @param \DateInterval $upcomingInterval
-     * @param array|null $agentIdentifiers
-     * @return array|TaskInterface[][]
-     * @throws \Doctrine\DBAL\DBALException
+     * @return array<string,array<int,TaskInterface>>
+     * @throws DbalException
+     * @throws DriverException
      */
-    final public function findPastDueDueAndUpcoming(\DateInterval $upcomingInterval, ?array $agentIdentifiers = null): array
+    final public function findPastDueDueAndUpcoming(\DateInterval $upcomingInterval, ?Agents $agents = null): array
     {
         $now = ScheduledTime::now();
         $referenceDate = $now->add($upcomingInterval);
 
         $query = 'SELECT * FROM ' . self::TABLE_NAME . '
-            WHERE scheduledtime <= :referenceDate
-            AND actionstatus IN (:actionStatusTypes)';
+                    WHERE scheduledtime <= :referenceDate
+                    AND actionstatus IN (:actionStatusTypes)';
         $parameters = [
             'referenceDate' => $referenceDate,
             'actionStatusTypes' => [
@@ -107,14 +117,14 @@ class Schedule
             'actionStatusTypes' => Connection::PARAM_STR_ARRAY
         ];
 
-        if ($agentIdentifiers) {
-            $parameters['agentIdentifiers'] = $agentIdentifiers;
+        if ($agents) {
+            $parameters['agentIdentifiers'] = $agents->getIdentifiers();
             $types['agentIdentifiers'] = Connection::PARAM_STR_ARRAY;
             $query .= ' AND agent IN (:agentIdentifiers)';
         }
         $query .= ' ORDER BY scheduledtime ASC';
 
-        $rawDataSet = $this->getDatabaseConnection()->executeQuery(
+        $rawDataSet = $this->databaseConnection->executeQuery(
             $query,
             $parameters,
             $types
@@ -133,12 +143,15 @@ class Schedule
         return $groupedTasks;
     }
 
-    final function countDue(?array $agentIdentifiers = null): int
+    /**
+     * @throws DriverException
+     * @throws DbalException
+     */
+    final function countDue(?Agents $agents = null): int
     {
-        $sql = 'SELECT COUNT(*) FROM ' . self::TABLE_NAME . '
-            WHERE
-                actionstatus IN (:actionStatusTypes)
-            AND TO_DAYS(scheduledTime) = TO_DAYS(NOW())';
+        $query = 'SELECT COUNT(*) FROM ' . self::TABLE_NAME . '
+                    WHERE actionstatus IN (:actionStatusTypes)
+                    AND TO_DAYS(scheduledTime) = TO_DAYS(NOW())';
 
         $parameters = [
             'actionStatusTypes' => [
@@ -151,14 +164,14 @@ class Schedule
             'actionStatusTypes' => Connection::PARAM_STR_ARRAY
         ];
 
-        if ($agentIdentifiers) {
-            $parameters['agentIdentifiers'] = $agentIdentifiers;
+        if ($agents) {
+            $parameters['agentIdentifiers'] = $agents->getIdentifiers();
             $types['agentIdentifiers'] = Connection::PARAM_STR_ARRAY;
-            $sql .= ' AND agent IN (:agentIdentifiers)';
+            $query .= ' AND agent IN (:agentIdentifiers)';
         }
 
-        $rawDataSet = $this->getDatabaseConnection()->executeQuery(
-            $sql,
+        $rawDataSet = $this->databaseConnection->executeQuery(
+            $query,
             $parameters,
             $types
         )->fetchAllAssociative();
@@ -166,13 +179,16 @@ class Schedule
         return (int) $rawDataSet[0]['COUNT(*)'];
     }
 
-    final function countPastDue(?array $agentIdentifiers = null): int
+    /**
+     * @throws DriverException
+     * @throws DbalException
+     */
+    final function countPastDue(?Agents $agents = null): int
     {
-        $sql = 'SELECT COUNT(*) FROM ' . self::TABLE_NAME . '
-            WHERE
-                actionstatus IN (:actionStatusTypes)
-            AND scheduledTime < NOW()
-            AND TO_DAYS(scheduledTime) <> TO_DAYS(NOW())';
+        $query = 'SELECT COUNT(*) FROM ' . self::TABLE_NAME . '
+                    WHERE actionstatus IN (:actionStatusTypes)
+                    AND scheduledTime < NOW()
+                    AND TO_DAYS(scheduledTime) <> TO_DAYS(NOW())';
 
         $parameters = [
             'actionStatusTypes' => [
@@ -185,14 +201,14 @@ class Schedule
             'actionStatusTypes' => Connection::PARAM_STR_ARRAY
         ];
 
-        if ($agentIdentifiers) {
-            $parameters['agentIdentifiers'] = $agentIdentifiers;
+        if ($agents) {
+            $parameters['agentIdentifiers'] = $agents->getIdentifiers();
             $types['agentIdentifiers'] = Connection::PARAM_STR_ARRAY;
-            $sql .= ' AND agent IN (:agentIdentifiers)';
+            $query .= ' AND agent IN (:agentIdentifiers)';
         }
 
-        $rawDataSet = $this->getDatabaseConnection()->executeQuery(
-            $sql,
+        $rawDataSet = $this->databaseConnection->executeQuery(
+            $query,
             $parameters,
             $types
         )->fetchAllAssociative();
@@ -200,14 +216,17 @@ class Schedule
         return (int) $rawDataSet[0]['COUNT(*)'];
     }
 
-    final function countUpcoming(\DateInterval $upcomingInterval, ?array $agentIdentifiers = null): int
+    /**
+     * @throws DriverException
+     * @throws DbalException
+     */
+    final function countUpcoming(\DateInterval $upcomingInterval, ?Agents $agents = null): int
     {
         $now = ScheduledTime::now();
         $referenceDate = $now->add($upcomingInterval);
 
-        $sql = 'SELECT COUNT(*) FROM ' . self::TABLE_NAME . '
-            WHERE
-                actionstatus IN (:actionStatusTypes)
+        $query = 'SELECT COUNT(*) FROM ' . self::TABLE_NAME . '
+            WHERE actionstatus IN (:actionStatusTypes)
             AND scheduledTime <= :referenceDate
             AND scheduledTime > NOW()
             AND TO_DAYS(scheduledTime) <> TO_DAYS(NOW())';
@@ -220,19 +239,19 @@ class Schedule
             ]
         ];
 
-            $types = [
+        $types = [
             'referenceDate' => Types::DATETIME_IMMUTABLE,
             'actionStatusTypes' => Connection::PARAM_STR_ARRAY
         ];
 
-        if ($agentIdentifiers) {
-            $parameters['agentIdentifiers'] = $agentIdentifiers;
+        if ($agents) {
+            $parameters['agentIdentifiers'] = $agents->getIdentifiers();
             $types['agentIdentifiers'] = Connection::PARAM_STR_ARRAY;
-            $sql .= ' AND agent IN (:agentIdentifiers)';
+            $query .= ' AND agent IN (:agentIdentifiers)';
         }
 
-        $rawDataSet = $this->getDatabaseConnection()->executeQuery(
-            $sql,
+        $rawDataSet = $this->databaseConnection->executeQuery(
+            $query,
             $parameters,
             $types
         )->fetchAllAssociative();
@@ -240,13 +259,17 @@ class Schedule
         return (int) $rawDataSet[0]['COUNT(*)'];
     }
 
+    /**
+     * @throws DriverException
+     * @throws DbalException
+     */
     final public function findPotentialTasksOfClassForObject(TaskClassName $taskClassName, NodeAddress $object): Tasks
     {
-        $rawDataSet = $this->getDatabaseConnection()->executeQuery(
+        $rawDataSet = $this->databaseConnection->executeQuery(
             'SELECT * FROM ' . self::TABLE_NAME . '
- WHERE classname = :taskClassName
-    AND object = :object
-    AND actionstatus = :actionStatusType',
+                    WHERE classname = :taskClassName
+                    AND object = :object
+                    AND actionstatus = :actionStatusType',
             [
                 'taskClassName' => $taskClassName,
                 'object' => $object,
@@ -254,15 +277,18 @@ class Schedule
             ]
         )->fetchAllAssociative();
 
-        $tasks = $this->createTasksFromTableRows($rawDataSet);
-        return $tasks;
+        return $this->createTasksFromTableRows($rawDataSet);
     }
 
+    /**
+     * @throws DriverException
+     * @throws DbalException
+     */
     final public function findActiveOrPotentialTasksForObject(NodeAddress $object, ?TaskClassName $taskClassName = null): Tasks
     {
         $query = 'SELECT * FROM ' . self::TABLE_NAME . '
-                WHERE object = :object
-                AND actionstatus IN (:actionStatusTypes)';
+                    WHERE object = :object
+                    AND actionstatus IN (:actionStatusTypes)';
         $params = [
             'object' => $object,
             'actionStatusTypes' => [
@@ -276,7 +302,7 @@ class Schedule
             $params['taskClassName'] = $taskClassName->getValue();
         }
 
-        $tableRows = $this->getDatabaseConnection()->executeQuery(
+        $tableRows = $this->databaseConnection->executeQuery(
             $query,
             $params,
             [
@@ -287,9 +313,12 @@ class Schedule
         return $this->createTasksFromTableRows($tableRows);
     }
 
+    /**
+     * @throws DbalException
+     */
     final public function scheduleTask(ScheduleTask $command): void
     {
-        $this->getDatabaseConnection()->insert(
+        $this->databaseConnection->insert(
             self::TABLE_NAME,
             [
                 'identifier' => (string)$command->getIdentifier(),
@@ -308,9 +337,12 @@ class Schedule
         );
     }
 
+    /**
+     * @throws DbalException
+     */
     final public function rescheduleTask(TaskIdentifier $taskIdentifier, \DateTimeImmutable $scheduledTime): void
     {
-        $this->getDatabaseConnection()->update(
+        $this->databaseConnection->update(
             self::TABLE_NAME,
             [
                 'scheduledtime' => $scheduledTime,
@@ -324,9 +356,12 @@ class Schedule
         );
     }
 
+    /**
+     * @throws DbalException
+     */
     final public function reassignTask(TaskIdentifier $taskIdentifier, Agent $agent): void
     {
-        $this->getDatabaseConnection()->update(
+        $this->databaseConnection->update(
             self::TABLE_NAME,
             [
                 'agent' => $agent,
@@ -337,9 +372,12 @@ class Schedule
         );
     }
 
+    /**
+     * @throws DbalException
+     */
     final public function setTaskObject(TaskIdentifier $taskIdentifier, ?NodeAddress $object): void
     {
-        $this->getDatabaseConnection()->update(
+        $this->databaseConnection->update(
             self::TABLE_NAME,
             [
                 'object' => $object ? json_encode($object) : null,
@@ -350,9 +388,12 @@ class Schedule
         );
     }
 
+    /**
+     * @throws DbalException
+     */
     final public function setTaskTarget(TaskIdentifier $taskIdentifier, ?UriInterface $target): void
     {
-        $this->getDatabaseConnection()->update(
+        $this->databaseConnection->update(
             self::TABLE_NAME,
             [
                 'target' => $target,
@@ -363,9 +404,12 @@ class Schedule
         );
     }
 
+    /**
+     * @throws DbalException
+     */
     final public function setTaskProperties(TaskIdentifier $taskIdentifier, array $properties): void
     {
-        $this->getDatabaseConnection()->update(
+        $this->databaseConnection->update(
             self::TABLE_NAME,
             [
                 'properties' => $properties,
@@ -374,21 +418,30 @@ class Schedule
                 'identifier' => $taskIdentifier,
             ],
             [
-                'properties' => Type::JSON
+                'properties' => Types::JSON
             ]
         );
     }
 
+    /**
+     * @throws DbalException
+     */
     final public function cancelTask(TaskIdentifier $taskIdentifier): void
     {
-        $this->getDatabaseConnection()->executeQuery('DELETE FROM ' . self::TABLE_NAME . ' WHERE identifier = :identifier', [
-            'identifier' => (string) $taskIdentifier
-        ]);
+        $this->databaseConnection->executeQuery(
+            'DELETE FROM ' . self::TABLE_NAME . ' WHERE identifier = :identifier',
+            [
+                'identifier' => (string) $taskIdentifier
+            ]
+        );
     }
 
+    /**
+     * @throws DbalException
+     */
     final public function updateTaskActionStatus(TaskIdentifier $taskIdentifier, ActionStatusType $actionStatus): void
     {
-        $this->getDatabaseConnection()->update(
+        $this->databaseConnection->update(
             self::TABLE_NAME,
             [
                 'actionstatus' => $actionStatus,
@@ -455,10 +508,5 @@ class Schedule
         return isset($this->factoryMapping[(string) $className])
             ? new $this->factoryMapping[(string) $className]()
             : new GenericTaskFactory();
-    }
-
-    private function getDatabaseConnection(): Connection
-    {
-        return $this->databaseClient->getConnection();
     }
 }

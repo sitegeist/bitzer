@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Task\Exception;
 
 use Sitegeist\Bitzer\Domain\Task\TaskIdentifier;
@@ -9,8 +8,8 @@ use Sitegeist\Bitzer\Domain\Task\TaskIdentifier;
  */
 final class TaskDoesNotExist extends \DomainException
 {
-    public static function althoughExpectedForIdentifier(TaskIdentifier $identifier): TaskDoesNotExist
+    public static function althoughExpectedForIdentifier(TaskIdentifier $identifier): self
     {
-        return new static('No task with identifier ' . $identifier . ' exists.', 1567600174);
+        return new self('No task with identifier ' . $identifier . ' exists.', 1567600174);
     }
 }

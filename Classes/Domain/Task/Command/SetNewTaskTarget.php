@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Task\Command;
 
 use Neos\Flow\Annotations as Flow;
@@ -8,19 +7,14 @@ use Sitegeist\Bitzer\Domain\Task\TaskIdentifier;
 
 /**
  * The SetNewTaskTarget command
+ *
  * @Flow\Proxy(false)
  */
 final class SetNewTaskTarget
 {
-    /**
-     * @var TaskIdentifier
-     */
-    private $identifier;
+    private TaskIdentifier $identifier;
 
-    /**
-     * @var UriInterface|null
-     */
-    private $target;
+    private ?UriInterface $target;
 
     public function __construct(TaskIdentifier $identifier, ?UriInterface $target)
     {

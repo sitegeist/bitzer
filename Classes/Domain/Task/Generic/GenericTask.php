@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Task\Generic;
 
 use Neos\ContentRepository\Domain\Model\NodeInterface;
@@ -17,51 +16,20 @@ use Sitegeist\Bitzer\Domain\Agent\Agent;
  */
 final class GenericTask implements TaskInterface
 {
-    /**
-     * @var TaskIdentifier
-     */
-    private $identifier;
+    private TaskIdentifier $identifier;
 
-    /**
-     * @var string
-     */
-    private $properties;
+    private array $properties;
 
-    /**
-     * @var \DateTimeImmutable
-     */
-    private $scheduledTime;
+    private \DateTimeImmutable $scheduledTime;
 
-    /**
-     * @var ActionStatusType
-     */
-    private $actionStatus;
+    private ActionStatusType $actionStatus;
 
-    /**
-     * @var Agent
-     */
-    private $agent;
+    private Agent $agent;
 
-    /**
-     * @var NodeInterface|null
-     */
-    private $object;
+    private ?NodeInterface $object;
 
-    /**
-     * @var UriInterface|null
-     */
-    private $target;
+    private ?UriInterface $target;
 
-    /**
-     * GenericTask constructor.
-     * @param TaskIdentifier $identifier
-     * @param array $properties
-     * @param \DateTimeImmutable $scheduledTime
-     * @param ActionStatusType $actionStatus
-     * @param string $agent
-     * @param TraversableNodeInterface|null $object
-     * @param UriInterface $target
-     */
     public function __construct(
         TaskIdentifier $identifier,
         array $properties,
@@ -93,8 +61,6 @@ final class GenericTask implements TaskInterface
 
     /**
      * The image describing the task. Must be a FontAwesome icon identifier available to the Neos UI.
-     *
-     * @return string
      */
     public function getImage(): string
     {
@@ -103,8 +69,6 @@ final class GenericTask implements TaskInterface
 
     /**
      * A description of the task.
-     *
-     * @return string
      */
     public function getDescription(): string
     {
@@ -113,8 +77,6 @@ final class GenericTask implements TaskInterface
 
     /**
      * The time the object is scheduled to.
-     *
-     * @return \DateTimeImmutable
      */
     public function getScheduledTime(): \DateTimeImmutable
     {
@@ -123,8 +85,6 @@ final class GenericTask implements TaskInterface
 
     /**
      * Indicates the current disposition of the Action.
-     *
-     * @return ActionStatusType
      */
     public function getActionStatus(): ActionStatusType
     {
@@ -134,8 +94,6 @@ final class GenericTask implements TaskInterface
     /**
      * The direct performer or driver of the action (animate or inanimate). e.g. John wrote a book.
      * In our case, as tasks are assigned to user groups, this is a Flow policy role identifier.
-     *
-     * @return Agent
      */
     public function getAgent(): Agent
     {
@@ -147,8 +105,6 @@ final class GenericTask implements TaskInterface
      * Also known as the semantic roles patient, affected or undergoer (which change their state) or theme (which doesn't).
      *
      * For now, we expect that only nodes are affected by tasks, if at all.
-     *
-     * @return TraversableNodeInterface|null
      */
     public function getObject(): ?TraversableNodeInterface
     {
@@ -159,8 +115,6 @@ final class GenericTask implements TaskInterface
      * Indicates a target EntryPoint for an Action.
      *
      * In our case this is the URI for the next action to be done within this task.
-     *
-     * @return UriInterface|null
      */
     public function getTarget(): ?UriInterface
     {

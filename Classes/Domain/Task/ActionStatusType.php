@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Task;
 
 use Neos\Flow\Annotations as Flow;
@@ -16,43 +15,40 @@ final class ActionStatusType
     const TYPE_FAILED = 'https://schema.org/FailedActionStatus';
     const TYPE_POTENTIAL = 'https://schema.org/PotentialActionStatus';
 
-    /**
-     * @var string
-     */
-    protected $value;
+    private string $value;
 
     private function __construct(string $value)
     {
         $this->value = $value;
     }
 
-    public static function createFromString(string $value)
+    public static function createFromString(string $value): self
     {
         if ($value !== self::TYPE_ACTIVE && $value !== self::TYPE_COMPLETED && $value !== self::TYPE_FAILED && $value !== self::TYPE_POTENTIAL) {
             throw new ActionStatusTypeIsInvalid('Given action status "' . $value . '" is invalid, must be one of the predefined constants. See also https://schema.org/ActionStatusType', 1567430844);
         }
 
-        return new static($value);
+        return new self($value);
     }
 
-    public static function active(): ActionStatusType
+    public static function active(): self
     {
-        return new static(self::TYPE_ACTIVE);
+        return new self(self::TYPE_ACTIVE);
     }
 
-    public static function completed(): ActionStatusType
+    public static function completed(): self
     {
-        return new static(self::TYPE_COMPLETED);
+        return new self(self::TYPE_COMPLETED);
     }
 
-    public static function failed(): ActionStatusType
+    public static function failed(): self
     {
-        return new static(self::TYPE_FAILED);
+        return new self(self::TYPE_FAILED);
     }
 
-    public static function potential(): ActionStatusType
+    public static function potential(): self
     {
-        return new static(self::TYPE_POTENTIAL);
+        return new self(self::TYPE_POTENTIAL);
     }
 
     public function getValue(): string

@@ -1,14 +1,10 @@
-<?php
-declare(strict_types=1);
-
+<?php declare(strict_types=1);
 namespace Sitegeist\Bitzer\Application\Controller;
 
 use GuzzleHttp\Psr7\Uri;
 use Neos\Error\Messages\Message;
 use Neos\Flow\I18n\Translator;
 use Neos\Flow\Annotations as Flow;
-use Neos\Flow\Mvc\View\ViewInterface;
-use Neos\Flow\Security\Context as SecurityContext;
 use Neos\Neos\Controller\Backend\ModuleController;
 use Neos\Flow\Mvc\FlashMessage\FlashMessageContainer;
 use Sitegeist\Bitzer\Application\Bitzer;
@@ -34,56 +30,11 @@ use Sitegeist\Bitzer\Presentation\ComponentName;
 
 /**
  * The bitzer controller for schedule actions
+ *
+ * @Flow\Scope("singleton")
  */
-class BitzerController extends ModuleController
+final class BitzerController extends ModuleController
 {
-    /**
-     * @Flow\Inject
-     * @var Bitzer
-     */
-    protected $bitzer;
-
-    /**
-     * @Flow\Inject
-     * @var Schedule
-     */
-    protected $schedule;
-
-    /**
-     * @Flow\Inject
-     * @var SecurityContext
-     */
-    protected $securityContext;
-
-    /**
-     * @Flow\Inject
-     * @var AgentRepository
-     */
-    protected $agentRepository;
-
-    /**
-     * @Flow\Inject
-     * @var Translator
-     */
-    protected $translator;
-    /**
-     * @Flow\Inject
-     * @var FlashMessageContainer
-     */
-    protected $flashMessageContainer;
-
-    /**
-     * @Flow\InjectConfiguration(path="upcomingInterval")
-     * @var string
-     */
-    protected $upcomingInterval;
-
-    /**
-     * @Flow\Inject
-     * @var TaskClassNameRepository
-     */
-    protected $taskClassNameRepository;
-
     /**
      * @var string
      */
@@ -94,9 +45,36 @@ class BitzerController extends ModuleController
      */
     protected $view;
 
-    protected function initializeView(ViewInterface $view)
-    {
-        parent::initializeView($view);
+    private Bitzer $bitzer;
+
+    private Schedule $schedule;
+
+    private AgentRepository $agentRepository;
+
+    private Translator $translator;
+
+    private FlashMessageContainer $flashMessageContainer;
+
+    private TaskClassNameRepository $taskClassNameRepository;
+
+    private \DateInterval $upcomingInterval;
+
+    public function __construct(
+        Bitzer $bitzer,
+        Schedule $schedule,
+        AgentRepository $agentRepository,
+        Translator $translator,
+        FlashMessageContainer $flashMessageContainer,
+        TaskClassNameRepository $taskClassNameRepository,
+        string $upcomingInterval
+    ) {
+        $this->bitzer = $bitzer;
+        $this->schedule = $schedule;
+        $this->agentRepository = $agentRepository;
+        $this->translator = $translator;
+        $this->flashMessageContainer = $flashMessageContainer;
+        $this->taskClassNameRepository = $taskClassNameRepository;
+        $this->upcomingInterval = new \DateInterval($upcomingInterval);
     }
 
     public function indexAction(array $module = []): void

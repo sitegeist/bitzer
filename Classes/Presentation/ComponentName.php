@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 namespace Sitegeist\Bitzer\Presentation;
 
 use Neos\Flow\Annotations as Flow;
@@ -35,7 +34,7 @@ final class ComponentName
         $componentName = implode('.', $componentNameSegments);
         $componentName .= ':Application.' . $prefix . end($namespaceSegments);
 
-        return new static($componentName);
+        return new self($componentName);
     }
 
     public function __toString(): string

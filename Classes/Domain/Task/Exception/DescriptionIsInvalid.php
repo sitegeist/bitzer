@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Task\Exception;
 
 /**
@@ -7,8 +6,8 @@ namespace Sitegeist\Bitzer\Domain\Task\Exception;
  */
 final class DescriptionIsInvalid extends \DomainException
 {
-    public static function mustNotBeEmpty(): DescriptionIsInvalid
+    public static function mustNotBeEmpty(): self
     {
-        return new static('The description of a task must not be empty.', 1567764586);
+        return new self('The description of a task must not be empty.', 1567764586);
     }
 }

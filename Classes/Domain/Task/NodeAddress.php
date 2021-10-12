@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Task;
 
 use Neos\ContentRepository\DimensionSpace\DimensionSpace\DimensionSpacePoint;
@@ -17,51 +16,48 @@ use Neos\Flow\Annotations as Flow;
  */
 final class NodeAddress implements \JsonSerializable, ProtectedContextAwareInterface
 {
-    /**
-     * @var string
-     */
-    private $workspaceName;
+    private string $workspaceName;
 
-    /**
-     * @var DimensionSpacePoint
-     */
-    private $dimensionSpacePoint;
+    private DimensionSpacePoint $dimensionSpacePoint;
 
-    /**
-     * @var NodeAggregateIdentifier
-     */
-    private $nodeAggregateIdentifier;
+    private NodeAggregateIdentifier $nodeAggregateIdentifier;
 
-    public function __construct(string $workspaceName, DimensionSpacePoint $dimensionSpacePoint, NodeAggregateIdentifier $nodeAggregateIdentifier)
-    {
+    public function __construct(
+        string $workspaceName,
+        DimensionSpacePoint $dimensionSpacePoint,
+        NodeAggregateIdentifier $nodeAggregateIdentifier
+    ) {
         $this->workspaceName = $workspaceName;
         $this->dimensionSpacePoint = $dimensionSpacePoint;
         $this->nodeAggregateIdentifier = $nodeAggregateIdentifier;
     }
 
-    public static function createFromNode(TraversableNodeInterface $node): NodeAddress
+    public static function createFromNode(TraversableNodeInterface $node): self
     {
         /** @var NodeInterface $node */
-        return new static(
+        return new self(
             $node->getContext()->getWorkspaceName(),
             DimensionSpacePoint::fromLegacyDimensionArray($node->getContext()->getDimensions()),
             NodeAggregateIdentifier::fromString($node->getIdentifier())
         );
     }
 
-    public static function createLiveFromNode(TraversableNodeInterface $node): NodeAddress
+    public static function createLiveFromNode(TraversableNodeInterface $node): self
     {
         /** @var NodeInterface $node */
-        return new static(
+        return new self(
             'live',
             DimensionSpacePoint::fromLegacyDimensionArray($node->getContext()->getDimensions()),
             NodeAggregateIdentifier::fromString($node->getIdentifier())
         );
     }
 
-    public static function createFromArray(array $serialization): NodeAddress
+    /**
+     * @param array<string,mixed> $serialization
+     */
+    public static function createFromArray(array $serialization): self
     {
-        return new static(
+        return new self(
             $serialization['workspaceName'],
             new DimensionSpacePoint($serialization['dimensionSpacePoint']),
             NodeAggregateIdentifier::fromString($serialization['nodeAggregateIdentifier'])
@@ -70,7 +66,7 @@ final class NodeAddress implements \JsonSerializable, ProtectedContextAwareInter
 
     public function withWorkspaceName(string $workspaceName): NodeAddress
     {
-        return new static(
+        return new self(
             $workspaceName,
             $this->dimensionSpacePoint,
             $this->nodeAggregateIdentifier
@@ -92,6 +88,9 @@ final class NodeAddress implements \JsonSerializable, ProtectedContextAwareInter
         return $this->nodeAggregateIdentifier;
     }
 
+    /**
+     * @return array<string,mixed>
+     */
     public function jsonSerialize(): array
     {
         return [
@@ -113,9 +112,8 @@ final class NodeAddress implements \JsonSerializable, ProtectedContextAwareInter
 
     /**
      * @param string $methodName
-     * @return boolean
      */
-    public function allowsCallOfMethod($methodName)
+    public function allowsCallOfMethod($methodName): bool
     {
         return true;
     }

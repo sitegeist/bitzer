@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Task\Command;
 
 use Neos\Flow\Annotations as Flow;
@@ -8,19 +7,14 @@ use Sitegeist\Bitzer\Domain\Task\TaskIdentifier;
 
 /**
  * The ReassignTask command
+ *
  * @Flow\Proxy(false)
  */
 final class ReassignTask
 {
-    /**
-     * @var TaskIdentifier
-     */
-    private $identifier;
+    private TaskIdentifier $identifier;
 
-    /**
-     * @var Agent
-     */
-    private $agent;
+    private Agent $agent;
 
     public function __construct(TaskIdentifier $identifier, Agent $agent)
     {

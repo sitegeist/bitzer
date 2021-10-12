@@ -12,27 +12,12 @@ use Neos\Neos\Domain\Model\User;
  */
 final class Agent
 {
-    /**
-     * @var string
-     */
-    private $identifier;
+    private string $identifier;
 
-    /**
-     * @var string
-     */
-    private $label;
+    private string $label;
 
-    /**
-     * @var AgentType
-     */
-    private $type;
+    private AgentType $type;
 
-    /**
-     * Agent constructor.
-     * @param string $identifier
-     * @param string $label
-     * @param AgentType $type
-     */
     public function __construct(string $identifier, string $label, AgentType $type)
     {
         $this->identifier = $identifier;
@@ -58,25 +43,16 @@ final class Agent
         );
     }
 
-    /**
-     * @return string
-     */
     public function getIdentifier(): string
     {
         return $this->identifier;
     }
 
-    /**
-     * @return AgentType
-     */
     public function getType(): AgentType
     {
         return $this->type;
     }
 
-    /**
-     * @return string
-     */
     public function getLabel(): string
     {
         return $this->label;

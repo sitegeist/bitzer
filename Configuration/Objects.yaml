@@ -1,0 +1,19 @@
+'Sitegeist\Bitzer\Domain\Task\Schedule':
+  arguments:
+    1:
+      setting: 'Sitegeist.Bitzer.factories'
+
+'Sitegeist\Bitzer\Application\Bitzer':
+  arguments:
+    5:
+      setting: 'Sitegeist.Bitzer.constraintCheckPlugins'
+
+'Sitegeist\Bitzer\Application\Controller\BitzerApiController':
+  arguments:
+    3:
+      setting: 'Sitegeist.Bitzer.upcomingInterval'
+
+'Sitegeist\Bitzer\Application\Controller\BitzerController':
+  arguments:
+    7:
+      setting: 'Sitegeist.Bitzer.upcomingInterval'

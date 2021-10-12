@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Task\Command;
 
 use Neos\Flow\Annotations as Flow;
@@ -11,15 +10,9 @@ use Sitegeist\Bitzer\Domain\Task\TaskIdentifier;
  */
 final class SetTaskProperties
 {
-    /**
-     * @var TaskIdentifier
-     */
-    private $identifier;
+    private TaskIdentifier $identifier;
 
-    /**
-     * @var array
-     */
-    private $properties;
+    private array $properties;
 
     public function __construct(
         TaskIdentifier $identifier,

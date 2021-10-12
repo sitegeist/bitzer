@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Task\Command;
 
 use Neos\Flow\Annotations as Flow;
@@ -15,40 +14,19 @@ use Sitegeist\Bitzer\Domain\Task\TaskIdentifier;
  */
 final class ScheduleTask
 {
-    /**
-     * @var TaskIdentifier
-     */
-    private $identifier;
+    private TaskIdentifier $identifier;
 
-    /**
-     * @var TaskClassName
-     */
-    private $className;
+    private TaskClassName $className;
 
-    /**
-     * @var array
-     */
-    private $properties;
+    private array $properties;
 
-    /**
-     * @var \DateTimeImmutable|null
-     */
-    private $scheduledTime;
+    private ?\DateTimeImmutable $scheduledTime;
 
-    /**
-     * @var Agent
-     */
-    private $agent;
+    private Agent $agent;
 
-    /**
-     * @var NodeAddress|null
-     */
-    private $object;
+    private ?NodeAddress $object;
 
-    /**
-     * @var UriInterface
-     */
-    private $target;
+    private UriInterface $target;
 
     public function __construct(
         TaskIdentifier $identifier,
