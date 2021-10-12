@@ -90,11 +90,13 @@ final class Agent
         );
     }
 
-    /**
-     * @return string
-     */
+    public function getCombinedIdentifier(): string
+    {
+        return $this->type . ':' . $this->identifier;
+    }
+
     public function __toString(): string
     {
-        return join(':', [$this->type, $this->identifier]);
+        return $this->getCombinedIdentifier();
     }
 }

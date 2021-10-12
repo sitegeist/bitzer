@@ -1,11 +1,11 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Task;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
+use GuzzleHttp\Psr7\Uri;
 use Neos\Flow\Annotations as Flow;
-use Neos\Flow\Http\Uri;
 use Neos\Neos\Domain\Service\ContentDimensionPresetSourceInterface;
 use Psr\Http\Message\UriInterface;
 use Sitegeist\Bitzer\Domain\Task\Command\ScheduleTask;
@@ -49,44 +49,36 @@ class Schedule
 
     final public function findByIdentifier(TaskIdentifier $identifier): ?TaskInterface
     {
-        $rawData = $this->getDatabaseConnection()->executeQuery(
+        $tableRow = $this->getDatabaseConnection()->executeQuery(
             'SELECT * FROM ' . self::TABLE_NAME . '
  WHERE identifier = :identifier',
             [
                 'identifier' => (string)$identifier
             ]
-        )->fetch();
+        )->fetchAssociative();
 
-        if (!empty($rawData)) {
-            return $this->createTaskFromRawData($rawData);
-        }
-
-        return null;
+        return $tableRow
+            ? $this->createTaskFromTableRow($tableRow)
+            : null;
     }
 
-    /**
-     * @return array|TaskInterface[]
-     * @throws \Doctrine\DBAL\DBALException
-     */
-    final public function findAll(): array
+    final public function findAll(): Tasks
     {
         $rawDataSet = $this->getDatabaseConnection()->executeQuery(
             'SELECT * FROM ' . self::TABLE_NAME
-        )->fetchAll();
+        )->fetchAllAssociative();
 
-        return $this->createTasksFromRawDataSet($rawDataSet);
+        return $this->createTasksFromTableRows($rawDataSet);
     }
-    /**
-     * @return array|TaskInterface[]
-     * @throws \Doctrine\DBAL\DBALException
-     */
-    final public function findAllOrdered(): array
+
+    final public function findAllOrdered(): Tasks
     {
         $rawDataSet = $this->getDatabaseConnection()->executeQuery(
-            'SELECT * FROM ' . self::TABLE_NAME . ' ORDER BY scheduledtime ASC'
-        )->fetchAll();
+            'SELECT * FROM ' . self::TABLE_NAME . '
+                ORDER BY scheduledtime ASC'
+        )->fetchAllAssociative();
 
-        return $this->createTasksFromRawDataSet($rawDataSet);
+        return $this->createTasksFromTableRows($rawDataSet);
     }
 
     /**
@@ -111,7 +103,7 @@ class Schedule
             ]
         ];
         $types = [
-            'referenceDate' => Type::DATETIME_IMMUTABLE,
+            'referenceDate' => Types::DATETIME_IMMUTABLE,
             'actionStatusTypes' => Connection::PARAM_STR_ARRAY
         ];
 
@@ -126,8 +118,8 @@ class Schedule
             $query,
             $parameters,
             $types
-        )->fetchAll();
-        $tasks = $this->createTasksFromRawDataSet($rawDataSet);
+        )->fetchAllAssociative();
+        $tasks = $this->createTasksFromTableRows($rawDataSet);
 
         $groupedTasks = [
             TaskDueStatusType::STATUS_PAST_DUE => [],
@@ -169,7 +161,7 @@ class Schedule
             $sql,
             $parameters,
             $types
-        )->fetchAll();
+        )->fetchAllAssociative();
 
         return (int) $rawDataSet[0]['COUNT(*)'];
     }
@@ -203,7 +195,7 @@ class Schedule
             $sql,
             $parameters,
             $types
-        )->fetchAll();
+        )->fetchAllAssociative();
 
         return (int) $rawDataSet[0]['COUNT(*)'];
     }
@@ -229,7 +221,7 @@ class Schedule
         ];
 
             $types = [
-            'referenceDate' => Type::DATETIME_IMMUTABLE,
+            'referenceDate' => Types::DATETIME_IMMUTABLE,
             'actionStatusTypes' => Connection::PARAM_STR_ARRAY
         ];
 
@@ -243,18 +235,12 @@ class Schedule
             $sql,
             $parameters,
             $types
-        )->fetchAll();
+        )->fetchAllAssociative();
 
         return (int) $rawDataSet[0]['COUNT(*)'];
     }
 
-    /**
-     * @param TaskClassName $taskClassName
-     * @param NodeAddress $object
-     * @return array|TaskInterface[]
-     * @throws \Doctrine\DBAL\DBALException
-     */
-    final public function findPotentialTasksOfClassForObject(TaskClassName $taskClassName, NodeAddress $object): array
+    final public function findPotentialTasksOfClassForObject(TaskClassName $taskClassName, NodeAddress $object): Tasks
     {
         $rawDataSet = $this->getDatabaseConnection()->executeQuery(
             'SELECT * FROM ' . self::TABLE_NAME . '
@@ -266,37 +252,39 @@ class Schedule
                 'object' => $object,
                 'actionStatusType' => ActionStatusType::TYPE_POTENTIAL
             ]
-        )->fetchAll();
+        )->fetchAllAssociative();
 
-        $tasks = $this->createTasksFromRawDataSet($rawDataSet);
+        $tasks = $this->createTasksFromTableRows($rawDataSet);
         return $tasks;
     }
 
-    /**
-     * @param NodeAddress $object
-     * @return array|TaskInterface[]
-     * @throws \Doctrine\DBAL\DBALException
-     */
-    final public function findActiveOrPotentialTasksForObject(NodeAddress $object): array
+    final public function findActiveOrPotentialTasksForObject(NodeAddress $object, ?TaskClassName $taskClassName = null): Tasks
     {
-        $rawDataSet = $this->getDatabaseConnection()->executeQuery(
-            'SELECT * FROM ' . self::TABLE_NAME . '
-    WHERE object = :object
- AND actionstatus IN (:actionStatusTypes)',
-            [
-                'object' => $object,
-                'actionStatusTypes' => [
-                    ActionStatusType::TYPE_POTENTIAL,
-                    ActionStatusType::TYPE_ACTIVE
-                ]
-            ],
+        $query = 'SELECT * FROM ' . self::TABLE_NAME . '
+                WHERE object = :object
+                AND actionstatus IN (:actionStatusTypes)';
+        $params = [
+            'object' => $object,
+            'actionStatusTypes' => [
+                ActionStatusType::TYPE_POTENTIAL,
+                ActionStatusType::TYPE_ACTIVE
+            ]
+        ];
+        if ($taskClassName) {
+            $query .= '
+                AND classname = :taskClassName';
+            $params['taskClassName'] = $taskClassName->getValue();
+        }
+
+        $tableRows = $this->getDatabaseConnection()->executeQuery(
+            $query,
+            $params,
             [
                 'actionStatusTypes' => Connection::PARAM_STR_ARRAY
             ]
-        )->fetchAll();
+        )->fetchAllAssociative();
 
-        $tasks = $this->createTasksFromRawDataSet($rawDataSet);
-        return $tasks;
+        return $this->createTasksFromTableRows($tableRows);
     }
 
     final public function scheduleTask(ScheduleTask $command): void
@@ -314,8 +302,8 @@ class Schedule
                 'target' => $command->getTarget()
             ],
             [
-                'scheduledtime' => Type::DATETIME_IMMUTABLE,
-                'properties' => Type::JSON
+                'scheduledtime' => Types::DATETIME_IMMUTABLE,
+                'properties' => Types::JSON
             ]
         );
     }
@@ -331,7 +319,7 @@ class Schedule
                 'identifier' => $taskIdentifier,
             ],
             [
-                'scheduledtime' => Type::DATETIME_IMMUTABLE
+                'scheduledtime' => Types::DATETIME_IMMUTABLE
             ]
         );
     }
@@ -422,42 +410,43 @@ class Schedule
     }
 
     /**
-     * @param array $rawDataSet
-     * @return array|TaskInterface[]
+     * @param array<int,mixed> $tableRows
      */
-    private function createTasksFromRawDataSet(array $rawDataSet): array
+    private function createTasksFromTableRows(array $tableRows): Tasks
     {
-        $tasks = [];
-        foreach ($rawDataSet as $rawData) {
-            $tasks[] = $this->createTaskFromRawData($rawData);
-        }
-
-        return $tasks;
+        return new Tasks(array_map(function (array $tableRow): TaskInterface {
+            return $this->createTaskFromTableRow($tableRow);
+        }, $tableRows));
     }
 
-    private function createTaskFromRawData(array $rawData): TaskInterface
+    /**
+     * @param array<string,mixed> $tableRow
+     */
+    private function createTaskFromTableRow(array $tableRow): TaskInterface
     {
-        $className = TaskClassName::createFromString($rawData['classname']);
+        $className = TaskClassName::createFromString($tableRow['classname']);
         $factory = $this->resolveFactory($className);
-        $agent = $this->agentRepository->findByString($rawData['agent']);
+        $agent = $this->agentRepository->findByString($tableRow['agent']);
         if (!$agent) {
-            throw AgentDoesNotExist::althoughExpectedForIdentifier($rawData['agent']);
+            throw AgentDoesNotExist::althoughExpectedForIdentifier($tableRow['agent']);
         }
 
         $object = null;
-        if (isset($rawData['object']) && !empty($rawData['object'])) {
-            $object = NodeAddress::createFromArray(json_decode($rawData['object'], true));
+        if (isset($tableRow['object']) && !empty($tableRow['object'])) {
+            $object = NodeAddress::createFromArray(json_decode($tableRow['object'], true));
         }
 
         return $factory->createFromRawData(
-            new TaskIdentifier($rawData['identifier']),
+            new TaskIdentifier($tableRow['identifier']),
             $className,
-            json_decode($rawData['properties'], true),
-            ScheduledTime::createFromDatabaseValue($rawData['scheduledtime']),
-            ActionStatusType::createFromString($rawData['actionstatus']),
+            json_decode($tableRow['properties'], true),
+            ScheduledTime::createFromDatabaseValue($tableRow['scheduledtime']),
+            ActionStatusType::createFromString($tableRow['actionstatus']),
             $agent,
             $object,
-            isset($rawData['target']) ? new Uri($rawData['target']) : null
+            isset($tableRow['target'])
+                ? new Uri($tableRow['target'])
+                : null
         );
     }
 
