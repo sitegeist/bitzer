@@ -6,22 +6,23 @@ prototype(Sitegeist.Bitzer:Application.MySchedule) < prototype(Neos.Fusion:Compo
         <table class="neos-table">
             <thead>
                 <tr>
-                    <th>{${Translation.translate('task.scheduledTime.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</th>
-                    <th>{${Translation.translate('task.actionStatus.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</th>
-                    <th>{${Translation.translate('task.properties.description.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</th>
-                    <th>{${Translation.translate('task.agent.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</th>
-                    <th>{${Translation.translate('task.object.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</th>
-                    <th><div class="neos-pull-right">{${Translation.translate('actions.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</div></th>
+                    <th></th>
+                    <th>{q(labels).get('task.scheduledTime.label')}</th>
+                    <th>{q(labels).get('task.actionStatus.label')}</th>
+                    <th>{q(labels).get('task.type.label')}</th>
+                    <th>{q(labels).get('task.properties.description.label')}</th>
+                    <th>{q(labels).get('task.agent.label')}</th>
+                    <th>{q(labels).get('task.object.label')}</th>
+                    <th><div class="neos-pull-right">{q(labels).get('actions.label')}</div></th>
                 </tr>
             </thead>
             <tbody>
-                <Sitegeist.Bitzer:MyScheduleTable tasks={props.groupedTasks.pastDue} groupIdentifier="pastDue" @if.hasPastDueTasks={props.groupedTasks.pastDue} />
-                <Sitegeist.Bitzer:MyScheduleTable tasks={props.groupedTasks.due} groupIdentifier="due" @if.hasDueTasks={props.groupedTasks.due} />
-                <Sitegeist.Bitzer:MyScheduleTable tasks={props.groupedTasks.upcoming} groupIdentifier="upcoming" @if.hasUpcomingTasks={props.groupedTasks.upcoming} />
+                <Sitegeist.Bitzer:MyScheduleTable @if.hasPastDueTasks={props.groupedTasks.pastDue} tasks={props.groupedTasks.pastDue} groupIdentifier="pastDue" />
+                <Sitegeist.Bitzer:MyScheduleTable @if.hasDueTasks={props.groupedTasks.due} tasks={props.groupedTasks.due} groupIdentifier="due" />
+                <Sitegeist.Bitzer:MyScheduleTable @if.hasUpcomingTasks={props.groupedTasks.upcoming} tasks={props.groupedTasks.upcoming} groupIdentifier="upcoming" />
             </tbody>
         </table>
-        <Sitegeist.Bitzer:ToggleScript />
-    `
+        <Sitegeist.Bitzer:ToggleScript />`
 }
 
 prototype(Sitegeist.Bitzer:MyScheduleTable) < prototype(Neos.Fusion:Component) {
@@ -33,21 +34,23 @@ prototype(Sitegeist.Bitzer:MyScheduleTable) < prototype(Neos.Fusion:Component) {
 
     renderer = afx`
         <tr class="neos-folder">
-            <td class="neos-priority1" colspan="4">{${Translation.translate('taskDueStatusType.' + props.groupIdentifier + '.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</td>
+            <td class="neos-priority1" colspan="7">{q(labels).get('taskDueStatusType.' + props.groupIdentifier + '.label')}</td>
             <td class="neos-priority1 neos-aRight">
-                <i class="fold-toggle icon-white fas fa-chevron-up" data-toggle={${'fold-tasks_' + props.groupIdentifier}}></i>
+                <i class="fold-toggle icon-white fas fa-chevron-up" data-toggle={'fold-tasks_' + props.groupIdentifier}></i>
             </td>
         </tr>
         <Neos.Fusion:Collection collection={props.tasks} itemName="task">
-            <tr class={${'fold-tasks_' + props.groupIdentifier}} style="display: table-row">
+            <tr class={'fold-tasks_' + props.groupIdentifier} style="display: table-row">
+                <td><i class={'fas fa-' + task.image + ' icon-white'}></i></td>
                 <td>{Date.format(task.scheduledTime, 'Y-m-d H:i')}</td>
-                <td>{${Translation.translate('actionStatusType.' + String.toString(task.actionStatus) + '.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</td>
+                <td>{q(labels).get('actionStatusType.' + String.toString(task.actionStatus) + '.label')}</td>
+                <td>{task.shortType}</td>
                 <td>{task.description}</td>
                 <td>{task.agent.label}</td>
                 <td>{task.object.label}</td>
                 <td class="neos-action">
                     <div class="neos-pull-right">
-                        <Sitegeist.Bitzer:CommandForm commandName="activateTask" commandArguments={{taskIdentifier: String.toString(task.identifier)}} icon="play" target={${task.target ? '_blank' : '_self'}} />
+                        <Sitegeist.Bitzer:CommandForm commandName="activateTask" commandArguments={{taskIdentifier: String.toString(task.identifier)}} icon="play" target={task.target ? '_blank' : '_self'} />
                         <Sitegeist.Bitzer:CommandForm commandName="completeTask" commandArguments={{taskIdentifier: String.toString(task.identifier)}} icon="check" />
                     </div>
                 </td>

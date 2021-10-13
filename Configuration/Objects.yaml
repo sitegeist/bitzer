@@ -15,5 +15,5 @@
 
 'Sitegeist\Bitzer\Application\Controller\BitzerController':
   arguments:
-    7:
+    6:
       setting: 'Sitegeist.Bitzer.upcomingInterval'

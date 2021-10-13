@@ -6,7 +6,6 @@ use Neos\Error\Messages\Message;
 use Neos\Flow\I18n\Translator;
 use Neos\Flow\Annotations as Flow;
 use Neos\Neos\Controller\Backend\ModuleController;
-use Neos\Flow\Mvc\FlashMessage\FlashMessageContainer;
 use Sitegeist\Bitzer\Application\Bitzer;
 use Sitegeist\Bitzer\Domain\Agent\AgentIdentifier;
 use Sitegeist\Bitzer\Domain\Agent\AgentRepository;
@@ -54,8 +53,6 @@ final class BitzerController extends ModuleController
 
     private Translator $translator;
 
-    private FlashMessageContainer $flashMessageContainer;
-
     private TaskClassNameRepository $taskClassNameRepository;
 
     private \DateInterval $upcomingInterval;
@@ -65,7 +62,6 @@ final class BitzerController extends ModuleController
         Schedule $schedule,
         AgentRepository $agentRepository,
         Translator $translator,
-        FlashMessageContainer $flashMessageContainer,
         TaskClassNameRepository $taskClassNameRepository,
         string $upcomingInterval
     ) {
@@ -73,7 +69,6 @@ final class BitzerController extends ModuleController
         $this->schedule = $schedule;
         $this->agentRepository = $agentRepository;
         $this->translator = $translator;
-        $this->flashMessageContainer = $flashMessageContainer;
         $this->taskClassNameRepository = $taskClassNameRepository;
         $this->upcomingInterval = new \DateInterval($upcomingInterval);
     }
@@ -168,7 +163,23 @@ final class BitzerController extends ModuleController
 
         $this->view->setFusionPath('mySchedule');
         $this->view->assignMultiple([
-            'groupedTasks' => $groupedTasks
+            'groupedTasks' => $groupedTasks,
+            'labels' => [
+                'task.scheduledTime.label' => $this->getLabel('task.scheduledTime.label'),
+                'task.actionStatus.label' => $this->getLabel('task.actionStatus.label'),
+                'task.type.label' => $this->getLabel('task.type.label'),
+                'task.properties.description.label' => $this->getLabel('task.properties.description.label'),
+                'task.agent.label' => $this->getLabel('task.agent.label'),
+                'task.object.label' => $this->getLabel('task.object.label'),
+                'actions.label' => $this->getLabel('actions.label'),
+                'taskDueStatusType.due.label' => $this->getLabel('taskDueStatusType.due.label'),
+                'taskDueStatusType.upcoming.due' => $this->getLabel('taskDueStatusType.upcoming.label'),
+                'taskDueStatusType.pastDue.label' => $this->getLabel('taskDueStatusType.pastDue.label'),
+                'actionStatusType.https://schema.org/ActiveActionStatus.label' => $this->getLabel('actionStatusType.https://schema.org/ActiveActionStatus.label'),
+                'actionStatusType.https://schema.org/CompletedActionStatus.label' => $this->getLabel('actionStatusType.https://schema.org/CompletedActionStatus.label'),
+                'actionStatusType.https://schema.org/FailedActionStatus.label' => $this->getLabel('actionStatusType.https://schema.org/FailedActionStatus.label'),
+                'actionStatusType.https://schema.org/PotentialActionStatus.label' => $this->getLabel('actionStatusType.https://schema.org/PotentialActionStatus.label')
+            ]
         ]);
     }
 
@@ -359,18 +370,20 @@ final class BitzerController extends ModuleController
             $id = 'taskClassName.' . $taskClassName->getValue() . '.label';
             return [
                 'identifier' => $taskClassName->getValue(),
-                'label' => $this->translator->translateById(
-                    $id,
-                    [], null, null,
-                    'Module.Bitzer',
-                    'Sitegeist.Bitzer'
-                ) ?: $id
+                'label' => $this->getLabel($id)
             ];
         }, $this->taskClassNameRepository->findAll()->getIterator()->getArrayCopy());
     }
 
     private function getLabel(string $labelIdentifier, array $arguments = [], $quantity = null): string
     {
-        return $this->translator->translateById($labelIdentifier, $arguments, $quantity, null, 'Module.Bitzer', 'Sitegeist.Bitzer') ?? 'not-found-'.$labelIdentifier;
+        return $this->translator->translateById(
+            $labelIdentifier,
+            $arguments,
+            $quantity,
+            null,
+            'Module.Bitzer',
+            'Sitegeist.Bitzer'
+        ) ?: $labelIdentifier;
     }
 }

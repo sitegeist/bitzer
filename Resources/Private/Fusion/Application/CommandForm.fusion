@@ -8,7 +8,7 @@ prototype(Sitegeist.Bitzer:CommandForm) < prototype(Neos.Fusion:Component) {
         tagName = 'form'
 
         attributes = Neos.Fusion:Attributes {
-            method = 'POST'
+            method = 'post'
             data-neos-toggle = 'tooltip'
             data-original-title = ${Translation.translate(props.commandName + '.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}
             style = 'display: inline-block'
@@ -22,8 +22,7 @@ prototype(Sitegeist.Bitzer:CommandForm) < prototype(Neos.Fusion:Component) {
         content = afx`
             <input type="hidden" name="__csrfToken" value={${Security.csrfToken()}} />
             <button type="submit">
-                <i class={${'fas fa-' + props.icon + ' icon-white'}}></i>
-            </button>
-        `
+                <i class={'fas fa-' + props.icon + ' icon-white'}></i>
+            </button>`
     }
 }
