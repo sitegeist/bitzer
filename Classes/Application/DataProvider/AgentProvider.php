@@ -11,6 +11,9 @@ use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\Neos\Service\DataSource\AbstractDataSource;
 use Sitegeist\Bitzer\Domain\Agent\AgentRepository;
 
+/**
+ * @Flow\Scope("singleton")
+ */
 final class AgentProvider extends AbstractDataSource implements ProtectedContextAwareInterface
 {
     /**
