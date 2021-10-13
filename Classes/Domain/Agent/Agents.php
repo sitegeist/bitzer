@@ -40,7 +40,7 @@ final class Agents implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @return \ArrayIterator<int,Agent>
+     * @return \ArrayIterator<int,Agent>|Agent[]
      */
     public function getIterator(): \ArrayIterator
     {

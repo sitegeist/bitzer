@@ -29,7 +29,7 @@ final class AgentProvider extends AbstractDataSource implements ProtectedContext
     {
         $agents = [];
         foreach ($this->agentRepository->findAll() as $agent) {
-            $agents[(string)$agent]['icon'] = $agent->getType()->getIsRole() ? 'users' : 'user';
+            $agents[(string)$agent]['icon'] = $agent->getIdentifier()->getType()->getIsRole() ? 'users' : 'user';
             $agents[(string)$agent]['label'] = $agent->getLabel();
         }
 
