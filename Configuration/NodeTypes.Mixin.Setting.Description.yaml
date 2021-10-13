@@ -1,0 +1,16 @@
+'Sitegeist.Bitzer:Mixin.Setting.Description':
+  abstract: true
+  superTypes:
+    'Sitegeist.Bitzer:Mixin.Inspector': true
+  properties:
+    bitzerTaskDescription:
+      type: string
+      validation:
+        'Neos.Neos/Validation/NotEmptyValidator': {}
+      ui:
+        label: i18n
+        inspector:
+          group: bitzer-settings
+          editor: 'Neos.Neos/Inspector/Editors/TextAreaEditor'
+          editorOptions:
+            rows: 7
