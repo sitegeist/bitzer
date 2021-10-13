@@ -1,11 +1,10 @@
 prototype(Sitegeist.Bitzer:FlashMessages) < prototype(Neos.Fusion:Component) {
-    flashMessages = ${flashMessages}
+    @context.flashMessages = ${Bitzer.FlashMessages.getMessagesAndFlush(this)}
 
     renderer = afx`
         <ul id="neos-notifications-inline">
-            <Neos.Fusion:Collection collection={props.flashMessages}>
+            <Neos.Fusion:Loop items={flashMessages}>
                 <li data-type={${String.toLowerCase(item.severity)}}>{item.message}</li>
-            </Neos.Fusion:Collection>
-        </ul>
-    `
+            </Neos.Fusion:Loop>
+        </ul>`
 }

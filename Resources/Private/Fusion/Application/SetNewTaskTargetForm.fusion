@@ -2,27 +2,30 @@ prototype(Sitegeist.Bitzer:SetNewTaskTargetForm) < prototype(Neos.Fusion:Compone
     task = null
     constraintCheckResult = null
 
-    @context.setNewTaskTargetUri = Neos.Fusion:UriBuilder {
-        package = 'Sitegeist.Bitzer'
-        subpackage = 'Application'
-        controller = 'Bitzer'
-        action = 'setNewTaskTarget'
+    @context {
+        setNewTaskTargetUri = Neos.Fusion:UriBuilder {
+            package = 'Sitegeist.Bitzer'
+            subpackage = 'Application'
+            controller = 'Bitzer'
+            action = 'setNewTaskTarget'
+        }
+        labels = ${Bitzer.Labels.forSetNewTaskTargetForm()}
     }
 
     renderer = afx`
-        <form action={setNewTaskTargetUri} method="POST">
+        <form action={setNewTaskTargetUri} method="post">
             <fieldset class="neos-span5">
-                <legend>{${Translation.translate('setNewTaskTarget.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</legend>
+                <legend>{q(labels).get('setNewTaskTarget.label')}</legend>
                 <input type="hidden" name="__csrfToken" value={${Security.csrfToken()}} />
                 <input type="hidden" name="moduleArguments[taskIdentifier]" value={${String.toString(props.task.identifier)}} />
                 <div class={${'neos-control-group' + (constraintCheckResult.hasFailedAtPath('target') ? ' neos-error' : '')}}>
-                    <label class="neos-control-label" for="title">{${Translation.translate('task.target.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</label>
+                    <label class="neos-control-label" for="title">{q(labels).get('task.target.label')}</label>
                     <div class="neos-controls neos-controls-row">
-                        <input type="text" class="neos-span4" id="target" name="moduleArguments[target]" placeholder={${Translation.translate('task.target.placeholder', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}} value={props.task.target}/>
+                        <input type="text" class="neos-span4" id="target" name="moduleArguments[target]" placeholder={q(labels).get('task.target.placeholder')} value={props.task.target}/>
                     </div>
                     <Sitegeist.Bitzer:Application.ConstraintCheckMessages constraintCheckResult={props.constraintCheckResult} path="target" />
                 </div>
-                <input class="neos-button neos-button-primary" type="submit" name="" value={${Translation.translate('setNewTaskTarget.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}} />
+                <input class="neos-button neos-button-primary" type="submit" name="" value={q(labels).get('setNewTaskTarget.label')} />
             </fieldset>
         </form>
     `

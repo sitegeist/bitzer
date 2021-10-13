@@ -2,6 +2,7 @@
 namespace Sitegeist\Bitzer\Domain\Task;
 
 use Neos\ContentRepository\DimensionSpace\DimensionSpace\DimensionSpacePoint;
+use Neos\ContentRepository\Domain\Model\NodeData;
 use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\ContentRepository\Domain\NodeAggregate\NodeAggregateIdentifier;
 use Neos\ContentRepository\Domain\Projection\Content\TraversableNodeInterface;
@@ -32,7 +33,7 @@ final class NodeAddress implements \JsonSerializable, ProtectedContextAwareInter
         $this->nodeAggregateIdentifier = $nodeAggregateIdentifier;
     }
 
-    public static function createFromNode(TraversableNodeInterface $node): self
+    public static function fromNode(TraversableNodeInterface $node): self
     {
         /** @var NodeInterface $node */
         return new self(
@@ -42,7 +43,16 @@ final class NodeAddress implements \JsonSerializable, ProtectedContextAwareInter
         );
     }
 
-    public static function createLiveFromNode(TraversableNodeInterface $node): self
+    public static function fromNodeData(NodeData $nodeData): self
+    {
+        return new self(
+            $nodeData->getWorkspace()->getName(),
+            DimensionSpacePoint::fromLegacyDimensionArray($nodeData->getDimensionValues()),
+            NodeAggregateIdentifier::fromString($nodeData->getIdentifier())
+        );
+    }
+
+    public static function liveFromNode(TraversableNodeInterface $node): self
     {
         /** @var NodeInterface $node */
         return new self(
@@ -52,10 +62,15 @@ final class NodeAddress implements \JsonSerializable, ProtectedContextAwareInter
         );
     }
 
+    public static function fromJsonString(string $jsonString): self
+    {
+        return self::fromArray(\json_decode($jsonString, true));
+    }
+
     /**
      * @param array<string,mixed> $serialization
      */
-    public static function createFromArray(array $serialization): self
+    public static function fromArray(array $serialization): self
     {
         return new self(
             $serialization['workspaceName'],
@@ -100,8 +115,12 @@ final class NodeAddress implements \JsonSerializable, ProtectedContextAwareInter
         ];
     }
 
-    public function equals(NodeAddress $other): bool
+    public function equals(?NodeAddress $other): bool
     {
+        if (!$other) {
+            return false;
+        }
+
         return $this->jsonSerialize() == $other->jsonSerialize();
     }
 

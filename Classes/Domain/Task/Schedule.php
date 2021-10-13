@@ -10,6 +10,7 @@ use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Persistence\Doctrine\ConnectionFactory;
 use Neos\Neos\Domain\Service\ContentDimensionPresetSourceInterface;
 use Psr\Http\Message\UriInterface;
+use Sitegeist\Bitzer\Domain\Agent\AgentIdentifier;
 use Sitegeist\Bitzer\Domain\Agent\Agents;
 use Sitegeist\Bitzer\Domain\Task\Command\ScheduleTask;
 use Sitegeist\Bitzer\Domain\Task\Generic\GenericTaskFactory;
@@ -479,14 +480,14 @@ final class Schedule
     {
         $className = TaskClassName::createFromString($tableRow['classname']);
         $factory = $this->resolveFactory($className);
-        $agent = $this->agentRepository->findByString($tableRow['agent']);
+        $agent = $this->agentRepository->findByIdentifier(AgentIdentifier::fromString($tableRow['agent']));
         if (!$agent) {
             throw AgentDoesNotExist::althoughExpectedForIdentifier($tableRow['agent']);
         }
 
         $object = null;
         if (isset($tableRow['object']) && !empty($tableRow['object'])) {
-            $object = NodeAddress::createFromArray(json_decode($tableRow['object'], true));
+            $object = NodeAddress::fromArray(json_decode($tableRow['object'], true));
         }
 
         return $factory->createFromRawData(

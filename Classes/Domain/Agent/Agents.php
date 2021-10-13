@@ -35,7 +35,7 @@ final class Agents implements \IteratorAggregate, \Countable
     public function getIdentifiers(): array
     {
         return array_map(function (Agent $agent): string {
-            return $agent->getCombinedIdentifier();
+            return $agent->getIdentifier()->toString();
         }, $this->agents);
     }
 

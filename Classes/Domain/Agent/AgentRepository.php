@@ -63,37 +63,23 @@ final class AgentRepository
         return new Agents($agents);
     }
 
-    public function findByString(string $string): ?Agent
+    public function findByIdentifier(AgentIdentifier $identifier): ?Agent
     {
-        if (strpos($string, ':') === false) {
-            return null;
-        }
-
-        list($type, $identifier) = explode(':', $string, 2);
-
-        return $this->findByTypeAndIdentifier(
-            AgentType::fromString($type),
-            $identifier
-        );
-    }
-
-    public function findByTypeAndIdentifier(AgentType $type, string $identifier): ?Agent
-    {
-        if ($type->getIsRole()) {
+        if ($identifier->getType()->getIsRole()) {
             try {
-                $role = $this->policyService->getRole($identifier);
+                $role = $this->policyService->getRole($identifier->getIdentifier());
                 if ($this->roleIsEligibleAgent($role)) {
                     return Agent::fromRole($role);
                 }
             } catch (NoSuchRoleException $e) {
                 return null;
             }
-        } elseif ($type->getIsUser()) {
+        } elseif ($identifier->getType()->getIsUser()) {
             /** @var User $user */
-            $user = $this->userRepository->findByIdentifier($identifier);
+            $user = $this->userRepository->findByIdentifier($identifier->getIdentifier());
             if ($user) {
                 if ($this->userIsEligibleAgent($user)) {
-                    return Agent::fromUser($user, $identifier);
+                    return Agent::fromUser($user, $identifier->getIdentifier());
                 }
             }
         }

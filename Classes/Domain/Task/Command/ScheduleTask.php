@@ -26,7 +26,7 @@ final class ScheduleTask
 
     private ?NodeAddress $object;
 
-    private UriInterface $target;
+    private ?UriInterface $target;
 
     public function __construct(
         TaskIdentifier $identifier,

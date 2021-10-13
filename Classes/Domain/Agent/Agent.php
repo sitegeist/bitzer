@@ -7,50 +7,44 @@ use Neos\Neos\Domain\Model\User;
 
 /**
  * @Flow\Proxy(false)
- * Class Agent
- * @package Sitegeist\Bitzer\Domain\Agent
  */
 final class Agent
 {
-    private string $identifier;
+    private AgentIdentifier $identifier;
 
     private string $label;
 
-    private AgentType $type;
-
-    public function __construct(string $identifier, string $label, AgentType $type)
+    public function __construct(AgentIdentifier $identifier, string $label)
     {
         $this->identifier = $identifier;
         $this->label = $label;
-        $this->type = $type;
     }
 
     public static function fromRole(Role $role): self
     {
         return new self(
-            $role->getIdentifier(),
+            new AgentIdentifier(
+                AgentType::role(),
+                $role->getIdentifier()
+            ),
             $role->getLabel(),
-            AgentType::role()
         );
     }
 
     public static function fromUser(User $user, string $identifier): self
     {
         return new self(
-            $identifier,
+            new AgentIdentifier(
+                AgentType::user(),
+                $identifier
+            ),
             $user->getName()->getFullName(),
-            AgentType::user()
         );
     }
 
-    public function getIdentifier(): string
+    public function getIdentifier(): AgentIdentifier
     {
         return $this->identifier;
-    }
-
-    public function getType(): AgentType
-    {
-        return $this->type;
     }
 
     public function getLabel(): string
@@ -60,19 +54,16 @@ final class Agent
 
     public function equals(Agent $other): bool
     {
-        return (
-            $this->getIdentifier() === $other->getIdentifier()
-            && $this->getType()->equals($other->getType())
-        );
+        return $this->identifier->equals($other->getIdentifier());
     }
 
-    public function getCombinedIdentifier(): string
+    public function toString(): string
     {
-        return $this->type . ':' . $this->identifier;
+        return $this->identifier->toString();
     }
 
     public function __toString(): string
     {
-        return $this->getCombinedIdentifier();
+        return $this->toString();
     }
 }

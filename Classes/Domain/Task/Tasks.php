@@ -30,7 +30,7 @@ final class Tasks implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @return \ArrayIterator<int,TaskInterface>
+     * @return \ArrayIterator<int,TaskInterface>|TaskInterface[]
      */
     public function getIterator(): \ArrayIterator
     {

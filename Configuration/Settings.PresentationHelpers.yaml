@@ -1,0 +1,6 @@
+Neos:
+  Fusion:
+    defaultContext:
+      Widget: Sitegeist\Bitzer\Presentation\WidgetFactory
+      Bitzer.Labels: Sitegeist\Bitzer\Application\LabelProvider
+      Bitzer.FlashMessages: Sitegeist\Bitzer\Application\FlashMessageProvider

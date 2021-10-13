@@ -2,16 +2,22 @@ prototype(Sitegeist.Bitzer:Component.Description) < prototype(Neos.Fusion:Compon
     constraintCheckResult = null
     command = null
 
+    @context {
+        labels = ${Bitzer.Labels.forDescriptionComponent()}
+    }
+
     renderer = afx`
         <fieldset class="neos-span5">
-            <legend>{${Translation.translate('task.properties.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</legend>
-            <div class={${'neos-control-group' + (constraintCheckResult.hasFailedAtPath('properties.description') ? ' neos-error' : '')}}>
-            <label class="neos-control-label" for="title">{${Translation.translate('task.properties.description.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}*</label>
-            <div class="neos-controls neos-controls-row">
-                <textarea id="description" required="required" class="neos-span4" rows="3" name="moduleArguments[properties][description]" placeholder={${Translation.translate('task.properties.description.placeholder', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}>{${props.command.properties.description}}</textarea>
+            <legend>{q(labels).get('task.properties.label')}</legend>
+            <div class={'neos-control-group' + (constraintCheckResult.hasFailedAtPath('properties.description') ? ' neos-error' : '')}>
+                <label class="neos-control-label" for="title">{q(labels).get('task.properties.description.label')}*</label>
+                <div class="neos-controls neos-controls-row">
+                    <textarea id="description" required="required" class="neos-span4" rows="3"
+                        name="moduleArguments[properties][description]"
+                        placeholder={q(labels).get('task.properties.description.placeholder')}
+                    >{props.command.properties.description}</textarea>
+                </div>
+                <Sitegeist.Bitzer:Application.ConstraintCheckMessages constraintCheckResult={props.constraintCheckResult} path="description" />
             </div>
-            <Sitegeist.Bitzer:Application.ConstraintCheckMessages constraintCheckResult={props.constraintCheckResult} path="description" />
-            </div>
-        </fieldset>
-    `
+        </fieldset>`
 }

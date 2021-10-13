@@ -1,27 +1,32 @@
 prototype(Sitegeist.Bitzer:Application.Index) < prototype(Neos.Fusion:Component) {
-    taskClassNames = ${[]}
-    @context.prepareTaskUriprepareTaskUri = afx`<Sitegeist.Bitzer:ActionUri action="schedule" />`
+    @context.prepareTaskUri = afx`<Sitegeist.Bitzer:ActionUri action="prepareTask" />`
+    @context.scheduleWidget = ${Widget.forSchedule(this)}
+    @context.myScheduleWidget = ${Widget.forMySchedule(this)}
     widgets = Neos.Fusion:DataStructure {
         schedule {
-            icon = 'fas fa-clipboard-list'
-            uri = afx`<Sitegeist.Bitzer:ActionUri action="schedule" />`
-            title = ${Translation.translate('schedule.label', null, [], 'Module/Bitzer', 'Sitegeist.Bitzer')}
-            description = ${Translation.translate('schedule.description', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}
-            footer = afx`<form action={prepareTaskUri} method="GET">
+            icon = ${scheduleWidget.icon}
+            uri = ${scheduleWidget.uri}
+            title = ${scheduleWidget.title}
+            description = ${scheduleWidget.description}
+            footer = afx`<form action="/neos/management/task" method="get">
+                <input type="hidden" name="moduleArguments[@package]" value="Sitegeist.Bitzer" />
+                <input type="hidden" name="moduleArguments[@subpackage]" value="Application" />
+                <input type="hidden" name="moduleArguments[@controller]" value="Bitzer" />
+                <input type="hidden" name="moduleArguments[@action]" value="prepareTask" />
+                <input type="hidden" name="moduleArguments[@format]" value="html" />
                 <select id="taskClassName" name="moduleArguments[taskClassName]">
-                    <Neos.Fusion:Collection collection={props.taskClassNames} itemName="taskClassName">
-                        <option value={taskClassName}>{${Translation.translate('taskClassName.' + String.toString(taskClassName) + '.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</option>
-                    </Neos.Fusion:Collection>
+                    <Neos.Fusion:Loop items={taskClassNames} itemName="taskClassName">
+                        <option value={taskClassName.identifier}>{taskClassName.label}</option>
+                    </Neos.Fusion:Loop>
                 </select>
-                <input class="neos-button neos-button-primary" type="submit" name="" value={${Translation.translate('actions.prepareTask.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}} />
+                <input class="neos-button neos-button-primary" type="submit" name="" value={scheduleWidget.footer} />
             </form>`
         }
-
         mySchedule {
-            icon = 'fas fa-clipboard-list'
-            uri = afx`<Sitegeist.Bitzer:ActionUri action="mySchedule" />`
-            title = ${Translation.translate('mySchedule.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}
-            description = ${Translation.translate('mySchedule.description', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}
+            icon = ${myScheduleWidget.icon}
+            uri = ${myScheduleWidget.uri}
+            title = ${myScheduleWidget.title}
+            description = ${myScheduleWidget.description}
             footer = ''
         }
     }

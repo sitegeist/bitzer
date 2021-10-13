@@ -3,17 +3,21 @@ prototype(Sitegeist.Bitzer:Component.Agent) < prototype(Neos.Fusion:Component) {
     constraintCheckResult = null
     command = null
 
+    @context {
+        labels = ${Bitzer.Labels.forAgentComponent()}
+    }
+
     renderer = afx`
         <fieldset class="neos-span5">
-            <legend>{${Translation.translate('task.agent.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</legend>
+            <legend>{q(labels).get('task.agent.label')}</legend>
             <div class="neos-control-group">
-                <label class="neos-control-label" for="title">{${Translation.translate('task.agent.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}*</label>
+                <label class="neos-control-label" for="title">{q(labels).get('task.agent.label')}*</label>
                 <div class="neos-controls neos-controls-row">
                     <select id="agent" name="moduleArguments[agent]">
-                        <Neos.Fusion:Collection collection={props.agents} itemName="agentIdentifier">
-                            <option value={agentIdentifier} @if.isNotAssigned={agentIdentifier != props.command.agent}>{agentIdentifier}</option>
-                            <option value={agentIdentifier} selected="selected" @if.isAssigned={agentIdentifier == props.command.agent}>{agentIdentifier}</option>
-                        </Neos.Fusion:Collection>
+                        <Neos.Fusion:Loop items={props.agents} itemName="agent">
+                            <option @if.isAssigned={props.command.agent.identifier.equals(agent.identifier)} value={agent.identifier.string} selected="selected">{agent.label}</option>
+                            <option @if.isNotAssigned={!props.command.agent.identifier.equals(agent.identifier)} value={agent.identifier.string}>{agent.label}</option>
+                        </Neos.Fusion:Loop>
                     </select>
                 </div>
             </div>

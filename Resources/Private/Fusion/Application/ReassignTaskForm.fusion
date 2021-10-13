@@ -3,31 +3,34 @@ prototype(Sitegeist.Bitzer:ReassignTaskForm) < prototype(Neos.Fusion:Component) 
     agents = ${[]}
     constraintCheckResult = null
 
-    @context.reassignUri = Neos.Fusion:UriBuilder {
-        package = 'Sitegeist.Bitzer'
-        subpackage = 'Application'
-        controller = 'Bitzer'
-        action = 'reassignTask'
+    @context {
+        reassignUri = Neos.Fusion:UriBuilder {
+            package = 'Sitegeist.Bitzer'
+            subpackage = 'Application'
+            controller = 'Bitzer'
+            action = 'reassignTask'
+        }
+        labels = ${Bitzer.Labels.forReassignTaskForm()}
     }
 
     renderer = afx`
-        <form action={reassignUri} method="POST">
+        <form action={reassignUri} method="post">
             <fieldset class="neos-span5">
-                <legend>{${Translation.translate('reassignTask.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</legend>
+                <legend>{q(labels).get('reassignTask.label')}</legend>
                 <input type="hidden" name="__csrfToken" value={${Security.csrfToken()}} />
-                <input type="hidden" name="moduleArguments[taskIdentifier]" value={${String.toString(props.task.identifier)}} />
-                <div class={${'neos-control-group' + (constraintCheckResult.hasFailedAtPath('agent') ? ' neos-error' : '')}}>
-                    <label class="neos-control-label" for="title">{${Translation.translate('task.agent.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}*</label>
+                <input type="hidden" name="moduleArguments[taskIdentifier]" value={props.task.identifier.value} />
+                <div class={'neos-control-group' + (constraintCheckResult.hasFailedAtPath('agent') ? ' neos-error' : '')}>
+                    <label class="neos-control-label" for="title">{q(labels).get('task.agent.label')}*</label>
                     <div class="neos-controls neos-controls-row">
                         <select id="agent" name="moduleArguments[agent]">
-                            <Neos.Fusion:Collection collection={props.agents} itemName="agentIdentifier">
-                                <option value={agentIdentifier} @if.isNotAssigned={agentIdentifier != props.task.agent}>{agentIdentifier}</option>
-                                <option value={agentIdentifier} selected="selected" @if.isAssigned={agentIdentifier == props.task.agent}>{agentIdentifier}</option>
-                            </Neos.Fusion:Collection>
+                            <Neos.Fusion:Loop items={props.agents} itemName="agent">
+                                <option @if.1={agent.identifier.string == props.task.agent.identifier.string} value={agent.identifier.string} selected="selected">{agent.label}</option>
+                                <option @if.1={agent.identifier.string != props.task.agent.identifier.string} value={agent.identifier.string}>{agent.label}</option>
+                            </Neos.Fusion:Loop>
                         </select>
                     </div>
                 </div>
-                <input class="neos-button neos-button-primary" type="submit" name="" value={${Translation.translate('reassignTask.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}} />
+                <input class="neos-button neos-button-primary" type="submit" name="" value={q(labels).get('reassignTask.label')} />
             </fieldset>
         </form>
     `

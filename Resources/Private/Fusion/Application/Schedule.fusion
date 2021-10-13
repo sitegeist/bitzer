@@ -1,33 +1,28 @@
 prototype(Sitegeist.Bitzer:Application.Schedule) < prototype(Neos.Fusion:Component) {
-    tasks = ${[]}
-    taskClassNames = ${[]}
-
-    @context.prepareTaskUri = Neos.Fusion:UriBuilder {
-        package = 'Sitegeist.Bitzer'
-        subpackage = 'Application'
-        controller = 'Bitzer'
-        action = 'prepareTask'
-    }
     renderer = afx`
         <Sitegeist.Bitzer:FlashMessages />
         <table class="neos-table">
             <thead>
                 <tr>
-                    <th>{${Translation.translate('task.scheduledTime.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</th>
-                    <th>{${Translation.translate('task.actionStatus.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</th>
-                    <th>{${Translation.translate('task.properties.description.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</th>
-                    <th>{${Translation.translate('task.agent.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</th>
-                    <th>{${Translation.translate('task.object.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</th>
-                    <th><div class="neos-pull-right">{${Translation.translate('actions.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</div></th>
+                    <th></th>
+                    <th>{q(labels).get('task.scheduledTime.label')}</th>
+                    <th>{q(labels).get('task.actionStatus.label')}</th>
+                    <th>{q(labels).get('task.type.label')}</th>
+                    <th>{q(labels).get('task.properties.description.label')}</th>
+                    <th>{q(labels).get('task.agent.label')}</th>
+                    <th>{q(labels).get('task.object.label')}</th>
+                    <th><div class="neos-pull-right">{q(labels).get('actions.label')}</div></th>
                 </tr>
             </thead>
             <tbody>
-                <Neos.Fusion:Collection collection={props.tasks} itemName="task">
+                <Neos.Fusion:Loop items={tasks} itemName="task">
                     <tr>
+                        <td><i class={'fas fa-' + task.image + ' icon-white'}></i></td>
                         <td>{Date.format(task.scheduledTime, 'Y-m-d H:i')}</td>
-                        <td>{${Translation.translate('actionStatusType.' + String.toString(task.actionStatus) + '.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</td>
+                        <td>{q(labels).get('actionStatusType.' + String.toString(task.actionStatus) + '.label')}</td>
+                        <td>{task.shortType}</td>
                         <td>{task.description}</td>
-                        <td>{task.agent}</td>
+                        <td>{task.agent.label}</td>
                         <td>{task.object.label}</td>
                         <td class="neos-action">
                             <div class="neos-pull-right">
@@ -37,17 +32,22 @@ prototype(Sitegeist.Bitzer:Application.Schedule) < prototype(Neos.Fusion:Compone
                             </div>
                         </td>
                     </tr>
-                </Neos.Fusion:Collection>
+                </Neos.Fusion:Loop>
             </tbody>
         </table>
         <div class="neos-footer">
-            <form action={prepareTaskUri} method="GET">
+            <form action="/neos/management/task" method="get">
+                <input type="hidden" name="moduleArguments[@package]" value="Sitegeist.Bitzer" />
+                <input type="hidden" name="moduleArguments[@subpackage]" value="Application" />
+                <input type="hidden" name="moduleArguments[@controller]" value="Bitzer" />
+                <input type="hidden" name="moduleArguments[@action]" value="prepareTask" />
+                <input type="hidden" name="moduleArguments[@format]" value="html" />
                 <select id="taskClassName" name="moduleArguments[taskClassName]">
-                    <Neos.Fusion:Collection collection={props.taskClassNames} itemName="taskClassName">
-                        <option value={taskClassName}>{${Translation.translate('taskClassName.' + String.toString(taskClassName) + '.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</option>
-                    </Neos.Fusion:Collection>
+                    <Neos.Fusion:Loop items={taskClassNames} itemName="taskClassName">
+                        <option value={taskClassName.identifier}>{taskClassName.label}</option>
+                    </Neos.Fusion:Loop>
                 </select>
-                <input class="neos-button neos-button-primary" type="submit" name="" value={${Translation.translate('actions.prepareTask.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}} />
+                <input class="neos-button neos-button-primary" type="submit" name="" value={q(labels).get('actions.prepareTask.label')} />
             </form>
         </div>
         <Sitegeist.Bitzer:ToggleScript />

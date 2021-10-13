@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
-  <file original="Module/Bitzer" product-name="Sitegeist.Bitzer" source-language="en" target-language="de" datatype="plaintext">
+  <file original="Module.Bitzer" product-name="Sitegeist.Bitzer" source-language="en" target-language="de" datatype="plaintext">
     <body>
       <trans-unit id="schedule.label" xml:space="preserve" approved="yes">
         <source>Schedule</source>
@@ -121,6 +121,10 @@
       <trans-unit id="task.actionStatus.label" xml:space="preserve" approved="yes">
         <source>Status</source>
         <target state="translated">Status</target>
+      </trans-unit>
+      <trans-unit id="task.type.label" xml:space="preserve" approved="yes">
+        <source>Type</source>
+        <target state="translated">Typ</target>
       </trans-unit>
       <trans-unit id="task.target.label" xml:space="preserve" approved="yes">
         <source>Target</source>

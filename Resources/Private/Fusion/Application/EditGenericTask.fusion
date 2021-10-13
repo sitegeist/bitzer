@@ -3,11 +3,11 @@ prototype(Sitegeist.Bitzer:Application.EditGenericTask) < prototype(Neos.Fusion:
     agents = ${[]}
     constraintCheckResult = null
 
-    @context.scheduleUri = Neos.Fusion:UriBuilder {
-        package = 'Sitegeist.Bitzer'
-        subpackage = 'Application'
-        controller = 'Bitzer'
-        action = 'schedule'
+    @context {
+        scheduleUri = Sitegeist.Bitzer:ActionUri {
+            action = 'schedule'
+        }
+        labels = ${Bitzer.Labels.forEditGenericTaskForm()}
     }
 
     renderer = afx`
@@ -21,7 +21,6 @@ prototype(Sitegeist.Bitzer:Application.EditGenericTask) < prototype(Neos.Fusion:
             <Sitegeist.Bitzer:SetNewTaskTargetForm task={props.task} constraintCheckResult={props.constraintCheckResult} />
         </div>
         <div class="neos-footer">
-            <a class="neos-button" href={scheduleUri}>{${Translation.translate('actions.back.label', null, [], 'Module.Bitzer', 'Sitegeist.Bitzer')}}</a>
-        </div>
-    `
+            <a class="neos-button" href={scheduleUri}>{q(labels).get('actions.back.label')}</a>
+        </div>`
 }
