@@ -5,8 +5,6 @@
   properties:
     bitzerTaskDescription:
       type: string
-      validation:
-        'Neos.Neos/Validation/NotEmptyValidator': {}
       ui:
         label: i18n
         inspector:
