@@ -1,5 +1,4 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 namespace Sitegeist\Bitzer\Domain\Task;
 
 use Neos\ContentRepository\DimensionSpace\DimensionSpace\DimensionSpacePoint;
@@ -32,8 +31,11 @@ final class NodeAddress implements \JsonSerializable, ProtectedContextAwareInter
      */
     private $nodeAggregateIdentifier;
 
-    public function __construct(string $workspaceName, DimensionSpacePoint $dimensionSpacePoint, NodeAggregateIdentifier $nodeAggregateIdentifier)
-    {
+    public function __construct(
+        string $workspaceName,
+        DimensionSpacePoint $dimensionSpacePoint,
+        NodeAggregateIdentifier $nodeAggregateIdentifier
+    ) {
         $this->workspaceName = $workspaceName;
         $this->dimensionSpacePoint = $dimensionSpacePoint;
         $this->nodeAggregateIdentifier = $nodeAggregateIdentifier;
@@ -42,7 +44,7 @@ final class NodeAddress implements \JsonSerializable, ProtectedContextAwareInter
     public static function createFromNode(TraversableNodeInterface $node): NodeAddress
     {
         /** @var NodeInterface $node */
-        return new static(
+        return new self(
             $node->getContext()->getWorkspaceName(),
             DimensionSpacePoint::fromLegacyDimensionArray($node->getContext()->getDimensions()),
             NodeAggregateIdentifier::fromString($node->getIdentifier())
@@ -52,25 +54,30 @@ final class NodeAddress implements \JsonSerializable, ProtectedContextAwareInter
     public static function createLiveFromNode(TraversableNodeInterface $node): NodeAddress
     {
         /** @var NodeInterface $node */
-        return new static(
+        return new self(
             'live',
             DimensionSpacePoint::fromLegacyDimensionArray($node->getContext()->getDimensions()),
             NodeAggregateIdentifier::fromString($node->getIdentifier())
         );
     }
 
-    public static function createFromArray(array $serialization): NodeAddress
+    public static function fromJsonString(string $jsonString): self
     {
-        return new static(
+        return self::createFromArray(\json_decode($jsonString, true));
+    }
+
+    public static function createFromArray(array $serialization): self
+    {
+        return new self(
             $serialization['workspaceName'],
             new DimensionSpacePoint($serialization['dimensionSpacePoint']),
             NodeAggregateIdentifier::fromString($serialization['nodeAggregateIdentifier'])
         );
     }
 
-    public function withWorkspaceName(string $workspaceName): NodeAddress
+    public function withWorkspaceName(string $workspaceName): self
     {
-        return new static(
+        return new self(
             $workspaceName,
             $this->dimensionSpacePoint,
             $this->nodeAggregateIdentifier
@@ -115,7 +122,7 @@ final class NodeAddress implements \JsonSerializable, ProtectedContextAwareInter
      * @param string $methodName
      * @return boolean
      */
-    public function allowsCallOfMethod($methodName)
+    public function allowsCallOfMethod($methodName): bool
     {
         return true;
     }

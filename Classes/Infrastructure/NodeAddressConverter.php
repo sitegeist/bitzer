@@ -45,6 +45,6 @@ class NodeAddressConverter extends AbstractTypeConverter
         array $convertedChildProperties = [],
         PropertyMappingConfigurationInterface $configuration = null
     ) {
-        return NodeAddress::createFromArray(json_decode($source, true));
+        return NodeAddress::fromJsonString($source);
     }
 }

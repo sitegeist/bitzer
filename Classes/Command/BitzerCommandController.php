@@ -1,17 +1,18 @@
-<?php
-declare(strict_types=1);
-
+<?php declare(strict_types=1);
 namespace Sitegeist\Bitzer\Command;
 
+use GuzzleHttp\Psr7\Uri;
 use Neos\Flow\Cli\CommandController;
-use Neos\Flow\Http\Uri;
 use Neos\Flow\Reflection\ReflectionService;
 use Neos\Flow\Annotations as Flow;
 use Sitegeist\Bitzer\Application\Bitzer;
+use Sitegeist\Bitzer\Domain\Agent\AgentRepository;
+use Sitegeist\Bitzer\Domain\Task\Command\ActivateTask;
 use Sitegeist\Bitzer\Domain\Task\Command\CancelTask;
 use Sitegeist\Bitzer\Domain\Task\Command\CompleteTask;
 use Sitegeist\Bitzer\Domain\Task\Command\ReassignTask;
 use Sitegeist\Bitzer\Domain\Task\Command\RescheduleTask;
+use Sitegeist\Bitzer\Domain\Task\Command\SetNewTaskObject;
 use Sitegeist\Bitzer\Domain\Task\Command\SetNewTaskTarget;
 use Sitegeist\Bitzer\Domain\Task\Command\SetTaskProperties;
 use Sitegeist\Bitzer\Domain\Task\NodeAddress;
@@ -45,6 +46,12 @@ class BitzerCommandController extends CommandController
      */
     protected $reflectionService;
 
+    /**
+     * @Flow\Inject
+     * @var AgentRepository
+     */
+    protected $agentRepository;
+
     public function listTasksCommand(): void
     {
         $table = new Table($this->output->getOutput());
@@ -69,25 +76,38 @@ class BitzerCommandController extends CommandController
         $table->render();
     }
 
-    public function scheduleTaskCommand(
-        string $shortType,
-        string $properties,
-        string $scheduledTime,
-        string $agent,
-        ?NodeAddress $object = null,
-        ?Uri $target = null
+    public function activateTaskCommand(
+        TaskIdentifier $taskIdentifier
     ): void {
-        $command = new ScheduleTask(
-            TaskIdentifier::create(),
-            TaskClassName::fromShortType($shortType, $this->reflectionService),
-            ScheduledTime::createFromString($scheduledTime),
-            $agent,
-            $object,
-            $target,
-            json_decode($properties, true)
+        $command = new ActivateTask($taskIdentifier);
+
+        $this->bitzer->handleActivateTask($command);
+    }
+
+    public function cancelTaskCommand(TaskIdentifier $taskIdentifier): void
+    {
+        $command = new CancelTask($taskIdentifier);
+
+        $this->bitzer->handleCancelTask($command);
+    }
+
+    public function completeTaskCommand(TaskIdentifier $taskIdentifier): void
+    {
+        $command = new CompleteTask($taskIdentifier);
+
+        $this->bitzer->handleCompleteTask($command);
+    }
+
+    public function reassignTaskCommand(
+        TaskIdentifier $taskIdentifier,
+        string $agent
+    ): void {
+        $command = new ReassignTask(
+            $taskIdentifier,
+            $this->agentRepository->findByString($agent)
         );
 
-        $this->bitzer->handleScheduleTask($command);
+        $this->bitzer->handleReassignTask($command);
     }
 
     public function rescheduleTaskCommand(
@@ -102,16 +122,37 @@ class BitzerCommandController extends CommandController
         $this->bitzer->handleRescheduleTask($command);
     }
 
-    public function reassignTaskCommand(
-        TaskIdentifier $taskIdentifier,
-        string $agent
+    public function scheduleTaskCommand(
+        string $shortType,
+        string $properties,
+        string $scheduledTime,
+        string $agent,
+        ?NodeAddress $object = null,
+        ?Uri $target = null
     ): void {
-        $command = new ReassignTask(
-            $taskIdentifier,
-            $agent
+        $command = new ScheduleTask(
+            TaskIdentifier::create(),
+            TaskClassName::fromShortType($shortType, $this->reflectionService),
+            ScheduledTime::createFromString($scheduledTime),
+            $this->agentRepository->findByString($agent),
+            $object,
+            $target,
+            \json_decode($properties, true)
         );
 
-        $this->bitzer->handleReassignTask($command);
+        $this->bitzer->handleScheduleTask($command);
+    }
+
+    public function setNewTaskObjectCommand(
+        TaskIdentifier $taskIdentifier,
+        ?NodeAddress $object = null
+    ): void {
+        $command = new SetNewTaskObject(
+            $taskIdentifier,
+            $object
+        );
+
+        $this->bitzer->handleSetNewTaskObject($command);
     }
 
     public function setNewTaskTargetCommand(
@@ -132,23 +173,9 @@ class BitzerCommandController extends CommandController
     ): void {
         $command = new SetTaskProperties(
             $taskIdentifier,
-            json_decode($properties, true)
+            \json_decode($properties, true)
         );
 
         $this->bitzer->handleSetTaskProperties($command);
-    }
-
-    public function cancelTaskCommand(TaskIdentifier $taskIdentifier): void
-    {
-        $command = new CancelTask($taskIdentifier);
-
-        $this->bitzer->handleCancelTask($command);
-    }
-
-    public function completeTaskCommand(TaskIdentifier $taskIdentifier): void
-    {
-        $command = new CompleteTask($taskIdentifier);
-
-        $this->bitzer->handleCompleteTask($command);
     }
 }
