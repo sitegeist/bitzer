@@ -1,0 +1,20 @@
+{
+  "name": "@sitegeist/bitzer-neos-ui-plugin",
+  "license": "GNU GPLv3",
+  "private": true,
+  "scripts": {
+    "build": "neos-react-scripts build",
+    "watch": "neos-react-scripts watch"
+  },
+  "devDependencies": {
+    "@neos-project/neos-ui-extensibility": "^4.0.9"
+  },
+  "neos": {
+    "buildTargetDirectory": "../Resources/Public/Neos.Ui"
+  },
+  "dependencies": {
+    "@neos-project/brand": "^1.1.0",
+    "@neos-project/react-ui-components": "^4.0.9",
+    "date-fns": "^2.15.0"
+  }
+}

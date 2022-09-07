@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file original="NeosUiPlugin" product-name="Sitegeist.Bitzer" source-language="en" datatype="plaintext" target-language="de">
+        <body>
+            <trans-unit id="reminder.title" xml:space="preserve" approved="yes">
+                <source>Reminder: Schedule</source>
+                <target state="translated">Erinnerung: Zeitplan</target>
+            </trans-unit>
+            <trans-unit id="reminder.introduction" xml:space="preserve" approved="yes">
+                <source>
+                    The following tasks are scheduled for you:
+                </source>
+                <target state="translated">
+                    Ihr Zeitplan enthält folgende Aufgaben:
+                </target>
+            </trans-unit>
+            <trans-unit id="reminder.taskPastDue" xml:space="preserve" approved="yes">
+                <source>{0} task past due</source>
+                <target state="translated">{0} überfällige Aufgabe</target>
+            </trans-unit>
+            <trans-unit id="reminder.tasksPastDue" xml:space="preserve" approved="yes">
+                <source>{0} tasks past due</source>
+                <target state="translated">{0} überfällige Aufgaben</target>
+            </trans-unit>
+            <trans-unit id="reminder.taskDue" xml:space="preserve" approved="yes">
+                <source>{0} task due</source>
+                <target state="translated">{0} heute fällige Aufgabe</target>
+            </trans-unit>
+            <trans-unit id="reminder.tasksDue" xml:space="preserve" approved="yes">
+                <source>{0} tasks due</source>
+                <target state="translated">{0} heute fällige Aufgaben</target>
+            </trans-unit>
+            <trans-unit id="reminder.taskUpcoming" xml:space="preserve" approved="yes">
+                <source>{0} upcoming task</source>
+                <target state="translated">{0} demnächst fällige Aufgabe</target>
+            </trans-unit>
+            <trans-unit id="reminder.tasksUpcoming" xml:space="preserve" approved="yes">
+                <source>{0} upcoming tasks</source>
+                <target state="translated">{0} demnächst fällige Aufgaben</target>
+            </trans-unit>
+            <trans-unit id="reminder.action.dismiss" xml:space="preserve" approved="yes">
+                <source>Dismiss</source>
+                <target state="translated">Schließen</target>
+            </trans-unit>
+            <trans-unit id="reminder.action.goToSchedule" xml:space="preserve" approved="yes">
+                <source>Go to Schedule</source>
+                <target state="translated">Zeitplan aufrufen</target>
+            </trans-unit>
+
+            <trans-unit id="intervalEditor.unit.minute" xml:space="preserve" approved="yes">
+                <source>Minute</source>
+                <target state="translated">Minute</target>
+            </trans-unit>
+            <trans-unit id="intervalEditor.unit.minutes" xml:space="preserve" approved="yes">
+                <source>Minutes</source>
+                <target state="translated">Minuten</target>
+            </trans-unit>
+            <trans-unit id="intervalEditor.unit.hour" xml:space="preserve" approved="yes">
+                <source>Hour</source>
+                <target state="translated">Stunde</target>
+            </trans-unit>
+            <trans-unit id="intervalEditor.unit.hours" xml:space="preserve" approved="yes">
+                <source>Hours</source>
+                <target state="translated">Stunden</target>
+            </trans-unit>
+            <trans-unit id="intervalEditor.unit.day" xml:space="preserve" approved="yes">
+                <source>Day</source>
+                <target state="translated">Tag</target>
+            </trans-unit>
+            <trans-unit id="intervalEditor.unit.days" xml:space="preserve" approved="yes">
+                <source>Days</source>
+                <target state="translated">Tage</target>
+            </trans-unit>
+            <trans-unit id="intervalEditor.unit.week" xml:space="preserve" approved="yes">
+                <source>Week</source>
+                <target state="translated">Woche</target>
+            </trans-unit>
+            <trans-unit id="intervalEditor.unit.weeks" xml:space="preserve" approved="yes">
+                <source>Weeks</source>
+                <target state="translated">Wochen</target>
+            </trans-unit>
+            <trans-unit id="intervalEditor.unit.month" xml:space="preserve" approved="yes">
+                <source>Month</source>
+                <target state="translated">Monat</target>
+            </trans-unit>
+            <trans-unit id="intervalEditor.unit.months" xml:space="preserve" approved="yes">
+                <source>Months</source>
+                <target state="translated">Monate</target>
+            </trans-unit>
+            <trans-unit id="intervalEditor.unit.year" xml:space="preserve" approved="yes">
+                <source>Year</source>
+                <target state="translated">Jahr</target>
+            </trans-unit>
+            <trans-unit id="intervalEditor.unit.years" xml:space="preserve" approved="yes">
+                <source>Years</source>
+                <target state="translated">Jahre</target>
+            </trans-unit>
+            <trans-unit id="intervalEditor.message.empty" xml:space="preserve" approved="yes">
+                <source>No interval has been set.</source>
+                <target state="translated">Es wurde kein Intervall festgelegt</target>
+            </trans-unit>
+            <trans-unit id="intervalEditor.action.initialize" xml:space="preserve" approved="yes">
+                <source>Set interval now</source>
+                <target state="translated">Jetzt Intervall festlegen</target>
+            </trans-unit>
+            <trans-unit id="intervalEditor.action.clear" xml:space="preserve" approved="yes">
+                <source>Clear interval</source>
+                <target state="translated">Intervall löschen</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

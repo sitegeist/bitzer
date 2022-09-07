@@ -13,5 +13,7 @@ Neos:
       translation:
         autoInclude:
           Sitegeist.Bitzer:
+            - 'NodeTypes/*'
             - 'Main'
             - 'Module.Bitzer'
+            - 'NeosUiPlugin'

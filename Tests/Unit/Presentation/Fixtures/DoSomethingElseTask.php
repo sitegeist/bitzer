@@ -6,6 +6,7 @@ use Psr\Http\Message\UriInterface;
 use Sitegeist\Bitzer\Domain\Task\ActionStatusType;
 use Sitegeist\Bitzer\Domain\Task\TaskIdentifier;
 use Sitegeist\Bitzer\Domain\Task\TaskInterface;
+use Sitegeist\Bitzer\Domain\Agent\Agent;
 
 /**
  * Another fixture dummy task
@@ -71,9 +72,9 @@ final class DoSomethingElseTask implements TaskInterface
      * The direct performer or driver of the action (animate or inanimate). e.g. John wrote a book.
      * In our case, as tasks are assigned to user groups, this is a Flow policy role identifier.
      *
-     * @return string
+     * @return Agent
      */
-    public function getAgent(): string
+    public function getAgent(): Agent
     {
         // TODO: Implement getAgent() method.
     }

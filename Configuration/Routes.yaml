@@ -1,0 +1,10 @@
+-
+  name:  'Backend API'
+  uriPattern: 'sitegeist/bitzer/api/due-tasks'
+  defaults:
+    '@package':    'Sitegeist.Bitzer'
+    '@subpackage': 'Application'
+    '@controller': 'BitzerApi'
+    '@action':     'dueTasks'
+    '@format':     'json'
+  httpMethods: ['GET']

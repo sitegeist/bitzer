@@ -1,0 +1,8 @@
+'Sitegeist.Bitzer:Mixin.Inspector':
+  abstract: true
+  ui:
+    inspector:
+      groups:
+        bitzer-settings:
+          icon: tasks
+          label: i18n

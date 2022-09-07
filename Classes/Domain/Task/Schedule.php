@@ -11,6 +11,9 @@ use Psr\Http\Message\UriInterface;
 use Sitegeist\Bitzer\Domain\Task\Command\ScheduleTask;
 use Sitegeist\Bitzer\Domain\Task\Generic\GenericTaskFactory;
 use Sitegeist\Bitzer\Infrastructure\DbalClient;
+use Sitegeist\Bitzer\Domain\Agent\Agent;
+use Sitegeist\Bitzer\Domain\Agent\AgentRepository;
+use Sitegeist\Bitzer\Domain\Task\Exception\AgentDoesNotExist;
 
 /**
  * The schedule, the repository for tasks
@@ -37,6 +40,12 @@ class Schedule
      * @var ContentDimensionPresetSourceInterface
      */
     protected $contentDimensionPresetSource;
+
+    /**
+     * @Flow\Inject
+     * @var AgentRepository
+     */
+    protected $agentRepository;
 
     final public function findByIdentifier(TaskIdentifier $identifier): ?TaskInterface
     {
@@ -89,11 +98,11 @@ class Schedule
     final public function findPastDueDueAndUpcoming(\DateInterval $upcomingInterval, ?array $agentIdentifiers = null): array
     {
         $now = ScheduledTime::now();
-        $referenceDate = $now->sub($upcomingInterval);
+        $referenceDate = $now->add($upcomingInterval);
 
         $query = 'SELECT * FROM ' . self::TABLE_NAME . '
- WHERE scheduledtime >= :referenceDate
- AND actionstatus IN (:actionStatusTypes)';
+            WHERE scheduledtime <= :referenceDate
+            AND actionstatus IN (:actionStatusTypes)';
         $parameters = [
             'referenceDate' => $referenceDate,
             'actionStatusTypes' => [
@@ -130,6 +139,113 @@ class Schedule
         }
 
         return $groupedTasks;
+    }
+
+    final function countDue(?array $agentIdentifiers = null): int
+    {
+        $sql = 'SELECT COUNT(*) FROM ' . self::TABLE_NAME . '
+            WHERE
+                actionstatus IN (:actionStatusTypes)
+            AND TO_DAYS(scheduledTime) = TO_DAYS(NOW())';
+
+        $parameters = [
+            'actionStatusTypes' => [
+                ActionStatusType::TYPE_POTENTIAL,
+                ActionStatusType::TYPE_ACTIVE
+            ]
+        ];
+
+        $types = [
+            'actionStatusTypes' => Connection::PARAM_STR_ARRAY
+        ];
+
+        if ($agentIdentifiers) {
+            $parameters['agentIdentifiers'] = $agentIdentifiers;
+            $types['agentIdentifiers'] = Connection::PARAM_STR_ARRAY;
+            $sql .= ' AND agent IN (:agentIdentifiers)';
+        }
+
+        $rawDataSet = $this->getDatabaseConnection()->executeQuery(
+            $sql,
+            $parameters,
+            $types
+        )->fetchAll();
+
+        return (int) $rawDataSet[0]['COUNT(*)'];
+    }
+
+    final function countPastDue(?array $agentIdentifiers = null): int
+    {
+        $sql = 'SELECT COUNT(*) FROM ' . self::TABLE_NAME . '
+            WHERE
+                actionstatus IN (:actionStatusTypes)
+            AND scheduledTime < NOW()
+            AND TO_DAYS(scheduledTime) <> TO_DAYS(NOW())';
+
+        $parameters = [
+            'actionStatusTypes' => [
+                ActionStatusType::TYPE_POTENTIAL,
+                ActionStatusType::TYPE_ACTIVE
+            ]
+        ];
+
+        $types = [
+            'actionStatusTypes' => Connection::PARAM_STR_ARRAY
+        ];
+
+        if ($agentIdentifiers) {
+            $parameters['agentIdentifiers'] = $agentIdentifiers;
+            $types['agentIdentifiers'] = Connection::PARAM_STR_ARRAY;
+            $sql .= ' AND agent IN (:agentIdentifiers)';
+        }
+
+        $rawDataSet = $this->getDatabaseConnection()->executeQuery(
+            $sql,
+            $parameters,
+            $types
+        )->fetchAll();
+
+        return (int) $rawDataSet[0]['COUNT(*)'];
+    }
+
+    final function countUpcoming(\DateInterval $upcomingInterval, ?array $agentIdentifiers = null): int
+    {
+        $now = ScheduledTime::now();
+        $referenceDate = $now->add($upcomingInterval);
+
+        $sql = 'SELECT COUNT(*) FROM ' . self::TABLE_NAME . '
+            WHERE
+                actionstatus IN (:actionStatusTypes)
+            AND scheduledTime <= :referenceDate
+            AND scheduledTime > NOW()
+            AND TO_DAYS(scheduledTime) <> TO_DAYS(NOW())';
+
+        $parameters = [
+            'referenceDate' => $referenceDate,
+            'actionStatusTypes' => [
+                ActionStatusType::TYPE_POTENTIAL,
+                ActionStatusType::TYPE_ACTIVE
+            ]
+        ];
+
+            $types = [
+            'referenceDate' => Type::DATETIME_IMMUTABLE,
+            'actionStatusTypes' => Connection::PARAM_STR_ARRAY
+        ];
+
+        if ($agentIdentifiers) {
+            $parameters['agentIdentifiers'] = $agentIdentifiers;
+            $types['agentIdentifiers'] = Connection::PARAM_STR_ARRAY;
+            $sql .= ' AND agent IN (:agentIdentifiers)';
+        }
+
+        $rawDataSet = $this->getDatabaseConnection()->executeQuery(
+            $sql,
+            $parameters,
+            $types
+        )->fetchAll();
+
+        return (int) $rawDataSet[0]['COUNT(*)'];
     }
 
     /**
@@ -220,7 +336,7 @@ class Schedule
         );
     }
 
-    final public function reassignTask(TaskIdentifier $taskIdentifier, string $agent): void
+    final public function reassignTask(TaskIdentifier $taskIdentifier, Agent $agent): void
     {
         $this->getDatabaseConnection()->update(
             self::TABLE_NAME,
@@ -293,6 +409,16 @@ class Schedule
                 'identifier' => $taskIdentifier
             ]
         );
+        $this->emitTaskActionStatusUpdated($taskIdentifier, $actionStatus);
+    }
+
+    /**
+     * @Flow\Signal
+     * @param TaskIdentifier $taskIdentifier
+     * @param ActionStatusType|null $actionStatus
+     */
+    public function emitTaskActionStatusUpdated(TaskIdentifier $taskIdentifier, ActionStatusType $actionStatus = null)
+    {
     }
 
     /**
@@ -313,6 +439,11 @@ class Schedule
     {
         $className = TaskClassName::createFromString($rawData['classname']);
         $factory = $this->resolveFactory($className);
+        $agent = $this->agentRepository->findByString($rawData['agent']);
+        if (!$agent) {
+            throw AgentDoesNotExist::althoughExpectedForIdentifier($rawData['agent']);
+        }
+
         $object = null;
         if (isset($rawData['object']) && !empty($rawData['object'])) {
             $object = NodeAddress::createFromArray(json_decode($rawData['object'], true));
@@ -324,7 +455,7 @@ class Schedule
             json_decode($rawData['properties'], true),
             ScheduledTime::createFromDatabaseValue($rawData['scheduledtime']),
             ActionStatusType::createFromString($rawData['actionstatus']),
-            $rawData['agent'],
+            $agent,
             $object,
             isset($rawData['target']) ? new Uri($rawData['target']) : null
         );

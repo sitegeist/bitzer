@@ -1,0 +1,55 @@
+.style__flashMessage___1nDY8 {
+    color: white;
+    font-size: 14px;
+    position: relative;
+    width: 512px;
+    margin: 0 auto 4px;
+    word-wrap: break-word;
+    overflow: hidden;
+    box-sizing: border-box;
+    box-shadow: 0 0 14px rgba(0,0,0, .15);
+}
+
+.style__flashMessage--success___O87pu {
+    background-color: #00a338;
+}
+
+.style__flashMessage--error___vSvet {
+    background-color: #ff460d;
+}
+
+.style__flashMessage--info___2Q5Ag {
+    background-color: #00ADEE;
+}
+
+.style__flashMessage__icon___3FN8t {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    line-height: 40px;
+    width: 40px !important;
+    text-align: center;
+    font-size: 16px;
+    padding: 0 calc((40px - 1em)/2);
+    margin: 0;
+    vertical-align: text-top;
+    border-right: 1px solid rgba(255,255,255, .3);
+}
+
+.style__flashMessage__heading___3-47J {
+    padding: 12px 49px 12px;
+    margin-bottom: 0;
+    color: white;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 14px;
+}
+
+.style__flashMessage__btnClose___ELV1a {
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+/*# sourceMappingURL=Plugin.css.map*/

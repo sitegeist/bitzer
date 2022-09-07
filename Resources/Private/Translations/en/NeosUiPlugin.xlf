@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file original="NeosUiPlugin" product-name="Sitegeist.Bitzer" source-language="en" datatype="plaintext" target-language="en">
+        <body>
+            <trans-unit id="reminder.title" xml:space="preserve" approved="yes">
+                <source>Reminder: Schedule</source>
+            </trans-unit>
+            <trans-unit id="reminder.introduction" xml:space="preserve" approved="yes">
+                <source>
+                    The following tasks are scheduled for you:
+                </source>
+            </trans-unit>
+            <trans-unit id="reminder.taskPastDue" xml:space="preserve" approved="yes">
+                <source>{0} task past due</source>
+            </trans-unit>
+            <trans-unit id="reminder.tasksPastDue" xml:space="preserve" approved="yes">
+                <source>{0} tasks past due</source>
+            </trans-unit>
+            <trans-unit id="reminder.taskDue" xml:space="preserve" approved="yes">
+                <source>{0} task due</source>
+            </trans-unit>
+            <trans-unit id="reminder.tasksDue" xml:space="preserve" approved="yes">
+                <source>{0} tasks due</source>
+            </trans-unit>
+            <trans-unit id="reminder.taskUpcoming" xml:space="preserve" approved="yes">
+                <source>{0} upcoming task</source>
+            </trans-unit>
+            <trans-unit id="reminder.tasksUpcoming" xml:space="preserve" approved="yes">
+                <source>{0} upcoming tasks</source>
+            </trans-unit>
+            <trans-unit id="reminder.action.dismiss" xml:space="preserve" approved="yes">
+                <source>Dismiss</source>
+            </trans-unit>
+            <trans-unit id="reminder.action.goToSchedule" xml:space="preserve" approved="yes">
+                <source>Go to Schedule</source>
+            </trans-unit>
+
+            <trans-unit id="intervalEditor.unit.minute" xml:space="preserve" approved="yes">
+                <source>Minute</source>
+            </trans-unit>
+            <trans-unit id="intervalEditor.unit.minutes" xml:space="preserve" approved="yes">
+                <source>Minutes</source>
+            </trans-unit>
+            <trans-unit id="intervalEditor.unit.hour" xml:space="preserve" approved="yes">
+                <source>Hour</source>
+            </trans-unit>
+            <trans-unit id="intervalEditor.unit.hours" xml:space="preserve" approved="yes">
+                <source>Hours</source>
+            </trans-unit>
+            <trans-unit id="intervalEditor.unit.day" xml:space="preserve" approved="yes">
+                <source>Day</source>
+            </trans-unit>
+            <trans-unit id="intervalEditor.unit.days" xml:space="preserve" approved="yes">
+                <source>Days</source>
+            </trans-unit>
+            <trans-unit id="intervalEditor.unit.week" xml:space="preserve" approved="yes">
+                <source>Week</source>
+            </trans-unit>
+            <trans-unit id="intervalEditor.unit.weeks" xml:space="preserve" approved="yes">
+                <source>Weeks</source>
+            </trans-unit>
+            <trans-unit id="intervalEditor.unit.month" xml:space="preserve" approved="yes">
+                <source>Month</source>
+            </trans-unit>
+            <trans-unit id="intervalEditor.unit.months" xml:space="preserve" approved="yes">
+                <source>Months</source>
+            </trans-unit>
+            <trans-unit id="intervalEditor.unit.year" xml:space="preserve" approved="yes">
+                <source>Year</source>
+            </trans-unit>
+            <trans-unit id="intervalEditor.unit.years" xml:space="preserve" approved="yes">
+                <source>Years</source>
+            </trans-unit>
+            <trans-unit id="intervalEditor.message.empty" xml:space="preserve" approved="yes">
+                <source>No interval has been set.</source>
+            </trans-unit>
+            <trans-unit id="intervalEditor.action.initialize" xml:space="preserve" approved="yes">
+                <source>Set interval now</source>
+            </trans-unit>
+            <trans-unit id="intervalEditor.action.clear" xml:space="preserve" approved="yes">
+                <source>Clear interval</source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

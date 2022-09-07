@@ -3,13 +3,14 @@ declare(strict_types=1);
 
 namespace Sitegeist\Bitzer\Application\Controller;
 
+use GuzzleHttp\Psr7\Uri;
 use Neos\Error\Messages\Message;
-use Neos\Flow\Http\Uri;
 use Neos\Flow\I18n\Translator;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Mvc\View\ViewInterface;
 use Neos\Flow\Security\Context as SecurityContext;
 use Neos\Neos\Controller\Backend\ModuleController;
+use Neos\Flow\Mvc\FlashMessage\FlashMessageContainer;
 use Sitegeist\Bitzer\Application\Bitzer;
 use Sitegeist\Bitzer\Domain\Agent\AgentRepository;
 use Sitegeist\Bitzer\Domain\Task\Command\ActivateTask;
@@ -65,6 +66,11 @@ class BitzerController extends ModuleController
      * @var Translator
      */
     protected $translator;
+    /**
+     * @Flow\Inject
+     * @var FlashMessageContainer
+     */
+    protected $flashMessageContainer;
 
     /**
      * @Flow\InjectConfiguration(path="upcomingInterval")
@@ -345,8 +351,8 @@ class BitzerController extends ModuleController
         $this->redirect('schedule');
     }
 
-    private function getLabel(string $labelIdentifier, array $arguments = [], $quantity = null): ?string
+    private function getLabel(string $labelIdentifier, array $arguments = [], $quantity = null): string
     {
-        return $this->translator->translateById($labelIdentifier, $arguments, $quantity, null, 'Module.Bitzer', 'Sitegeist.Bitzer');
+        return $this->translator->translateById($labelIdentifier, $arguments, $quantity, null, 'Module.Bitzer', 'Sitegeist.Bitzer') ?? 'not-found-'.$labelIdentifier;
     }
 }

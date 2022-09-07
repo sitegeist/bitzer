@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file original="" product-name="Sitegeist.Bitzer" source-language="en" datatype="plaintext" target-language="de">
+        <body>
+            <trans-unit id="properties.bitzerTaskAgent" xml:space="preserve" approved="yes">
+                <source>Agent</source>
+                <target state="translated">Zuständigkeit</target>
+            </trans-unit>
+            <trans-unit id="properties.bitzerTaskAgent.selectBoxEditor.placeholder" xml:space="preserve" approved="yes">
+                <source>Role or User</source>
+                <target state="translated">Gruppe oder Benutzer/in</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

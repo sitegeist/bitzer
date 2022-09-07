@@ -6,6 +6,7 @@ namespace Sitegeist\Bitzer\Application;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\ObjectManagement\ObjectManagerInterface;
 use Psr\Http\Message\UriInterface;
+use Sitegeist\Bitzer\Domain\Agent\Agent;
 use Sitegeist\Bitzer\Domain\Agent\AgentRepository;
 use Sitegeist\Bitzer\Domain\Task\ActionStatusType;
 use Sitegeist\Bitzer\Domain\Task\Command\ActivateTask;
@@ -81,7 +82,8 @@ class Bitzer
         $this->requireScheduledTimeToBeSet($command->getScheduledTime(), $constraintCheckResult);
         $this->requireDescriptionToBeSet($command->getProperties(), $constraintCheckResult);
         if ($command->getObject()) {
-            $this->requireObjectToExist($command->getObject(), $constraintCheckResult);
+            // @todo find some way to enforce this; recently published nodes are not yet known to the new content context
+            //$this->requireObjectToExist($command->getObject(), $command->getAgent(), $constraintCheckResult);
         }
         if ($command->getTarget()) {
             $this->requireTargetToBeAbsoluteUri($command->getTarget(), $constraintCheckResult);
@@ -269,12 +271,12 @@ class Bitzer
         }
     }
 
-    private function requireAgentToExist(string $agentIdentifier, ConstraintCheckResult $constraintCheckResult = null): void
+    private function requireAgentToExist(Agent $agent, ConstraintCheckResult $constraintCheckResult = null): void
     {
-        if (!$this->agentRepository->findByIdentifier($agentIdentifier)) {
-            $exception = AgentDoesNotExist::althoughExpectedForIdentifier($agentIdentifier);
+        if (!$this->agentRepository->findByTypeAndIdentifier($agent->getType(), $agent->getIdentifier())) {
+            $exception = AgentDoesNotExist::althoughExpectedForIdentifier($agent->getIdentifier());
             if ($constraintCheckResult) {
-                $constraintCheckResult->registerFailedCheck('agent', $exception, [$agentIdentifier]);
+                $constraintCheckResult->registerFailedCheck('agent', $exception, [$agent->getIdentifier()]);
             } else {
                 throw $exception;
             }

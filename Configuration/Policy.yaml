@@ -4,6 +4,8 @@ privilegeTargets:
       matcher: 'method(Sitegeist\Bitzer\Application\Controller\BitzerController->(index|mySchedule|activateTask|completeTask)Action())'
     'Sitegeist.Bitzer:Module.Bitzer.Administration':
       matcher: 'method(Sitegeist\Bitzer\Application\Controller\BitzerController->(schedule|prepareTask|scheduleTask|cancelTask|editTask|rescheduleTask|reassignTask|setNewTaskTarget|setNewTaskObject|setTaskProperties)Action())'
+    'Sitegeist.Bitzer:Api.Bitzer':
+      matcher: 'method(Sitegeist\Bitzer\Application\Controller\BitzerApiController->dueTasksAction())'
 
 roles:
 
@@ -12,6 +14,9 @@ roles:
     privileges:
       -
         privilegeTarget: 'Sitegeist.Bitzer:Module.Bitzer'
+        permission: GRANT
+      -
+        privilegeTarget: 'Sitegeist.Bitzer:Api.Bitzer'
         permission: GRANT
 
   'Sitegeist.Bitzer:Administrator':
@@ -22,6 +27,9 @@ roles:
         permission: GRANT
       -
         privilegeTarget: 'Sitegeist.Bitzer:Module.Bitzer.Administration'
+        permission: GRANT
+      -
+        privilegeTarget: 'Sitegeist.Bitzer:Api.Bitzer'
         permission: GRANT
 
   'Neos.Neos:AbstractEditor':
@@ -36,5 +44,8 @@ roles:
         permission: GRANT
       -
         privilegeTarget: 'Sitegeist.Bitzer:Module.Bitzer.Administration'
+        permission: GRANT
+      -
+        privilegeTarget: 'Sitegeist.Bitzer:Api.Bitzer'
         permission: GRANT
 

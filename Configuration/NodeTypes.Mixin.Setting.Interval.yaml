@@ -1,0 +1,15 @@
+'Sitegeist.Bitzer:Mixin.Setting.Interval':
+  abstract: true
+  superTypes:
+    'Sitegeist.Bitzer:Mixin.Inspector': true
+  properties:
+    bitzerTaskInterval:
+      type: string
+      defaultValue: P1M
+      validation:
+        'Neos.Neos/Validation/NotEmptyValidator': []
+      ui:
+        label: i18n
+        inspector:
+          group: bitzer-settings
+          editor: 'Sitegeist.Bitzer/Inspector/Editors/IntervalEditor'

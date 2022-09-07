@@ -1,0 +1,7 @@
+Neos:
+  Neos:
+    Ui:
+      resources:
+        javascript:
+          'Sitegeist.Bitzer:Plugin':
+            resource: resource://Sitegeist.Bitzer/Public/Neos.Ui/Plugin.js

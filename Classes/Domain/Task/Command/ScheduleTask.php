@@ -4,6 +4,7 @@ namespace Sitegeist\Bitzer\Domain\Task\Command;
 
 use Neos\Flow\Annotations as Flow;
 use Psr\Http\Message\UriInterface;
+use Sitegeist\Bitzer\Domain\Agent\Agent;
 use Sitegeist\Bitzer\Domain\Task\NodeAddress;
 use Sitegeist\Bitzer\Domain\Task\TaskClassName;
 use Sitegeist\Bitzer\Domain\Task\TaskIdentifier;
@@ -35,7 +36,7 @@ final class ScheduleTask
     private $scheduledTime;
 
     /**
-     * @var string
+     * @var Agent
      */
     private $agent;
 
@@ -53,7 +54,7 @@ final class ScheduleTask
         TaskIdentifier $identifier,
         TaskClassName $className,
         ?\DateTimeImmutable $scheduledTime,
-        string $agent,
+        Agent $agent,
         ?NodeAddress $object,
         ?UriInterface $target,
         array $properties
@@ -87,7 +88,7 @@ final class ScheduleTask
         return $this->scheduledTime;
     }
 
-    public function getAgent(): string
+    public function getAgent(): Agent
     {
         return $this->agent;
     }
