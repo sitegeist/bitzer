@@ -44,7 +44,7 @@ final class Agent
     {
         return new self(
             $role->getIdentifier(),
-            $role->getName(),
+            $role->getLabel(),
             AgentType::role()
         );
     }

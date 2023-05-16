@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Neos\Flow\Persistence\Doctrine\Migrations;
 
-use Doctrine\DBAL\Migrations\AbstractMigration;
+use Doctrine\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
 
 /**
@@ -16,7 +16,7 @@ class Version20200707184200 extends AbstractMigration
         return 'The migration for removing the agenttype field and adds a "role:" prefix to the agent field in the basic task table structure';
     }
 
-    public function up(Schema $schema)
+    public function up(Schema $schema): void
     {
         $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'mysql',
             'Migration can only be executed safely on "mysql".');
@@ -25,7 +25,7 @@ class Version20200707184200 extends AbstractMigration
         $this->addSql('UPDATE sitegeist_bitzer_domain_task_task SET agent = concat("role:", agent)');
     }
 
-    public function down(Schema $schema)
+    public function down(Schema $schema): void
     {
         $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'mysql',
             'Migration can only be executed safely on "mysql".');
