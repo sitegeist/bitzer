@@ -2,6 +2,7 @@
   "name": "@sitegeist/bitzer-neos-ui-plugin",
   "license": "GNU GPLv3",
   "private": true,
+  "main": "index.js",
   "scripts": {
     "build": "neos-react-scripts build",
     "watch": "neos-react-scripts watch"
