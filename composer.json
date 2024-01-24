@@ -3,7 +3,7 @@
   "type": "neos-package",
   "description": "A content lifecycle task manager for Neos CMS",
   "require": {
-    "neos/neos": "~7.0 || ~8.0",
+    "neos/neos": "~7.0 || ~8.1.0",
     "neos/fusion": "~7.0 || ~8.0",
     "neos/content-repository": "~7.0 || ~8.0",
     "neos/fusion-afx": "~7.0 || ~8.0",
