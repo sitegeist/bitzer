@@ -315,6 +315,43 @@ final class Schedule
     }
 
     /**
+     * @return array<TaskIdentifier>
+     * @throws DriverException
+     * @throws DbalException
+     */
+    final public function findActiveOrPotentialTaskIdsForObject(NodeAddress $object, ?TaskClassName $taskClassName = null): array
+    {
+        $query = 'SELECT * FROM ' . self::TABLE_NAME . '
+                    WHERE object = :object
+                    AND actionstatus IN (:actionStatusTypes)';
+        $params = [
+            'object' => $object,
+            'actionStatusTypes' => [
+                ActionStatusType::TYPE_POTENTIAL,
+                ActionStatusType::TYPE_ACTIVE
+            ]
+        ];
+        if ($taskClassName) {
+            $query .= '
+                AND classname = :taskClassName';
+            $params['taskClassName'] = $taskClassName->getValue();
+        }
+
+        $tableRows = $this->databaseConnection->executeQuery(
+            $query,
+            $params,
+            [
+                'actionStatusTypes' => Connection::PARAM_STR_ARRAY
+            ]
+        )->fetchAllAssociative();
+
+        return array_map(
+            fn (array $taskRecord): TaskIdentifier => new TaskIdentifier($taskRecord['identifier']),
+            $tableRows
+        );
+    }
+
+    /**
      * @throws DbalException
      */
     final public function scheduleTask(ScheduleTask $command): void
