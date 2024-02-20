@@ -468,21 +468,21 @@ final class Schedule
      */
     private function createTasksFromTableRows(array $tableRows): Tasks
     {
-        return new Tasks(array_map(function (array $tableRow): TaskInterface {
+        return new Tasks(array_filter(array_map(function (array $tableRow): ?TaskInterface {
             return $this->createTaskFromTableRow($tableRow);
-        }, $tableRows));
+        }, $tableRows)));
     }
 
     /**
      * @param array<string,mixed> $tableRow
      */
-    private function createTaskFromTableRow(array $tableRow): TaskInterface
+    private function createTaskFromTableRow(array $tableRow): ?TaskInterface
     {
         $className = TaskClassName::createFromString($tableRow['classname']);
         $factory = $this->resolveFactory($className);
         $agent = $this->agentRepository->findByIdentifier(AgentIdentifier::fromString($tableRow['agent']));
         if (!$agent) {
-            throw AgentDoesNotExist::althoughExpectedForIdentifier($tableRow['agent']);
+            return null;
         }
 
         $object = null;
