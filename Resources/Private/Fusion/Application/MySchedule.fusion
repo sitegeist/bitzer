@@ -20,6 +20,7 @@ prototype(Sitegeist.Bitzer:Application.MySchedule) < prototype(Neos.Fusion:Compo
                 <Sitegeist.Bitzer:MyScheduleTable @if.hasPastDueTasks={props.groupedTasks.pastDue} tasks={props.groupedTasks.pastDue} groupIdentifier="pastDue" />
                 <Sitegeist.Bitzer:MyScheduleTable @if.hasDueTasks={props.groupedTasks.due} tasks={props.groupedTasks.due} groupIdentifier="due" />
                 <Sitegeist.Bitzer:MyScheduleTable @if.hasUpcomingTasks={props.groupedTasks.upcoming} tasks={props.groupedTasks.upcoming} groupIdentifier="upcoming" />
+                <Sitegeist.Bitzer:CompletedTable @if.hasCompletedTasks={props.completedTasks} tasks={props.completedTasks} />
             </tbody>
         </table>
         <Sitegeist.Bitzer:ToggleScript />`
@@ -54,6 +55,30 @@ prototype(Sitegeist.Bitzer:MyScheduleTable) < prototype(Neos.Fusion:Component) {
                         <Sitegeist.Bitzer:CommandForm commandName="completeTask" commandArguments={{taskIdentifier: String.toString(task.identifier)}} icon="check" />
                     </div>
                 </td>
+            </tr>
+        </Neos.Fusion:Collection>`
+}
+
+prototype(Sitegeist.Bitzer:CompletedTable) < prototype(Neos.Fusion:Component) {
+    tasks = ${[]}
+
+    renderer = afx`
+        <tr class="neos-folder">
+            <td class="neos-priority1" colspan="7">{q(labels).get('actionStatusType.https://schema.org/CompletedActionStatus.label')}</td>
+            <td class="neos-priority1 neos-aRight">
+                <i class="fold-toggle icon-white fas fa-chevron-up" data-toggle={'fold-tasks_completed'}></i>
+            </td>
+        </tr>
+        <Neos.Fusion:Collection collection={props.tasks} itemName="task">
+            <tr class={'fold-tasks_completed'} style="display: table-row">
+                <td><i class={'fas fa-' + task.image + ' icon-white'}></i></td>
+                <td>{Date.format(task.scheduledTime, 'Y-m-d H:i')}</td>
+                <td></td>
+                <td>{task.shortType}</td>
+                <td>{task.description}</td>
+                <td>{task.agent.label}</td>
+                <td>{task.object.label}</td>
+                <td></td>
             </tr>
         </Neos.Fusion:Collection>`
 }

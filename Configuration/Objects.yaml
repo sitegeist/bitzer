@@ -17,3 +17,5 @@
   arguments:
     6:
       setting: 'Sitegeist.Bitzer.upcomingInterval'
+    7:
+      setting: 'Sitegeist.Bitzer.mySchedule.showCompletedTasks'

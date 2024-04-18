@@ -57,13 +57,16 @@ final class BitzerController extends ModuleController
 
     private \DateInterval $upcomingInterval;
 
+    private bool $showCompletedTasks;
+
     public function __construct(
         Bitzer $bitzer,
         Schedule $schedule,
         AgentRepository $agentRepository,
         Translator $translator,
         TaskClassNameRepository $taskClassNameRepository,
-        string $upcomingInterval
+        string $upcomingInterval,
+        bool $showCompletedTasks
     ) {
         $this->bitzer = $bitzer;
         $this->schedule = $schedule;
@@ -71,6 +74,7 @@ final class BitzerController extends ModuleController
         $this->translator = $translator;
         $this->taskClassNameRepository = $taskClassNameRepository;
         $this->upcomingInterval = new \DateInterval($upcomingInterval);
+        $this->showCompletedTasks = $showCompletedTasks;
     }
 
     public function indexAction(array $module = []): void
@@ -164,6 +168,7 @@ final class BitzerController extends ModuleController
         $this->view->setFusionPath('mySchedule');
         $this->view->assignMultiple([
             'groupedTasks' => $groupedTasks,
+            'completedTasks' => $this->showCompletedTasks ? $this->schedule->findCompleted(null, $agents) : null,
             'labels' => [
                 'task.scheduledTime.label' => $this->getLabel('task.scheduledTime.label'),
                 'task.actionStatus.label' => $this->getLabel('task.actionStatus.label'),

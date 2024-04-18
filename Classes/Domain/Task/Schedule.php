@@ -145,6 +145,38 @@ final class Schedule
     }
 
     /**
+     * @throws DbalException
+     * @throws DriverException
+     */
+    final public function findCompleted(?TaskClassName $taskClassName = null, ?Agents $agents = null): Tasks
+    {
+        $query = 'SELECT * FROM ' . self::TABLE_NAME . '
+                    WHERE actionstatus = :actionStatusType';
+        $parameters = [
+            'actionStatusType' => ActionStatusType::TYPE_COMPLETED
+        ];
+        if ($taskClassName) {
+            $query .= ' AND classname = :taskClassName';
+            $params['taskClassName'] = $taskClassName->getValue();
+        }
+
+        if ($agents) {
+            $parameters['agentIdentifiers'] = $agents->getIdentifiers();
+            $types['agentIdentifiers'] = Connection::PARAM_STR_ARRAY;
+            $query .= ' AND agent IN (:agentIdentifiers)';
+        }
+        $query .= ' ORDER BY scheduledtime ASC';
+
+        $rawDataSet = $this->databaseConnection->executeQuery(
+            $query,
+            $parameters,
+            $types
+        )->fetchAllAssociative();
+
+        return $this->createTasksFromTableRows($rawDataSet);
+    }
+
+    /**
      * @throws DriverException
      * @throws DbalException
      */
