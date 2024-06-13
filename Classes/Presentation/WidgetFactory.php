@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Sitegeist\Bitzer\Presentation;
 
 use GuzzleHttp\Psr7\Uri;
@@ -10,18 +13,16 @@ use Neos\Fusion\FusionObjects\AbstractFusionObject;
 
 /**
  * The widget factory
- * @Flow\Scope("singleton")
  */
+#[Flow\Scope('singleton')]
 final class WidgetFactory implements ProtectedContextAwareInterface
 {
-    private Translator $translator;
-
-    public function __construct(Translator $translator)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        private readonly Translator $translator
+    ) {
     }
 
-    public function forSchedule(AbstractFusionObject $component): WidgetInterface
+    public function forSchedule(AbstractFusionObject $component): Widget
     {
         $uriBuilder = clone $component->getRuntime()->getControllerContext()->getUriBuilder();
 
@@ -34,7 +35,7 @@ final class WidgetFactory implements ProtectedContextAwareInterface
         );
     }
 
-    public function forMySchedule(AbstractFusionObject $component): WidgetInterface
+    public function forMySchedule(AbstractFusionObject $component): Widget
     {
         $uriBuilder = clone $component->getRuntime()->getControllerContext()->getUriBuilder();
 
@@ -47,6 +48,9 @@ final class WidgetFactory implements ProtectedContextAwareInterface
         );
     }
 
+    /**
+     * @param array<string,mixed> $arguments
+     */
     private function getActionUri(UriBuilder $uriBuilder, string $actionName, array $arguments = []): Uri
     {
         return new Uri($uriBuilder->uriFor(
@@ -58,6 +62,9 @@ final class WidgetFactory implements ProtectedContextAwareInterface
         ));
     }
 
+    /**
+     * @param array<string,mixed> $arguments
+     */
     private function getLabel(string $id, array $arguments = []): string
     {
         return $this->translator->translateById(

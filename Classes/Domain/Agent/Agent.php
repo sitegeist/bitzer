@@ -1,30 +1,27 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Sitegeist\Bitzer\Domain\Agent;
 
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Security\Policy\Role;
 use Neos\Neos\Domain\Model\User;
 
-/**
- * @Flow\Proxy(false)
- */
-final class Agent
+#[Flow\Proxy(false)]
+final readonly class Agent
 {
-    private AgentIdentifier $identifier;
-
-    private string $label;
-
-    public function __construct(AgentIdentifier $identifier, string $label)
-    {
-        $this->identifier = $identifier;
-        $this->label = $label;
+    public function __construct(
+        public AgentIdentifier $identifier,
+        public string $label
+    ) {
     }
 
     public static function fromRole(Role $role): self
     {
         return new self(
             new AgentIdentifier(
-                AgentType::role(),
+                AgentType::TYPE_ROLE,
                 $role->getIdentifier()
             ),
             $role->getLabel(),
@@ -35,26 +32,16 @@ final class Agent
     {
         return new self(
             new AgentIdentifier(
-                AgentType::user(),
+                AgentType::TYPE_USER,
                 $identifier
             ),
             $user->getName()->getFullName(),
         );
     }
 
-    public function getIdentifier(): AgentIdentifier
-    {
-        return $this->identifier;
-    }
-
-    public function getLabel(): string
-    {
-        return $this->label;
-    }
-
     public function equals(Agent $other): bool
     {
-        return $this->identifier->equals($other->getIdentifier());
+        return $this->identifier->equals($other->identifier);
     }
 
     public function toString(): string

@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Sitegeist\Bitzer\Presentation;
 
 use Neos\Flow\Annotations as Flow;
@@ -6,18 +9,13 @@ use Sitegeist\Bitzer\Domain\Task\TaskClassName;
 
 /**
  * The component name value object
- * @Flow\Proxy(false)
  */
-final class ComponentName
+#[Flow\Proxy(false)]
+final class ComponentName implements \Stringable
 {
-    /**
-     * @var string
-     */
-    private $value;
-
-    private function __construct(string $value)
-    {
-        $this->value = $value;
+    private function __construct(
+        public readonly string $value
+    ) {
     }
 
     public static function fromTaskClassName(TaskClassName $taskClassName, string $prefix = ''): ComponentName

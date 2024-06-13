@@ -1,22 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Sitegeist\Bitzer\Domain\Agent;
 
-use Neos\Eel\ProtectedContextAwareInterface;
 use Neos\Flow\Annotations as Flow;
 
-/**
- * @Flow\Proxy(false)
- */
-final class AgentIdentifier implements ProtectedContextAwareInterface
+#[Flow\Proxy(false)]
+final class AgentIdentifier implements \Stringable
 {
-    private AgentType $type;
-
-    private string $identifier;
-
-    public function __construct(AgentType $type, string $identifier)
-    {
-        $this->type = $type;
-        $this->identifier = $identifier;
+    public function __construct(
+        public readonly AgentType $type,
+        public readonly string $identifier
+    ) {
     }
 
     public static function fromString(string $string): self
@@ -24,30 +20,20 @@ final class AgentIdentifier implements ProtectedContextAwareInterface
         list($type, $identifier) = explode(':', $string, 2);
 
         return new self(
-            AgentType::fromString($type),
+            AgentType::from($type),
             $identifier
         );
     }
 
-    public function getType(): AgentType
-    {
-        return $this->type;
-    }
-
-    public function getIdentifier(): string
-    {
-        return $this->identifier;
-    }
-
     public function equals(AgentIdentifier $other): bool
     {
-        return $this->getIdentifier() === $other->getIdentifier()
-            && $this->getType()->equals($other->getType());
+        return $this->identifier === $other->identifier
+            && $this->type === $other->type;
     }
 
     public function toString(): string
     {
-        return $this->type . ':' . $this->identifier;
+        return $this->type->value . ':' . $this->identifier;
     }
 
     public function getString(): string
@@ -58,13 +44,5 @@ final class AgentIdentifier implements ProtectedContextAwareInterface
     public function __toString(): string
     {
         return $this->toString();
-    }
-
-    /**
-     * @param string $methodName
-     */
-    public function allowsCallOfMethod($methodName): bool
-    {
-        return true;
     }
 }

@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Sitegeist\Bitzer\Domain\Task\Generic;
 
 use Neos\Flow\Annotations as Flow;
@@ -15,18 +18,18 @@ use Sitegeist\Bitzer\Domain\Agent\Agent;
 /**
  * The generic task factory
  * Creates task objects by using the implementation's constructor
- *
- * @Flow\Scope("singleton")
  */
+#[Flow\Scope('singleton')]
 final class GenericTaskFactory implements TaskFactoryInterface
 {
-    private ObjectRepository $objectRepository;
-
-    public function __construct(ObjectRepository $objectRepository)
-    {
-        $this->objectRepository = $objectRepository;
+    public function __construct(
+        private readonly ObjectRepository $objectRepository
+    ) {
     }
 
+    /**
+     * @param array<string,mixed> $properties
+     */
     final public function createFromRawData(
         TaskIdentifier $identifier,
         TaskClassName $className,
@@ -37,10 +40,10 @@ final class GenericTaskFactory implements TaskFactoryInterface
         ?NodeAddress $object,
         ?UriInterface $target
     ): TaskInterface {
-        $classIdentifier = (string)$className;
         $object = $object ? $this->objectRepository->findByAddress($object) : null;
 
-        return new $classIdentifier(
+        /** @var TaskInterface $task */
+        $task = new $className->value(
             $identifier,
             $properties,
             $scheduledTime,
@@ -49,5 +52,7 @@ final class GenericTaskFactory implements TaskFactoryInterface
             $object,
             $target
         );
+
+        return $task;
     }
 }

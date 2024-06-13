@@ -1,9 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Sitegeist\Bitzer\Domain\Task\Exception;
+
+use Neos\Flow\Annotations as Flow;
 
 /**
  * The exception to be thrown if a scheduled time is undefined but was supposed to be
  */
+#[Flow\Proxy(false)]
 final class ScheduledTimeIsUndefined extends \DomainException
 {
     public static function althoughExpected(): self

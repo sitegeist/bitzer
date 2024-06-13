@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Sitegeist\Bitzer\Application\Object;
 
 use Neos\ContentRepository\Domain\Projection\Content\TraversableNodeInterface;
@@ -11,28 +14,27 @@ use Sitegeist\Bitzer\Domain\Task\NodeAddress;
 
 /**
  * The object provider
- * @Flow\Scope("singleton")
  */
+#[Flow\Scope('singleton')]
 final class ObjectProvider implements ProtectedContextAwareInterface
 {
-    private ContextFactoryInterface $contentContextFactory;
-
-    public function __construct(ContextFactoryInterface $contentContextFactory)
-    {
-        $this->contentContextFactory = $contentContextFactory;
+    public function __construct(
+        private readonly ContextFactoryInterface $contentContextFactory
+    ) {
     }
 
-    public function getObjects(): array
+    public function getObjects(): LabeledObjectAddresses
     {
         $flowQuery = new FlowQuery([$this->getContentContext()->getCurrentSiteNode()]);
 
         $objects = [];
+        /** @phpstan-ignore-next-line magic method */
         foreach ($flowQuery->find('[instanceof Neos.Neos:Document]')->get() as $document) {
             /** @var TraversableNodeInterface $document */
             $objects[] = new LabeledObjectAddress(NodeAddress::fromNode($document), $document->getLabel());
         }
 
-        return $objects;
+        return new LabeledObjectAddresses(...$objects);
     }
 
     public function getAddress(?TraversableNodeInterface $object): ?NodeAddress

@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Sitegeist\Bitzer\Infrastructure;
 
 /*
@@ -39,6 +42,9 @@ class NodeAddressConverter extends AbstractTypeConverter
      */
     protected $priority = 10;
 
+    /**
+     * @param array<string,mixed> $convertedChildProperties
+     */
     public function convertFrom(
         $source,
         $targetType,

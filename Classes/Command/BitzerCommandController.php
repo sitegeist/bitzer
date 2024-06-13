@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Sitegeist\Bitzer\Command;
 
 use GuzzleHttp\Psr7\Uri;
@@ -6,6 +9,8 @@ use Neos\Flow\Cli\CommandController;
 use Neos\Flow\Reflection\ReflectionService;
 use Neos\Flow\Annotations as Flow;
 use Sitegeist\Bitzer\Application\Bitzer;
+use Sitegeist\Bitzer\Domain\Agent\Agent;
+use Sitegeist\Bitzer\Domain\Agent\AgentIdentifier;
 use Sitegeist\Bitzer\Domain\Task\Command\CancelTask;
 use Sitegeist\Bitzer\Domain\Task\Command\CompleteTask;
 use Sitegeist\Bitzer\Domain\Task\Command\ReassignTask;
@@ -22,23 +27,16 @@ use Symfony\Component\Console\Helper\Table;
 
 /**
  * The command line endpoint for sending commands to Bitzer
- *
- * @Flow\Scope("singleton")
  */
+#[Flow\Scope('singleton')]
 final class BitzerCommandController extends CommandController
 {
-    private Schedule $schedule;
-
-    private Bitzer $bitzer;
-
-    private ReflectionService $reflectionService;
-
-    public function __construct(Schedule $schedule, Bitzer $bitzer, ReflectionService $reflectionService)
-    {
+    public function __construct(
+        private readonly Schedule $schedule,
+        private readonly Bitzer $bitzer,
+        private readonly ReflectionService $reflectionService
+    ) {
         parent::__construct();
-        $this->schedule = $schedule;
-        $this->bitzer = $bitzer;
-        $this->reflectionService = $reflectionService;
     }
 
     public function listTasksCommand(): void
@@ -77,7 +75,7 @@ final class BitzerCommandController extends CommandController
             TaskIdentifier::create(),
             TaskClassName::fromShortType($shortType, $this->reflectionService),
             ScheduledTime::createFromString($scheduledTime),
-            $agent,
+            AgentIdentifier::fromString($agent),
             $object,
             $target,
             json_decode($properties, true)
@@ -104,7 +102,7 @@ final class BitzerCommandController extends CommandController
     ): void {
         $command = new ReassignTask(
             $taskIdentifier,
-            $agent
+            AgentIdentifier::fromString($agent),
         );
 
         $this->bitzer->handleReassignTask($command);

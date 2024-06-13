@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Sitegeist\Bitzer\Application\Controller;
 
 use Neos\Flow\Annotations as Flow;
@@ -6,9 +9,7 @@ use Neos\Flow\Mvc\Controller\RestController;
 use Sitegeist\Bitzer\Domain\Agent\AgentRepository;
 use Sitegeist\Bitzer\Domain\Task\Schedule;
 
-/**
- * @Flow\Scope("singleton")
- */
+#[Flow\Scope('singleton')]
 final class BitzerApiController extends RestController
 {
     /**
@@ -21,19 +22,13 @@ final class BitzerApiController extends RestController
      */
     protected $viewFormatToObjectNameMap = ['json' => 'Neos\Flow\Mvc\View\JsonView'];
 
-    private AgentRepository $agentRepository;
-
-    private Schedule $schedule;
-
-    private \DateInterval $upcomingInterval;
+    private readonly \DateInterval $upcomingInterval;
 
     public function __construct(
-        AgentRepository $agentRepository,
-        Schedule $schedule,
+        private readonly AgentRepository $agentRepository,
+        private readonly Schedule $schedule,
         string $upcomingInterval
     ) {
-        $this->agentRepository = $agentRepository;
-        $this->schedule = $schedule;
         $this->upcomingInterval = new \DateInterval($upcomingInterval);
     }
 

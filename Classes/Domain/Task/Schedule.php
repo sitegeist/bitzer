@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Sitegeist\Bitzer\Domain\Task;
 
 use Doctrine\DBAL\Connection;
@@ -7,8 +10,8 @@ use Doctrine\DBAL\Exception as DbalException;
 use Doctrine\DBAL\Types\Types;
 use GuzzleHttp\Psr7\Uri;
 use Neos\Flow\Annotations as Flow;
+use Neos\Flow\ObjectManagement\ObjectManager;
 use Neos\Flow\Persistence\Doctrine\ConnectionFactory;
-use Neos\Neos\Domain\Service\ContentDimensionPresetSourceInterface;
 use Psr\Http\Message\UriInterface;
 use Sitegeist\Bitzer\Domain\Agent\AgentIdentifier;
 use Sitegeist\Bitzer\Domain\Agent\Agents;
@@ -16,35 +19,27 @@ use Sitegeist\Bitzer\Domain\Task\Command\ScheduleTask;
 use Sitegeist\Bitzer\Domain\Task\Generic\GenericTaskFactory;
 use Sitegeist\Bitzer\Domain\Agent\Agent;
 use Sitegeist\Bitzer\Domain\Agent\AgentRepository;
-use Sitegeist\Bitzer\Domain\Task\Exception\AgentDoesNotExist;
 
 /**
  * The schedule, the repository for tasks
- *
- * @Flow\Scope("singleton")
  */
+#[Flow\Scope('singleton')]
 final class Schedule
 {
-    const TABLE_NAME = 'sitegeist_bitzer_domain_task_task';
+    private const TABLE_NAME = 'sitegeist_bitzer_domain_task_task';
 
-    private array $factoryMapping;
+    private readonly Connection $databaseConnection;
 
-    private Connection $databaseConnection;
-
-    protected ContentDimensionPresetSourceInterface $contentDimensionPresetSource;
-
-    protected AgentRepository $agentRepository;
-
+    /**
+     * @param array<class-string<TaskInterface>,class-string<TaskFactoryInterface>> $factoryMapping
+     */
     public function __construct(
-        array $factoryMapping,
+        private readonly array $factoryMapping,
         ConnectionFactory $connectionFactory,
-        ContentDimensionPresetSourceInterface $contentDimensionPresetSource,
-        AgentRepository $agentRepository
+        private readonly AgentRepository $agentRepository,
+        private readonly ObjectManager $objectManager,
     ) {
-        $this->factoryMapping = $factoryMapping;
         $this->databaseConnection = $connectionFactory->create();
-        $this->contentDimensionPresetSource = $contentDimensionPresetSource;
-        $this->agentRepository = $agentRepository;
     }
 
     /**
@@ -109,8 +104,8 @@ final class Schedule
         $parameters = [
             'referenceDate' => $referenceDate,
             'actionStatusTypes' => [
-                ActionStatusType::TYPE_POTENTIAL,
-                ActionStatusType::TYPE_ACTIVE
+                ActionStatusType::TYPE_POTENTIAL->value,
+                ActionStatusType::TYPE_ACTIVE->value,
             ]
         ];
         $types = [
@@ -133,12 +128,12 @@ final class Schedule
         $tasks = $this->createTasksFromTableRows($rawDataSet);
 
         $groupedTasks = [
-            TaskDueStatusType::STATUS_PAST_DUE => [],
-            TaskDueStatusType::STATUS_DUE => [],
-            TaskDueStatusType::STATUS_UPCOMING => []
+            TaskDueStatusType::STATUS_PAST_DUE->value => [],
+            TaskDueStatusType::STATUS_DUE->value => [],
+            TaskDueStatusType::STATUS_UPCOMING->value => []
         ];
         foreach ($tasks as $task) {
-            $groupedTasks[(string)TaskDueStatusType::forTask($task)][] = $task;
+            $groupedTasks[TaskDueStatusType::forTask($task)->value][] = $task;
         }
 
         return $groupedTasks;
@@ -148,7 +143,7 @@ final class Schedule
      * @throws DriverException
      * @throws DbalException
      */
-    final function countDue(?Agents $agents = null): int
+    final public function countDue(?Agents $agents = null): int
     {
         $query = 'SELECT COUNT(*) FROM ' . self::TABLE_NAME . '
                     WHERE actionstatus IN (:actionStatusTypes)
@@ -156,8 +151,8 @@ final class Schedule
 
         $parameters = [
             'actionStatusTypes' => [
-                ActionStatusType::TYPE_POTENTIAL,
-                ActionStatusType::TYPE_ACTIVE
+                ActionStatusType::TYPE_POTENTIAL->value,
+                ActionStatusType::TYPE_ACTIVE->value,
             ]
         ];
 
@@ -184,7 +179,7 @@ final class Schedule
      * @throws DriverException
      * @throws DbalException
      */
-    final function countPastDue(?Agents $agents = null): int
+    final public function countPastDue(?Agents $agents = null): int
     {
         $query = 'SELECT COUNT(*) FROM ' . self::TABLE_NAME . '
                     WHERE actionstatus IN (:actionStatusTypes)
@@ -193,8 +188,8 @@ final class Schedule
 
         $parameters = [
             'actionStatusTypes' => [
-                ActionStatusType::TYPE_POTENTIAL,
-                ActionStatusType::TYPE_ACTIVE
+                ActionStatusType::TYPE_POTENTIAL->value,
+                ActionStatusType::TYPE_ACTIVE->value,
             ]
         ];
 
@@ -221,7 +216,7 @@ final class Schedule
      * @throws DriverException
      * @throws DbalException
      */
-    final function countUpcoming(\DateInterval $upcomingInterval, ?Agents $agents = null): int
+    final public function countUpcoming(\DateInterval $upcomingInterval, ?Agents $agents = null): int
     {
         $now = ScheduledTime::now();
         $referenceDate = $now->add($upcomingInterval);
@@ -235,8 +230,8 @@ final class Schedule
         $parameters = [
             'referenceDate' => $referenceDate,
             'actionStatusTypes' => [
-                ActionStatusType::TYPE_POTENTIAL,
-                ActionStatusType::TYPE_ACTIVE
+                ActionStatusType::TYPE_POTENTIAL->value,
+                ActionStatusType::TYPE_ACTIVE->value,
             ]
         ];
 
@@ -274,7 +269,7 @@ final class Schedule
             [
                 'taskClassName' => $taskClassName,
                 'object' => $object,
-                'actionStatusType' => ActionStatusType::TYPE_POTENTIAL
+                'actionStatusType' => ActionStatusType::TYPE_POTENTIAL->value,
             ]
         )->fetchAllAssociative();
 
@@ -293,14 +288,14 @@ final class Schedule
         $params = [
             'object' => $object,
             'actionStatusTypes' => [
-                ActionStatusType::TYPE_POTENTIAL,
-                ActionStatusType::TYPE_ACTIVE
+                ActionStatusType::TYPE_POTENTIAL->value,
+                ActionStatusType::TYPE_ACTIVE->value,
             ]
         ];
         if ($taskClassName) {
             $query .= '
                 AND classname = :taskClassName';
-            $params['taskClassName'] = $taskClassName->getValue();
+            $params['taskClassName'] = $taskClassName->value;
         }
 
         $tableRows = $this->databaseConnection->executeQuery(
@@ -327,14 +322,14 @@ final class Schedule
         $params = [
             'object' => $object,
             'actionStatusTypes' => [
-                ActionStatusType::TYPE_POTENTIAL,
-                ActionStatusType::TYPE_ACTIVE
+                ActionStatusType::TYPE_POTENTIAL->value,
+                ActionStatusType::TYPE_ACTIVE->value,
             ]
         ];
         if ($taskClassName) {
             $query .= '
                 AND classname = :taskClassName';
-            $params['taskClassName'] = $taskClassName->getValue();
+            $params['taskClassName'] = $taskClassName->value;
         }
 
         $tableRows = $this->databaseConnection->executeQuery(
@@ -354,19 +349,19 @@ final class Schedule
     /**
      * @throws DbalException
      */
-    final public function scheduleTask(ScheduleTask $command): void
+    final public function scheduleTask(ScheduleTask $command, Agent $agent): void
     {
         $this->databaseConnection->insert(
             self::TABLE_NAME,
             [
-                'identifier' => (string)$command->getIdentifier(),
-                'classname' => (string)$command->getClassName(),
-                'properties' => $command->getProperties(),
-                'scheduledtime' => $command->getScheduledTime(),
-                'actionstatus' => ActionStatusType::potential(),
-                'agent' => $command->getAgent(),
-                'object' => $command->getObject() ? json_encode($command->getObject()) : null,
-                'target' => $command->getTarget()
+                'identifier' => (string)$command->identifier,
+                'classname' => (string)$command->className,
+                'properties' => $command->properties,
+                'scheduledtime' => $command->scheduledTime,
+                'actionstatus' => ActionStatusType::TYPE_POTENTIAL,
+                'agent' => $agent,
+                'object' => $command->object ? json_encode($command->object) : null,
+                'target' => $command->target
             ],
             [
                 'scheduledtime' => Types::DATETIME_IMMUTABLE,
@@ -378,7 +373,7 @@ final class Schedule
     /**
      * @throws DbalException
      */
-    final public function rescheduleTask(TaskIdentifier $taskIdentifier, \DateTimeImmutable $scheduledTime): void
+    final public function rescheduleTask(TaskIdentifier $taskIdentifier, ?\DateTimeImmutable $scheduledTime): void
     {
         $this->databaseConnection->update(
             self::TABLE_NAME,
@@ -443,6 +438,7 @@ final class Schedule
     }
 
     /**
+     * @param array<string,mixed> $properties
      * @throws DbalException
      */
     final public function setTaskProperties(TaskIdentifier $taskIdentifier, array $properties): void
@@ -496,7 +492,7 @@ final class Schedule
      * @param TaskIdentifier $taskIdentifier
      * @param ActionStatusType|null $actionStatus
      */
-    public function emitTaskActionStatusUpdated(TaskIdentifier $taskIdentifier, ActionStatusType $actionStatus = null)
+    public function emitTaskActionStatusUpdated(TaskIdentifier $taskIdentifier, ActionStatusType $actionStatus = null): void
     {
     }
 
@@ -505,7 +501,7 @@ final class Schedule
      */
     private function createTasksFromTableRows(array $tableRows): Tasks
     {
-        return new Tasks(array_filter(array_map(function (array $tableRow): ?TaskInterface {
+        return new Tasks(...array_filter(array_map(function (array $tableRow): ?TaskInterface {
             return $this->createTaskFromTableRow($tableRow);
         }, $tableRows)));
     }
@@ -532,7 +528,7 @@ final class Schedule
             $className,
             json_decode($tableRow['properties'], true),
             ScheduledTime::createFromDatabaseValue($tableRow['scheduledtime']),
-            ActionStatusType::createFromString($tableRow['actionstatus']),
+            ActionStatusType::from($tableRow['actionstatus']),
             $agent,
             $object,
             isset($tableRow['target'])
@@ -543,8 +539,11 @@ final class Schedule
 
     private function resolveFactory(TaskClassName $className): TaskFactoryInterface
     {
-        return isset($this->factoryMapping[(string) $className])
-            ? new $this->factoryMapping[(string) $className]()
-            : new GenericTaskFactory();
+        /** @var TaskFactoryInterface $taskFactory */
+        $taskFactory = $this->objectManager->get(
+            $this->factoryMapping[(string)$className] ?? GenericTaskFactory::class
+        );
+
+        return $taskFactory;
     }
 }

@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Sitegeist\Bitzer\Domain\Agent;
 
 use Neos\Flow\Annotations as Flow;
@@ -6,9 +9,9 @@ use Neos\Flow\Annotations as Flow;
 /**
  * The agent domain entity collection
  *
- * @Flow\Proxy(false)
  * @implements \IteratorAggregate<int,Agent>
  */
+#[Flow\Proxy(false)]
 final class Agents implements \IteratorAggregate, \Countable
 {
     /**
@@ -16,17 +19,9 @@ final class Agents implements \IteratorAggregate, \Countable
      */
     private array $agents;
 
-    /**
-     * @param array<int,mixed> $items
-     */
-    public function __construct(array $items)
+    public function __construct(Agent ...$items)
     {
-        foreach ($items as $item) {
-            if (!$item instanceof Agent) {
-                throw new \InvalidArgumentException(self::class . ' can only consist of ' . Agent::class);
-            }
-        }
-        $this->agents = $items;
+        $this->agents = array_values($items);
     }
 
     /**
@@ -35,16 +30,16 @@ final class Agents implements \IteratorAggregate, \Countable
     public function getIdentifiers(): array
     {
         return array_map(function (Agent $agent): string {
-            return $agent->getIdentifier()->toString();
+            return $agent->identifier->toString();
         }, $this->agents);
     }
 
     /**
-     * @return \ArrayIterator<int,Agent>|Agent[]
+     * @return \Traversable<int,Agent>
      */
-    public function getIterator(): \ArrayIterator
+    public function getIterator(): \Traversable
     {
-        return new \ArrayIterator($this->agents);
+        return yield from $this->agents;
     }
 
     public function count(): int

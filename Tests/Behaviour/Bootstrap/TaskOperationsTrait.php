@@ -1,12 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
+namespace Sitegeist\Bitzer\Tests\Behaviour\Bootstrap;
 
 /*
  * This file is part of the Sitegeist.Bitzer package.
  */
 
 use Behat\Gherkin\Node\TableNode;
+use GuzzleHttp\Psr7\Uri;
 use Neos\ContentRepository\Domain\Model\NodeInterface;
-use Neos\Flow\Http\Uri;
 use Neos\Flow\ObjectManagement\ObjectManagerInterface;
 use Neos\Flow\Security\Context;
 use PHPUnit\Framework\Assert;
@@ -61,7 +65,7 @@ trait TaskOperationsTrait
 
     abstract protected function getObjectManager(): ObjectManagerInterface;
 
-    protected function setupTaskOperations()
+    protected function setupTaskOperations(): void
     {
         $this->bitzer = $this->getObjectManager()->get(Bitzer::class);
         $this->schedule = $this->getObjectManager()->get(Schedule::class);
@@ -89,17 +93,15 @@ trait TaskOperationsTrait
     /**
      * @Given /^exceptions are collected in a constraint check result$/
      */
-    public function exceptionsAreCollectedInAConstraintCheckResult()
+    public function exceptionsAreCollectedInAConstraintCheckResult(): void
     {
         $this->constraintCheckResult = new ConstraintCheckResult();
     }
 
     /**
      * @When /^the command ScheduleTask is executed with payload:$/
-     * @param TableNode $payloadTable
-     * @throws Exception
      */
-    public function theCommandScheduleTaskIsExecutedWithPayload(TableNode $payloadTable)
+    public function theCommandScheduleTaskIsExecutedWithPayload(TableNode $payloadTable): void
     {
         $commandArguments = $this->readPayloadTable($payloadTable);
 
@@ -108,22 +110,20 @@ trait TaskOperationsTrait
             new TaskClassName($commandArguments['taskClassName']),
             isset($commandArguments['scheduledTime']) ? ScheduledTime::createFromString($commandArguments['scheduledTime']) : null,
             $commandArguments['agent'],
-            isset($commandArguments['object']) ? NodeAddress::createFromArray($commandArguments['object']) : null,
+            isset($commandArguments['object']) ? NodeAddress::fromArray($commandArguments['object']) : null,
             isset($commandArguments['target']) ? new Uri($commandArguments['target']) : null,
             $commandArguments['properties']
         );
 
-        $this->getSecurityContext()->withoutAuthorizationChecks(function() use($command) {
+        $this->getSecurityContext()->withoutAuthorizationChecks(function () use ($command) {
             $this->bitzer->handleScheduleTask($command, $this->constraintCheckResult);
         });
     }
 
     /**
      * @When /^the command ScheduleTask is executed with payload and exceptions are caught:$/
-     * @param TableNode $payloadTable
-     * @throws Exception
      */
-    public function theCommandScheduleTaskIsExecutedWithPayloadAndExceptionsAreCaught(TableNode $payloadTable)
+    public function theCommandScheduleTaskIsExecutedWithPayloadAndExceptionsAreCaught(TableNode $payloadTable): void
     {
         try {
             $this->theCommandScheduleTaskIsExecutedWithPayload($payloadTable);
@@ -134,10 +134,8 @@ trait TaskOperationsTrait
 
     /**
      * @When /^the command RescheduleTask is executed with payload:$/
-     * @param TableNode $payloadTable
-     * @throws Exception
      */
-    public function theCommandRescheduleTaskIsExecutedWithPayload(TableNode $payloadTable)
+    public function theCommandRescheduleTaskIsExecutedWithPayload(TableNode $payloadTable): void
     {
         $commandArguments = $this->readPayloadTable($payloadTable);
 
@@ -146,17 +144,15 @@ trait TaskOperationsTrait
             isset($commandArguments['scheduledTime']) ? ScheduledTime::createFromString($commandArguments['scheduledTime']) : null
         );
 
-        $this->getSecurityContext()->withoutAuthorizationChecks(function() use($command) {
+        $this->getSecurityContext()->withoutAuthorizationChecks(function () use ($command) {
             $this->bitzer->handleRescheduleTask($command, $this->constraintCheckResult);
         });
     }
 
     /**
      * @When /^the command RescheduleTask is executed with payload and exceptions are caught:$/
-     * @param TableNode $payloadTable
-     * @throws Exception
      */
-    public function theCommandRescheduleTaskIsExecutedWithPayloadAndExceptionsAreCaught(TableNode $payloadTable)
+    public function theCommandRescheduleTaskIsExecutedWithPayloadAndExceptionsAreCaught(TableNode $payloadTable): void
     {
         try {
             $this->theCommandRescheduleTaskIsExecutedWithPayload($payloadTable);
@@ -167,10 +163,8 @@ trait TaskOperationsTrait
 
     /**
      * @When /^the command ReassignTask is executed with payload:$/
-     * @param TableNode $payloadTable
-     * @throws Exception
      */
-    public function theCommandReassignTaskIsExecutedWithPayload(TableNode $payloadTable)
+    public function theCommandReassignTaskIsExecutedWithPayload(TableNode $payloadTable): void
     {
         $commandArguments = $this->readPayloadTable($payloadTable);
 
@@ -179,17 +173,15 @@ trait TaskOperationsTrait
             $commandArguments['agent']
         );
 
-        $this->getSecurityContext()->withoutAuthorizationChecks(function() use($command) {
+        $this->getSecurityContext()->withoutAuthorizationChecks(function () use ($command) {
             $this->bitzer->handleReassignTask($command, $this->constraintCheckResult);
         });
     }
 
     /**
      * @When /^the command ReassignTask is executed with payload and exceptions are caught:$/
-     * @param TableNode $payloadTable
-     * @throws Exception
      */
-    public function theCommandReassignTaskIsExecutedWithPayloadAndExceptionsAreCaught(TableNode $payloadTable)
+    public function theCommandReassignTaskIsExecutedWithPayloadAndExceptionsAreCaught(TableNode $payloadTable): void
     {
         try {
             $this->theCommandReassignTaskIsExecutedWithPayload($payloadTable);
@@ -200,10 +192,8 @@ trait TaskOperationsTrait
 
     /**
      * @When /^the command SetTaskProperties is executed with payload:$/
-     * @param TableNode $payloadTable
-     * @throws Exception
      */
-    public function theCommandSetTaskPropertiesIsExecutedWithPayload(TableNode $payloadTable)
+    public function theCommandSetTaskPropertiesIsExecutedWithPayload(TableNode $payloadTable): void
     {
         $commandArguments = $this->readPayloadTable($payloadTable);
 
@@ -212,17 +202,15 @@ trait TaskOperationsTrait
             $commandArguments['properties']
         );
 
-        $this->getSecurityContext()->withoutAuthorizationChecks(function() use($command) {
+        $this->getSecurityContext()->withoutAuthorizationChecks(function () use ($command) {
             $this->bitzer->handleSetTaskProperties($command, $this->constraintCheckResult);
         });
     }
 
     /**
      * @When /^the command SetTaskProperties is executed with payload and exceptions are caught:$/
-     * @param TableNode $payloadTable
-     * @throws Exception
      */
-    public function theCommandSetTaskPropertiesIsExecutedWithPayloadAndExceptionsAreCaught(TableNode $payloadTable)
+    public function theCommandSetTaskPropertiesIsExecutedWithPayloadAndExceptionsAreCaught(TableNode $payloadTable): void
     {
         try {
             $this->theCommandSetTaskPropertiesIsExecutedWithPayload($payloadTable);
@@ -233,10 +221,8 @@ trait TaskOperationsTrait
 
     /**
      * @When /^the command CancelTask is executed with payload:$/
-     * @param TableNode $payloadTable
-     * @throws Exception
      */
-    public function theCommandCancelTaskIsExecutedWithPayload(TableNode $payloadTable)
+    public function theCommandCancelTaskIsExecutedWithPayload(TableNode $payloadTable): void
     {
         $commandArguments = $this->readPayloadTable($payloadTable);
 
@@ -244,17 +230,15 @@ trait TaskOperationsTrait
             new TaskIdentifier($commandArguments['taskIdentifier'])
         );
 
-        $this->getSecurityContext()->withoutAuthorizationChecks(function() use($command) {
+        $this->getSecurityContext()->withoutAuthorizationChecks(function () use ($command) {
             $this->bitzer->handleCancelTask($command, $this->constraintCheckResult);
         });
     }
 
     /**
      * @When /^the command CancelTask is executed with payload and exceptions are caught:$/
-     * @param TableNode $payloadTable
-     * @throws Exception
      */
-    public function theCommandCancelTaskIsExecutedWithPayloadAndExceptionsAreCaught(TableNode $payloadTable)
+    public function theCommandCancelTaskIsExecutedWithPayloadAndExceptionsAreCaught(TableNode $payloadTable): void
     {
         try {
             $this->theCommandCancelTaskIsExecutedWithPayload($payloadTable);
@@ -265,10 +249,8 @@ trait TaskOperationsTrait
 
     /**
      * @When /^the command CompleteTask is executed with payload:$/
-     * @param TableNode $payloadTable
-     * @throws Exception
      */
-    public function theCommandCompleteTaskIsExecutedWithPayload(TableNode $payloadTable)
+    public function theCommandCompleteTaskIsExecutedWithPayload(TableNode $payloadTable): void
     {
         $commandArguments = $this->readPayloadTable($payloadTable);
 
@@ -276,17 +258,15 @@ trait TaskOperationsTrait
             new TaskIdentifier($commandArguments['taskIdentifier'])
         );
 
-        $this->getSecurityContext()->withoutAuthorizationChecks(function() use($command) {
+        $this->getSecurityContext()->withoutAuthorizationChecks(function () use ($command) {
             $this->bitzer->handleCompleteTask($command, $this->constraintCheckResult);
         });
     }
 
     /**
      * @When /^the command CompleteTask is executed with payload and exceptions are caught:$/
-     * @param TableNode $payloadTable
-     * @throws Exception
      */
-    public function theCommandCompleteTaskIsExecutedWithPayloadAndExceptionsAreCaught(TableNode $payloadTable)
+    public function theCommandCompleteTaskIsExecutedWithPayloadAndExceptionsAreCaught(TableNode $payloadTable): void
     {
         try {
             $this->theCommandCompleteTaskIsExecutedWithPayload($payloadTable);
@@ -297,10 +277,8 @@ trait TaskOperationsTrait
 
     /**
      * @When /^the command ActivateTask is executed with payload:$/
-     * @param TableNode $payloadTable
-     * @throws Exception
      */
-    public function theCommandActivateTaskIsExecutedWithPayload(TableNode $payloadTable)
+    public function theCommandActivateTaskIsExecutedWithPayload(TableNode $payloadTable): void
     {
         $commandArguments = $this->readPayloadTable($payloadTable);
 
@@ -308,17 +286,15 @@ trait TaskOperationsTrait
             new TaskIdentifier($commandArguments['taskIdentifier'])
         );
 
-        $this->getSecurityContext()->withoutAuthorizationChecks(function() use($command) {
+        $this->getSecurityContext()->withoutAuthorizationChecks(function () use ($command) {
             $this->bitzer->handleActivateTask($command, $this->constraintCheckResult);
         });
     }
 
     /**
      * @When /^the command ActivateTask is executed with payload and exceptions are caught:$/
-     * @param TableNode $payloadTable
-     * @throws Exception
      */
-    public function theCommandActivateTaskIsExecutedWithPayloadAndExceptionsAreCaught(TableNode $payloadTable)
+    public function theCommandActivateTaskIsExecutedWithPayloadAndExceptionsAreCaught(TableNode $payloadTable): void
     {
         try {
             $this->theCommandActivateTaskIsExecutedWithPayload($payloadTable);
@@ -329,10 +305,8 @@ trait TaskOperationsTrait
 
     /**
      * @When /^the command SetNewTaskTarget is executed with payload:$/
-     * @param TableNode $payloadTable
-     * @throws Exception
      */
-    public function theCommandSetNewTaskTargetIsExecutedWithPayload(TableNode $payloadTable)
+    public function theCommandSetNewTaskTargetIsExecutedWithPayload(TableNode $payloadTable): void
     {
         $commandArguments = $this->readPayloadTable($payloadTable);
 
@@ -341,17 +315,15 @@ trait TaskOperationsTrait
             isset($commandArguments['target']) ? new Uri($commandArguments['target']) : null
         );
 
-        $this->getSecurityContext()->withoutAuthorizationChecks(function() use($command) {
+        $this->getSecurityContext()->withoutAuthorizationChecks(function () use ($command) {
             $this->bitzer->handleSetNewTaskTarget($command, $this->constraintCheckResult);
         });
     }
 
     /**
      * @When /^the command SetNewTaskTarget is executed with payload and exceptions are caught:$/
-     * @param TableNode $payloadTable
-     * @throws Exception
      */
-    public function theCommandSetNewTaskTargetIsExecutedWithPayloadAndExceptionsAreCaught(TableNode $payloadTable)
+    public function theCommandSetNewTaskTargetIsExecutedWithPayloadAndExceptionsAreCaught(TableNode $payloadTable): void
     {
         try {
             $this->theCommandSetNewTaskTargetIsExecutedWithPayload($payloadTable);
@@ -362,29 +334,25 @@ trait TaskOperationsTrait
 
     /**
      * @When /^the command SetNewTaskObject is executed with payload:$/
-     * @param TableNode $payloadTable
-     * @throws Exception
      */
-    public function theCommandSetNewTaskObjectIsExecutedWithPayload(TableNode $payloadTable)
+    public function theCommandSetNewTaskObjectIsExecutedWithPayload(TableNode $payloadTable): void
     {
         $commandArguments = $this->readPayloadTable($payloadTable);
 
         $command = new SetNewTaskObject(
             new TaskIdentifier($commandArguments['taskIdentifier']),
-            isset($commandArguments['object']) ? NodeAddress::createFromArray($commandArguments['object']) : null
+            isset($commandArguments['object']) ? NodeAddress::fromArray($commandArguments['object']) : null
         );
 
-        $this->getSecurityContext()->withoutAuthorizationChecks(function() use($command) {
+        $this->getSecurityContext()->withoutAuthorizationChecks(function () use ($command) {
             $this->bitzer->handleSetNewTaskObject($command, $this->constraintCheckResult);
         });
     }
 
     /**
      * @When /^the command SetNewTaskObject is executed with payload and exceptions are caught:$/
-     * @param TableNode $payloadTable
-     * @throws Exception
      */
-    public function theCommandSetNewTaskObjectIsExecutedWithPayloadAndExceptionsAreCaught(TableNode $payloadTable)
+    public function theCommandSetNewTaskObjectIsExecutedWithPayloadAndExceptionsAreCaught(TableNode $payloadTable): void
     {
         try {
             $this->theCommandSetNewTaskObjectIsExecutedWithPayload($payloadTable);
@@ -395,10 +363,8 @@ trait TaskOperationsTrait
 
     /**
      * @Then /^the last command should have thrown an exception of type "([^"]*)"$/
-     * @param string $shortExceptionName
-     * @throws ReflectionException
      */
-    public function theLastCommandShouldHaveThrown(string $shortExceptionName)
+    public function theLastCommandShouldHaveThrown(string $shortExceptionName): void
     {
         Assert::assertNotNull($this->lastCommandException, 'Command did not throw exception');
         $lastCommandExceptionShortName = (new ReflectionClass($this->lastCommandException))->getShortName();
@@ -407,14 +373,12 @@ trait TaskOperationsTrait
 
     /**
      * @Then /^I expect the task "([^"]*)" to exist$/
-     * @param string $taskIdentifier
-     * @throws Exception
      */
     public function iExpectTheTaskToExist(string $taskIdentifier): void
     {
         $taskIdentifier = new TaskIdentifier($taskIdentifier);
 
-        $this->getSecurityContext()->withoutAuthorizationChecks(function() use($taskIdentifier) {
+        $this->getSecurityContext()->withoutAuthorizationChecks(function () use ($taskIdentifier) {
             $this->currentTask = $this->schedule->findByIdentifier($taskIdentifier);
         });
 
@@ -423,7 +387,6 @@ trait TaskOperationsTrait
 
     /**
      * @Then /^I expect the task "([^"]*)" not to exist$/
-     * @param string $taskIdentifier
      */
     public function iExpectTheTaskNotToExist(string $taskIdentifier): void
     {
@@ -436,8 +399,6 @@ trait TaskOperationsTrait
 
     /**
      * @Then /^I expect the schedule to consist of exactly (\d+) tasks$/
-     * @param int $expectedNumberOfTasks
-     * @throws \Doctrine\DBAL\DBALException
      */
     public function iExpectTheGraphProjectionToConsistOfExactlyNodes(int $expectedNumberOfTasks)
     {
@@ -447,9 +408,8 @@ trait TaskOperationsTrait
 
     /**
      * @Then /^I expect this task to be of class "([^"]*)"$/
-     * @param string $expectedClassName
      */
-    public function iExpectThisTaskToBeOfClass(string $expectedClassName)
+    public function iExpectThisTaskToBeOfClass(string $expectedClassName): void
     {
         $actualClassName = get_class($this->currentTask);
         Assert::assertEquals($expectedClassName, $actualClassName, 'The current task is of type ' . $actualClassName . ', expected was ' . $expectedClassName);
@@ -457,20 +417,18 @@ trait TaskOperationsTrait
 
     /**
      * @Then /^I expect this task to have action status "([^"]*)"$/
-     * @param string $expectedActionStatus
      */
-    public function iExpectThisTaskToHaveActionStatus(string $expectedActionStatus)
+    public function iExpectThisTaskToHaveActionStatus(string $expectedActionStatus): void
     {
-        $expectedActionStatus = ActionStatusType::createFromString($expectedActionStatus);
+        $expectedActionStatus = ActionStatusType::from($expectedActionStatus);
         $actualActionStatus = $this->currentTask->getActionStatus();
-        Assert::assertTrue($expectedActionStatus->equals($actualActionStatus), 'The current task has action status ' . $actualActionStatus . ', expected was ' . $expectedActionStatus);
+        Assert::assertTrue($expectedActionStatus === $actualActionStatus, 'The current task has action status ' . $actualActionStatus->value . ', expected was ' . $expectedActionStatus->value);
     }
 
     /**
      * @Then /^I expect this task to be scheduled to "([^"]*)"$/
-     * @param string $expectedScheduledTime
      */
-    public function iExpectThisTaskToBeScheduledTo(string $expectedScheduledTime)
+    public function iExpectThisTaskToBeScheduledTo(string $expectedScheduledTime): void
     {
         $actualScheduledTime = $this->currentTask->getScheduledTime()->format('c');
         Assert::assertEquals($expectedScheduledTime, $actualScheduledTime, 'The current task is scheduled to  ' . $actualScheduledTime . ', expected was ' . $expectedScheduledTime);
@@ -478,9 +436,8 @@ trait TaskOperationsTrait
 
     /**
      * @Then /^I expect this task to be assigned to "([^"]*)"$/
-     * @param string $expectedAgent
      */
-    public function iExpectThisTaskToBeAssignedTo(string $expectedAgent)
+    public function iExpectThisTaskToBeAssignedTo(string $expectedAgent): void
     {
         $actualAgent = $this->currentTask->getAgent();
         Assert::assertEquals($expectedAgent, $actualAgent, 'The current task is assigned to  ' . $actualAgent . ', expected was ' . $expectedAgent);
@@ -490,11 +447,11 @@ trait TaskOperationsTrait
      * @Then /^I expect this task to be about '([^']*)'$/
      * @param string $expectedObject
      */
-    public function iExpectThisTaskToBeAbout(string $expectedObject)
+    public function iExpectThisTaskToBeAbout(string $expectedObject): void
     {
-        $expectedObject = NodeAddress::createFromArray(json_decode($expectedObject, true));
+        $expectedObject = NodeAddress::fromArray(json_decode($expectedObject, true));
         Assert::assertInstanceOf(NodeInterface::class, $this->currentTask->getObject(), 'The current task is about nothing, expected was ' . $expectedObject);
-        $actualObject = NodeAddress::createFromNode($this->currentTask->getObject());
+        $actualObject = NodeAddress::fromNode($this->currentTask->getObject());
         Assert::assertTrue($expectedObject->equals($actualObject), 'The current task is about  ' . $actualObject . ', expected was ' . $expectedObject);
     }
 
@@ -503,15 +460,14 @@ trait TaskOperationsTrait
      */
     public function iExpectThisTaskToBeAboutNothing()
     {
-        $actualObject = $this->currentTask->getObject() ? NodeAddress::createFromNode($this->currentTask->getObject()) : null;
+        $actualObject = $this->currentTask->getObject() ? NodeAddress::fromNode($this->currentTask->getObject()) : null;
         Assert::assertNull($this->currentTask->getObject(), 'The current task is about ' . $actualObject . ', expected was nothing');
     }
 
     /**
      * @Then /^I expect this task to have the target "([^"]*)"$/
-     * @param string $expectedTarget
      */
-    public function iExpectThisTaskToHaveTheTarget(string $expectedTarget)
+    public function iExpectThisTaskToHaveTheTarget(string $expectedTarget): void
     {
         $expectedTarget = new Uri($expectedTarget);
         $actualTarget = $this->currentTask->getTarget();
@@ -520,9 +476,8 @@ trait TaskOperationsTrait
 
     /**
      * @Then /^I expect this task to have the adjusted target "([^"]*)"$/
-     * @param string $expectedTarget
      */
-    public function iExpectThisTaskToHaveTheAdjustedTarget(string $expectedTarget)
+    public function iExpectThisTaskToHaveTheAdjustedTarget(string $expectedTarget): void
     {
         $actualTarget = str_replace('bin/bin', '', (string)$this->currentTask->getTarget());
         Assert::assertSame($expectedTarget, $actualTarget, 'The current task has the target  ' . $actualTarget . ', expected was ' . $expectedTarget);
@@ -530,9 +485,8 @@ trait TaskOperationsTrait
 
     /**
      * @Then /^I expect this task to have the properties:$/
-     * @param TableNode $expectedProperties
      */
-    public function iExpectThisTaskToHaveTheProperties(TableNode $expectedProperties)
+    public function iExpectThisTaskToHaveTheProperties(TableNode $expectedProperties): void
     {
         $actualProperties = $this->currentTask->getProperties();
         foreach ($expectedProperties->getHash() as $row) {
@@ -546,11 +500,8 @@ trait TaskOperationsTrait
 
     /**
      * @Then /^I expect the constraint check result to contain an exception of type "([^"]*)" at path "([^"]*)"$/
-     * @param string $expectedShortName
-     * @param string $expectedPath
-     * @throws ReflectionException
      */
-    public function iExpectTheConstraintCheckResultToContainAnExceptionOfTypeAtPath(string $expectedShortName, string $expectedPath)
+    public function iExpectTheConstraintCheckResultToContainAnExceptionOfTypeAtPath(string $expectedShortName, string $expectedPath): void
     {
         Assert::assertNotNull($this->constraintCheckResult->getException($expectedPath), 'Constraint check result does not contain an exception at path ' . $expectedPath);
         $actualShortName = (new ReflectionClass($this->constraintCheckResult->getException($expectedPath)))->getShortName();

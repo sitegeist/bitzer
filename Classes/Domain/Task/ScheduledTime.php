@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Sitegeist\Bitzer\Domain\Task;
 
 use Neos\Flow\Annotations as Flow;
@@ -7,8 +10,8 @@ use Neos\Flow\Annotations as Flow;
  * The scheduled time factory for \DateTimeImmutable
  *
  * To be replaced by the actual node address from the new content repository
- * @Flow\Proxy(false)
  */
+#[Flow\Proxy(false)]
 final class ScheduledTime
 {
     public static function createFromString(string $dateString): \DateTimeImmutable
@@ -22,8 +25,7 @@ final class ScheduledTime
     }
 
     /**
-     * @param array $dateArray
-     * @return \DateTimeImmutable
+     * @param array<string,mixed> $dateArray
      * @todo properly determine time zone
      */
     public static function createFromArray(array $dateArray): \DateTimeImmutable
@@ -45,6 +47,11 @@ final class ScheduledTime
 
     public static function createFromDatabaseValue(string $dateString): \DateTimeImmutable
     {
-        return \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $dateString);
+        $date = \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $dateString);
+        if (!$date) {
+            throw new \DomainException('Invalid scheduled time ' . $dateString, 1718270785);
+        }
+
+        return $date;
     }
 }

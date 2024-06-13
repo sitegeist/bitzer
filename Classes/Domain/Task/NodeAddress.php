@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Sitegeist\Bitzer\Domain\Task;
 
 use Neos\ContentRepository\DimensionSpace\DimensionSpace\DimensionSpacePoint;
@@ -13,24 +16,15 @@ use Neos\Flow\Annotations as Flow;
  * The node address value object
  *
  * To be replaced by the actual node address from the new content repository
- * @Flow\Proxy(false)
  */
+#[Flow\Proxy(false)]
 final class NodeAddress implements \JsonSerializable, ProtectedContextAwareInterface
 {
-    private string $workspaceName;
-
-    private DimensionSpacePoint $dimensionSpacePoint;
-
-    private NodeAggregateIdentifier $nodeAggregateIdentifier;
-
     public function __construct(
-        string $workspaceName,
-        DimensionSpacePoint $dimensionSpacePoint,
-        NodeAggregateIdentifier $nodeAggregateIdentifier
+        public readonly string $workspaceName,
+        public readonly DimensionSpacePoint $dimensionSpacePoint,
+        public readonly NodeAggregateIdentifier $nodeAggregateIdentifier
     ) {
-        $this->workspaceName = $workspaceName;
-        $this->dimensionSpacePoint = $dimensionSpacePoint;
-        $this->nodeAggregateIdentifier = $nodeAggregateIdentifier;
     }
 
     public static function fromNode(TraversableNodeInterface $node): self
@@ -88,21 +82,6 @@ final class NodeAddress implements \JsonSerializable, ProtectedContextAwareInter
         );
     }
 
-    public function getWorkspaceName(): string
-    {
-        return $this->workspaceName;
-    }
-
-    public function getDimensionSpacePoint(): DimensionSpacePoint
-    {
-        return $this->dimensionSpacePoint;
-    }
-
-    public function getNodeAggregateIdentifier(): NodeAggregateIdentifier
-    {
-        return $this->nodeAggregateIdentifier;
-    }
-
     /**
      * @return array<string,mixed>
      */
@@ -126,7 +105,7 @@ final class NodeAddress implements \JsonSerializable, ProtectedContextAwareInter
 
     public function __toString(): string
     {
-        return json_encode($this);
+        return json_encode($this, JSON_THROW_ON_ERROR);
     }
 
     /**

@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Sitegeist\Bitzer\Domain\Task;
 
 use Neos\Eel\ProtectedContextAwareInterface;
@@ -7,9 +10,8 @@ use Neos\Flow\Annotations as Flow;
 /**
  * The constraint check result registry
  * Collects exceptions that otherwise would have been
- *
- * @Flow\Proxy(false)
  */
+#[Flow\Proxy(false)]
 final class ConstraintCheckResult implements ProtectedContextAwareInterface
 {
     /**
@@ -20,10 +22,13 @@ final class ConstraintCheckResult implements ProtectedContextAwareInterface
 
     /**
      * The registry for message arguments for the failed constraint checks
-     * @var array<string,array<mixed,mixed>>
+     * @var array<string,array<int,mixed>>
      */
     private array $messageArguments = [];
 
+    /**
+     * @param array<int,mixed> $messageArguments
+     */
     public function registerFailedCheck(string $path, \DomainException $failedConstraintCheck, array $messageArguments = []): void
     {
         $this->failedChecks[$path] = $failedConstraintCheck;
@@ -53,6 +58,9 @@ final class ConstraintCheckResult implements ProtectedContextAwareInterface
         return $this->failedChecks[$path]->getMessage();
     }
 
+    /**
+     * @return array<int,mixed>|null
+     */
     public function getMessageArguments(string $path): ?array
     {
         if (!isset($this->messageArguments[$path])) {

@@ -1,17 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
+namespace Sitegeist\Bitzer\Tests\Behaviour\Bootstrap;
 
 /*
  * This file is part of the Sitegeist.Bitzer package.
  */
 
 use Behat\Gherkin\Node\TableNode;
-use Doctrine\Common\Collections\ArrayCollection;
+use GuzzleHttp\Psr7\Uri;
 use Neos\ContentRepository\Domain\Repository\ContentDimensionRepository;
 use Neos\ContentRepository\Domain\Service\ContentDimensionPresetSourceInterface;
-use Neos\Flow\Http\Uri;
 use Neos\Flow\ObjectManagement\ObjectManagerInterface;
 use Neos\Flow\Persistence\PersistenceManagerInterface;
-use Neos\Flow\Security\Context;
 use Neos\Neos\Domain\Model\Domain;
 use Neos\Neos\Domain\Model\Site;
 use Neos\Neos\Domain\Repository\DomainRepository;
@@ -25,7 +27,7 @@ trait ObjectsTrait
     /**
      * @Given /^I have no content dimensions$/
      */
-    public function iHaveNoContentDimensions()
+    public function iHaveNoContentDimensions(): void
     {
         $dimensions = [];
 
@@ -38,10 +40,8 @@ trait ObjectsTrait
 
     /**
      * @Given /^I have the following sites:$/
-     * @param TableNode $siteProperties
-     * @throws \Neos\Flow\Persistence\Exception\IllegalObjectTypeException
      */
-    public function iHaveTheFollowingSites(TableNode $siteProperties)
+    public function iHaveTheFollowingSites(TableNode $siteProperties): void
     {
         /** @var SiteRepository $siteRepository */
         $siteRepository = $this->getObjectManager()->get(SiteRepository::class);

@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Sitegeist\Bitzer\Application\DataProvider;
 
 /*
@@ -10,10 +13,9 @@ use Neos\Eel\ProtectedContextAwareInterface;
 use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\Neos\Service\DataSource\AbstractDataSource;
 use Sitegeist\Bitzer\Domain\Agent\AgentRepository;
+use Sitegeist\Bitzer\Domain\Agent\AgentType;
 
-/**
- * @Flow\Scope("singleton")
- */
+#[Flow\Scope('singleton')]
 final class AgentProvider extends AbstractDataSource implements ProtectedContextAwareInterface
 {
     /**
@@ -21,19 +23,21 @@ final class AgentProvider extends AbstractDataSource implements ProtectedContext
      */
     protected static $identifier = 'sitegeist-bitzer-agent';
 
-    private AgentRepository $agentRepository;
-
-    public function __construct(AgentRepository $agentRepository)
-    {
-        $this->agentRepository = $agentRepository;
+    public function __construct(
+        private readonly AgentRepository $agentRepository
+    ) {
     }
 
+    /**
+     * @param array<string,mixed> $arguments
+     * @return array<string,mixed>
+     */
     public function getData(NodeInterface $node = null, array $arguments = []): array
     {
         $agents = [];
         foreach ($this->agentRepository->findAll() as $agent) {
-            $agents[(string)$agent]['icon'] = $agent->getIdentifier()->getType()->getIsRole() ? 'users' : 'user';
-            $agents[(string)$agent]['label'] = $agent->getLabel();
+            $agents[(string)$agent]['icon'] = $agent->identifier->type === AgentType::TYPE_ROLE ? 'users' : 'user';
+            $agents[(string)$agent]['label'] = $agent->label;
         }
 
         return $agents;

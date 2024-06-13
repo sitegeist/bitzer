@@ -1,10 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
+namespace Sitegeist\Bitzer\Tests\Behaviour\Bootstrap;
 
 /*
  * This file is part of the Sitegeist.Bitzer package.
  */
 
-use Neos\Flow\Http\Request;
+use GuzzleHttp\Psr7\ServerRequest;
+use GuzzleHttp\Psr7\Uri;
 use Neos\Flow\Mvc\ActionRequest;
 use Neos\Flow\ObjectManagement\ObjectManagerInterface;
 use Neos\Flow\Persistence\PersistenceManagerInterface;
@@ -30,7 +35,7 @@ trait AgentsTrait
     /**
      * @AfterScenario @fixtures
      */
-    public function resetCustomRoles()
+    public function resetCustomRoles(): void
     {
         if (!is_null($this->rolesBackup)) {
             /** @var PolicyService $policyService */
@@ -46,7 +51,7 @@ trait AgentsTrait
     /**
      * @Given /^I have the following additional agents:$/
      */
-    public function iHaveTheFollowingAdditionalAgents($agentConfiguration)
+    public function iHaveTheFollowingAdditionalAgents($agentConfiguration): void
     {
         /** @var PolicyService $policyService */
         $policyService = $this->getObjectManager()->get(PolicyService::class);
@@ -74,7 +79,7 @@ trait AgentsTrait
      * @throws \Neos\Flow\Security\Exception\NoTokensAuthenticatedException
      * @throws \Neos\Utility\Exception\PropertyNotAccessibleException
      */
-    public function iAmAuthenticatedAsExistingUser(string $userName)
+    public function iAmAuthenticatedAsExistingUser(string $userName): void
     {
         /** @var UserService $userDomainService */
         $userDomainService = $this->getObjectManager()->get(UserService::class);
@@ -85,8 +90,12 @@ trait AgentsTrait
         $persistenceManager = $this->getObjectManager()->get(PersistenceManagerInterface::class);
         $persistenceManager->persistAll();
 
-        $authenticationRequest = new ActionRequest(new Request(
+        $authenticationRequest = ActionRequest::fromHttpRequest(new ServerRequest(
+            'GET',
+            new Uri('https://neos.io'),
             [],
+            null,
+            '1.1',
             [
                 '__authentication' => [
                     'Neos' => [
@@ -105,8 +114,6 @@ trait AgentsTrait
                     ]
                 ]
             ],
-            [],
-            []
         ));
 
         /** @var Context $securityContext */

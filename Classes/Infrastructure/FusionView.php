@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Sitegeist\Bitzer\Infrastructure;
 
 /*
@@ -6,6 +9,7 @@ namespace Sitegeist\Bitzer\Infrastructure;
  */
 
 use Neos\Flow\Annotations as Flow;
+use Neos\Flow\Mvc\View\ViewInterface;
 use Neos\Flow\Package\PackageManager;
 use Neos\Utility\Files;
 
@@ -14,11 +18,12 @@ use Neos\Utility\Files;
  */
 class FusionView extends \Neos\Fusion\View\FusionView
 {
-    protected $autoIncludeFusionPattern = 'resource://%s/Private/Fusion/Root.fusion';
+    protected string $autoIncludeFusionPattern = 'resource://%s/Private/Fusion/Root.fusion';
 
     /**
      * @Flow\InjectConfiguration(path="fusion.autoInclude")
      * @var array
+     * @phpstan-var array<string,mixed>
      */
     protected $autoloadedPlugins;
 
@@ -28,7 +33,7 @@ class FusionView extends \Neos\Fusion\View\FusionView
      */
     protected $packageManager;
 
-    protected $fallbackView;
+    protected ViewInterface $fallbackView;
 
     /**
      * @var boolean

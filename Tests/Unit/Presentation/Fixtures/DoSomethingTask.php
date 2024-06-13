@@ -1,8 +1,13 @@
 <?php
-namespace My\Package\Domain\Task\DoSomething;
 
-use Neos\ContentRepository\Domain\Model\NodeInterface;
+declare(strict_types=1);
+
+namespace Sitegeist\Bitzer\Tests\Unit\Presentation\Fixtures;
+
+use Neos\ContentRepository\Domain\Projection\Content\TraversableNodeInterface;
 use Psr\Http\Message\UriInterface;
+use Sitegeist\Bitzer\Domain\Agent\AgentIdentifier;
+use Sitegeist\Bitzer\Domain\Agent\AgentType;
 use Sitegeist\Bitzer\Domain\Task\ActionStatusType;
 use Sitegeist\Bitzer\Domain\Task\TaskIdentifier;
 use Sitegeist\Bitzer\Domain\Task\TaskInterface;
@@ -15,68 +20,56 @@ final class DoSomethingTask implements TaskInterface
 {
     /**
      * The short type to resolve the class name
-     *
-     * @return string
      */
     public static function getShortType(): string
     {
-        // TODO: Implement getShortType() method.
+        return 'do-something';
     }
 
     public function getIdentifier(): TaskIdentifier
     {
-        // TODO: Implement getIdentifier() method.
+        return TaskIdentifier::create();
     }
 
     /**
      * The image describing the task. Must be a FontAwesome icon identifier available to the Neos UI.
-     *
-     * @return string
      */
     public function getImage(): string
     {
-        // TODO: Implement getImage() method.
+        return '';
     }
 
     /**
      * A description of the task.
-     *
-     * @return string
      */
     public function getDescription(): string
     {
-        // TODO: Implement getDescription() method.
+        return '';
     }
 
     /**
      * The time the object is scheduled to.
-     *
-     * @return \DateTimeImmutable
      */
     public function getScheduledTime(): \DateTimeImmutable
     {
-        // TODO: Implement getScheduledTime() method.
+        return new \DateTimeImmutable();
     }
 
     /**
      * Indicates the current disposition of the Action.
-     *
-     * @return ActionStatusType
      */
     public function getActionStatus(): ActionStatusType
     {
-        // TODO: Implement getActionStatus() method.
+        return ActionStatusType::TYPE_POTENTIAL;
     }
 
     /**
      * The direct performer or driver of the action (animate or inanimate). e.g. John wrote a book.
      * In our case, as tasks are assigned to user groups, this is a Flow policy role identifier.
-     *
-     * @return Agent
      */
     public function getAgent(): Agent
     {
-        // TODO: Implement getAgent() method.
+        return new Agent(new AgentIdentifier(AgentType::TYPE_ROLE, 'Vendor.Site:Role'), 'Some agent');
     }
 
     /**
@@ -84,33 +77,29 @@ final class DoSomethingTask implements TaskInterface
      * Also known as the semantic roles patient, affected or undergoer (which change their state) or theme (which doesn't).
      *
      * For now, we expect that only nodes are affected by tasks, if at all.
-     *
-     * @return NodeInterface|null
      */
-    public function getObject(): ?NodeInterface
+    public function getObject(): ?TraversableNodeInterface
     {
-        // TODO: Implement getObject() method.
+        return null;
     }
 
     /**
      * Indicates a target EntryPoint for an Action.
      *
      * In our case this is the URI for the next action to be done within this task.
-     *
-     * @return UriInterface|null
      */
     public function getTarget(): ?UriInterface
     {
-        // TODO: Implement getTarget() method.
+        return null;
     }
 
     /**
      * Returns custom, arbitrary properties of a task.
      *
-     * @return array
+     * @return array<string,mixed>
      */
     public function getProperties(): array
     {
-        // TODO: Implement getProperties() method.
+        return [];
     }
 }

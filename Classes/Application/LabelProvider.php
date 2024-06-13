@@ -1,20 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Sitegeist\Bitzer\Application;
 
 use Neos\Eel\ProtectedContextAwareInterface;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\I18n\Translator;
 
-/**
- * @Flow\Scope("singleton")
- */
+#[Flow\Scope('singleton')]
 final class LabelProvider implements ProtectedContextAwareInterface
 {
-    private Translator $translator;
-
-    public function __construct(Translator $translator)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        private readonly Translator $translator
+    ) {
     }
 
     /**
@@ -152,6 +151,9 @@ final class LabelProvider implements ProtectedContextAwareInterface
         ];
     }
 
+    /**
+     * @param array<string,mixed> $arguments
+     */
     private function getLabel(string $id, array $arguments = []): string
     {
         return $this->translator->translateById(
@@ -161,7 +163,7 @@ final class LabelProvider implements ProtectedContextAwareInterface
             null,
             'Module.Bitzer',
             'Sitegeist.Bitzer'
-        );
+        ) ?: $id;
     }
 
     /**

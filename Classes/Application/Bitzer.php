@@ -1,10 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Sitegeist\Bitzer\Application;
 
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\ObjectManagement\ObjectManagerInterface;
 use Psr\Http\Message\UriInterface;
 use Sitegeist\Bitzer\Domain\Agent\Agent;
+use Sitegeist\Bitzer\Domain\Agent\AgentIdentifier;
 use Sitegeist\Bitzer\Domain\Agent\AgentRepository;
 use Sitegeist\Bitzer\Domain\Task\ActionStatusType;
 use Sitegeist\Bitzer\Domain\Task\Command\ActivateTask;
@@ -31,6 +35,7 @@ use Sitegeist\Bitzer\Domain\Task\Exception\TaskDoesExist;
 use Sitegeist\Bitzer\Domain\Task\Exception\TaskDoesNotExist;
 use Sitegeist\Bitzer\Domain\Task\TaskClassName;
 use Sitegeist\Bitzer\Domain\Task\TaskIdentifier;
+use Sitegeist\Bitzer\Domain\Task\TaskInterface;
 use Sitegeist\Bitzer\Infrastructure\ContentContextFactory;
 
 /**
@@ -38,33 +43,27 @@ use Sitegeist\Bitzer\Infrastructure\ContentContextFactory;
  *
  * Takes commands, validates them and relays them to the schedule
  *
- * @Flow\Scope("singleton")
  * @api
  */
+#[Flow\Scope('singleton')]
 final class Bitzer
 {
-    private Schedule $schedule;
-
-    private AgentRepository $agentRepository;
-
-    private ContentContextFactory $contentContextFactory;
-
     /**
      * The constraint check plugins, indexed by task type
-     * @var array<string,array<int,ConstraintCheckPluginInterface>>
+     * @var array<class-string<TaskInterface>,array<int,ConstraintCheckPluginInterface>>
      */
-    private array $constraintCheckPlugins;
+    private readonly array $constraintCheckPlugins;
 
+    /**
+     * @param array<class-string<TaskInterface>,array<class-string<ConstraintCheckPluginInterface>,bool>> $constraintCheckPluginMapping
+     */
     public function __construct(
-        Schedule $schedule,
-        AgentRepository $agentRepository,
-        ContentContextFactory $contentContextFactory,
+        private readonly Schedule $schedule,
+        private readonly AgentRepository $agentRepository,
+        private readonly ContentContextFactory $contentContextFactory,
         ObjectManagerInterface $objectManager,
         array $constraintCheckPluginMapping
     ) {
-        $this->schedule = $schedule;
-        $this->agentRepository = $agentRepository;
-        $this->contentContextFactory = $contentContextFactory;
         $constraintCheckPlugins = [];
         foreach ($constraintCheckPluginMapping as $taskClassName => $constraintCheckPluginNames) {
             foreach ($constraintCheckPluginNames as $pluginClassName => $isActive) {
@@ -76,7 +75,9 @@ final class Bitzer
                         throw ConstraintCheckPluginIsInvalid::becauseItDoesNotImplementTheRequiredInterface($pluginClassName);
                     }
 
-                    $constraintCheckPlugins[$taskClassName][] = $objectManager->get($pluginClassName);
+                    /** @var ConstraintCheckPluginInterface $plugin */
+                    $plugin = $objectManager->get($pluginClassName);
+                    $constraintCheckPlugins[$taskClassName][] = $plugin;
                 }
             }
         }
@@ -86,33 +87,33 @@ final class Bitzer
 
     final public function handleScheduleTask(ScheduleTask $command, ?ConstraintCheckResult $constraintCheckResult = null): void
     {
-        $this->requireTaskToNotExist($command->getIdentifier(), $constraintCheckResult);
-        $this->requireAgentToExist($command->getAgent(), $constraintCheckResult);
-        $this->requireScheduledTimeToBeSet($command->getScheduledTime(), $constraintCheckResult);
-        $this->requireDescriptionToBeSet($command->getProperties(), $constraintCheckResult);
-        if ($command->getObject()) {
+        $this->requireTaskToNotExist($command->identifier, $constraintCheckResult);
+        $agent = $this->requireAgent($command->agentId, $constraintCheckResult);
+        $this->requireScheduledTimeToBeSet($command->scheduledTime, $constraintCheckResult);
+        $this->requireDescriptionToBeSet($command->properties, $constraintCheckResult);
+        if ($command->object) {
             // @todo find some way to enforce this; recently published nodes are not yet known to the new content context
             //$this->requireObjectToExist($command->getObject(), $command->getAgent(), $constraintCheckResult);
         }
-        if ($command->getTarget()) {
-            $this->requireTargetToBeAbsoluteUri($command->getTarget(), $constraintCheckResult);
+        if ($command->target) {
+            $this->requireTargetToBeAbsoluteUri($command->target, $constraintCheckResult);
         }
 
-        foreach ($this->getConstraintCheckPlugins($command->getClassName()) as $constraintCheckPlugin) {
+        foreach ($this->getConstraintCheckPlugins($command->className) as $constraintCheckPlugin) {
             $constraintCheckPlugin->checkScheduleTask($command, $constraintCheckResult);
         }
 
-        if (IsCommandToBeExecuted::isSatisfiedByConstraintCheckResult($constraintCheckResult)) {
-            $this->schedule->scheduleTask($command);
+        if (IsCommandToBeExecuted::isSatisfiedByConstraintCheckResult($constraintCheckResult) && $agent) {
+            $this->schedule->scheduleTask($command, $agent);
         }
     }
 
     final public function handleRescheduleTask(RescheduleTask $command, ?ConstraintCheckResult $constraintCheckResult = null): void
     {
-        $this->requireTaskToExist($command->getIdentifier(), $constraintCheckResult);
-        $this->requireScheduledTimeToBeSet($command->getScheduledTime(), $constraintCheckResult);
+        $this->requireTaskToExist($command->identifier, $constraintCheckResult);
+        $this->requireScheduledTimeToBeSet($command->scheduledTime, $constraintCheckResult);
 
-        $task = $this->schedule->findByIdentifier($command->getIdentifier());
+        $task = $this->schedule->findByIdentifier($command->identifier);
         if ($task) {
             foreach ($this->getConstraintCheckPlugins(TaskClassName::createFromObject($task)) as $constraintCheckPlugin) {
                 $constraintCheckPlugin->checkRescheduleTask($command, $constraintCheckResult);
@@ -120,35 +121,35 @@ final class Bitzer
         }
 
         if (IsCommandToBeExecuted::isSatisfiedByConstraintCheckResult($constraintCheckResult)) {
-            $this->schedule->rescheduleTask($command->getIdentifier(), $command->getScheduledTime());
+            $this->schedule->rescheduleTask($command->identifier, $command->scheduledTime);
         }
     }
 
     final public function handleReassignTask(ReassignTask $command, ?ConstraintCheckResult $constraintCheckResult = null): void
     {
-        $this->requireTaskToExist($command->getIdentifier(), $constraintCheckResult);
-        $this->requireAgentToExist($command->getAgent(), $constraintCheckResult);
+        $this->requireTaskToExist($command->identifier, $constraintCheckResult);
+        $agent = $this->requireAgent($command->agentId, $constraintCheckResult);
 
-        $task = $this->schedule->findByIdentifier($command->getIdentifier());
+        $task = $this->schedule->findByIdentifier($command->identifier);
         if ($task) {
             foreach ($this->getConstraintCheckPlugins(TaskClassName::createFromObject($task)) as $constraintCheckPlugin) {
                 $constraintCheckPlugin->checkReassignTask($command, $constraintCheckResult);
             }
         }
 
-        if (IsCommandToBeExecuted::isSatisfiedByConstraintCheckResult($constraintCheckResult)) {
-            $this->schedule->reassignTask($command->getIdentifier(), $command->getAgent());
+        if (IsCommandToBeExecuted::isSatisfiedByConstraintCheckResult($constraintCheckResult) && $agent) {
+            $this->schedule->reassignTask($command->identifier, $agent);
         }
     }
 
     final public function handleSetNewTaskTarget(SetNewTaskTarget $command, ?ConstraintCheckResult $constraintCheckResult = null): void
     {
-        $this->requireTaskToExist($command->getIdentifier(), $constraintCheckResult);
-        if ($command->getTarget()) {
-            $this->requireTargetToBeAbsoluteUri($command->getTarget(), $constraintCheckResult);
+        $this->requireTaskToExist($command->identifier, $constraintCheckResult);
+        if ($command->target) {
+            $this->requireTargetToBeAbsoluteUri($command->target, $constraintCheckResult);
         }
 
-        $task = $this->schedule->findByIdentifier($command->getIdentifier());
+        $task = $this->schedule->findByIdentifier($command->identifier);
         if ($task) {
             foreach ($this->getConstraintCheckPlugins(TaskClassName::createFromObject($task)) as $constraintCheckPlugin) {
                 $constraintCheckPlugin->checkSetNewTaskTarget($command, $constraintCheckResult);
@@ -156,18 +157,18 @@ final class Bitzer
         }
 
         if (IsCommandToBeExecuted::isSatisfiedByConstraintCheckResult($constraintCheckResult)) {
-            $this->schedule->setTaskTarget($command->getIdentifier(), $command->getTarget());
+            $this->schedule->setTaskTarget($command->identifier, $command->target);
         }
     }
 
     final public function handleSetNewTaskObject(SetNewTaskObject $command, ?ConstraintCheckResult $constraintCheckResult = null): void
     {
-        $this->requireTaskToExist($command->getIdentifier(), $constraintCheckResult);
-        if ($command->getObject()) {
-            $this->requireObjectToExist($command->getObject(), $constraintCheckResult);
+        $this->requireTaskToExist($command->identifier, $constraintCheckResult);
+        if ($command->object) {
+            $this->requireObjectToExist($command->object, $constraintCheckResult);
         }
 
-        $task = $this->schedule->findByIdentifier($command->getIdentifier());
+        $task = $this->schedule->findByIdentifier($command->identifier);
         if ($task) {
             foreach ($this->getConstraintCheckPlugins(TaskClassName::createFromObject($task)) as $constraintCheckPlugin) {
                 $constraintCheckPlugin->checkSetNewTaskObject($command, $constraintCheckResult);
@@ -175,16 +176,16 @@ final class Bitzer
         }
 
         if (IsCommandToBeExecuted::isSatisfiedByConstraintCheckResult($constraintCheckResult)) {
-            $this->schedule->setTaskObject($command->getIdentifier(), $command->getObject());
+            $this->schedule->setTaskObject($command->identifier, $command->object);
         }
     }
 
     final public function handleSetTaskProperties(SetTaskProperties $command, ?ConstraintCheckResult $constraintCheckResult = null): void
     {
-        $this->requireTaskToExist($command->getIdentifier(), $constraintCheckResult);
-        $this->requireDescriptionToBeSet($command->getProperties(), $constraintCheckResult);
+        $this->requireTaskToExist($command->identifier, $constraintCheckResult);
+        $this->requireDescriptionToBeSet($command->properties, $constraintCheckResult);
 
-        $task = $this->schedule->findByIdentifier($command->getIdentifier());
+        $task = $this->schedule->findByIdentifier($command->identifier);
         if ($task) {
             foreach ($this->getConstraintCheckPlugins(TaskClassName::createFromObject($task)) as $constraintCheckPlugin) {
                 $constraintCheckPlugin->checkSetTaskProperties($command, $constraintCheckResult);
@@ -192,15 +193,15 @@ final class Bitzer
         }
 
         if (IsCommandToBeExecuted::isSatisfiedByConstraintCheckResult($constraintCheckResult)) {
-            $this->schedule->setTaskProperties($command->getIdentifier(), $command->getProperties());
+            $this->schedule->setTaskProperties($command->identifier, $command->properties);
         }
     }
 
     final public function handleCancelTask(CancelTask $command, ?ConstraintCheckResult $constraintCheckResult = null): void
     {
-        $this->requireTaskToExist($command->getIdentifier(), $constraintCheckResult);
+        $this->requireTaskToExist($command->identifier, $constraintCheckResult);
 
-        $task = $this->schedule->findByIdentifier($command->getIdentifier());
+        $task = $this->schedule->findByIdentifier($command->identifier);
         if ($task) {
             foreach ($this->getConstraintCheckPlugins(TaskClassName::createFromObject($task)) as $constraintCheckPlugin) {
                 $constraintCheckPlugin->checkCancelTask($command, $constraintCheckResult);
@@ -208,15 +209,15 @@ final class Bitzer
         }
 
         if (IsCommandToBeExecuted::isSatisfiedByConstraintCheckResult($constraintCheckResult)) {
-            $this->schedule->cancelTask($command->getIdentifier());
+            $this->schedule->cancelTask($command->identifier);
         }
     }
 
     final public function handleActivateTask(ActivateTask $command, ?ConstraintCheckResult $constraintCheckResult = null): void
     {
-        $this->requireTaskToExist($command->getIdentifier(), $constraintCheckResult);
+        $this->requireTaskToExist($command->identifier, $constraintCheckResult);
 
-        $task = $this->schedule->findByIdentifier($command->getIdentifier());
+        $task = $this->schedule->findByIdentifier($command->identifier);
         if ($task) {
             foreach ($this->getConstraintCheckPlugins(TaskClassName::createFromObject($task)) as $constraintCheckPlugin) {
                 $constraintCheckPlugin->checkActivateTask($command, $constraintCheckResult);
@@ -224,15 +225,15 @@ final class Bitzer
         }
 
         if (IsCommandToBeExecuted::isSatisfiedByConstraintCheckResult($constraintCheckResult)) {
-            $this->schedule->updateTaskActionStatus($command->getIdentifier(), ActionStatusType::active());
+            $this->schedule->updateTaskActionStatus($command->identifier, ActionStatusType::TYPE_ACTIVE);
         }
     }
 
     final public function handleCompleteTask(CompleteTask $command, ?ConstraintCheckResult $constraintCheckResult = null): void
     {
-        $this->requireTaskToExist($command->getIdentifier(), $constraintCheckResult);
+        $this->requireTaskToExist($command->identifier, $constraintCheckResult);
 
-        $task = $this->schedule->findByIdentifier($command->getIdentifier());
+        $task = $this->schedule->findByIdentifier($command->identifier);
         if ($task) {
             foreach ($this->getConstraintCheckPlugins(TaskClassName::createFromObject($task)) as $constraintCheckPlugin) {
                 $constraintCheckPlugin->checkCompleteTask($command, $constraintCheckResult);
@@ -240,7 +241,7 @@ final class Bitzer
         }
 
         if (IsCommandToBeExecuted::isSatisfiedByConstraintCheckResult($constraintCheckResult)) {
-            $this->schedule->updateTaskActionStatus($command->getIdentifier(), ActionStatusType::completed());
+            $this->schedule->updateTaskActionStatus($command->identifier, ActionStatusType::TYPE_COMPLETED);
         }
     }
 
@@ -280,15 +281,19 @@ final class Bitzer
         }
     }
 
-    private function requireAgentToExist(Agent $agent, ConstraintCheckResult $constraintCheckResult = null): void
+    private function requireAgent(AgentIdentifier $agentId, ConstraintCheckResult $constraintCheckResult = null): ?Agent
     {
-        if (!$this->agentRepository->findByIdentifier($agent->getIdentifier())) {
-            $exception = AgentDoesNotExist::althoughExpectedForIdentifier($agent->getIdentifier()->toString());
+        $agent = $this->agentRepository->findByIdentifier($agentId);
+        if (!$agent) {
+            $exception = AgentDoesNotExist::althoughExpectedForIdentifier($agentId->toString());
             if ($constraintCheckResult) {
-                $constraintCheckResult->registerFailedCheck('agent', $exception, [$agent->getIdentifier()->toString()]);
+                $constraintCheckResult->registerFailedCheck('agent', $exception, [$agentId->toString()]);
+                return null;
             } else {
                 throw $exception;
             }
+        } else {
+            return $agent;
         }
     }
 
@@ -296,10 +301,10 @@ final class Bitzer
     {
         $contentContext = $this->contentContextFactory->createContentContext($address);
 
-        if (!$contentContext->getNodeByIdentifier((string) $address->getNodeAggregateIdentifier())) {
+        if (!$contentContext->getNodeByIdentifier((string)$address->nodeAggregateIdentifier)) {
             $exception = ObjectDoesNotExist::althoughExpectedForAddress($address);
             if ($constraintCheckResult) {
-                $constraintCheckResult->registerFailedCheck('object', $exception, [$address->getNodeAggregateIdentifier(), $address->getWorkspaceName(),$address->getDimensionSpacePoint()]);
+                $constraintCheckResult->registerFailedCheck('object', $exception, [$address->nodeAggregateIdentifier, $address->workspaceName, $address->dimensionSpacePoint]);
             } else {
                 throw $exception;
             }
@@ -318,6 +323,9 @@ final class Bitzer
         }
     }
 
+    /**
+     * @param array<string,mixed> $properties
+     */
     private function requireDescriptionToBeSet(array $properties, ConstraintCheckResult $constraintCheckResult = null): void
     {
         if (!isset($properties['description']) || empty($properties['description'])) {

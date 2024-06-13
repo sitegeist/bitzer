@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Sitegeist\Bitzer\Domain\Task;
 
 use Neos\Flow\Annotations as Flow;
@@ -6,39 +9,31 @@ use Neos\Flow\Annotations as Flow;
 /**
  * The task domain entity collection
  *
- * @Flow\Proxy(false)
  * @implements \IteratorAggregate<int,TaskInterface>
  */
+#[Flow\Proxy(false)]
 final class Tasks implements \IteratorAggregate, \Countable
 {
     /**
      * @var array<int,TaskInterface>
      */
-    private array $tasks;
+    private array $items;
 
-    /**
-     * @param array<int,mixed> $items
-     */
-    public function __construct(array $items)
+    public function __construct(TaskInterface ...$items)
     {
-        foreach ($items as $item) {
-            if (!$item instanceof TaskInterface) {
-                throw new \InvalidArgumentException(self::class . ' can only consist of ' . TaskInterface::class);
-            }
-        }
-        $this->tasks = $items;
+        $this->items = array_values($items);
     }
 
     /**
-     * @return \ArrayIterator<int,TaskInterface>|TaskInterface[]
+     * @return \Traversable<int,TaskInterface>
      */
-    public function getIterator(): \ArrayIterator
+    public function getIterator(): \Traversable
     {
-        return new \ArrayIterator($this->tasks);
+        yield from $this->items;
     }
 
     public function count(): int
     {
-        return count($this->tasks);
+        return count($this->items);
     }
 }
