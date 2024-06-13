@@ -17,7 +17,7 @@ prototype(Sitegeist.Bitzer:SetNewTaskTargetForm) < prototype(Neos.Fusion:Compone
             <fieldset class="neos-span5">
                 <legend>{q(labels).get('setNewTaskTarget.label')}</legend>
                 <input type="hidden" name="__csrfToken" value={${Security.csrfToken()}} />
-                <input type="hidden" name="moduleArguments[taskIdentifier]" value={${String.toString(props.task.identifier)}} />
+                <input type="hidden" name="moduleArguments[taskIdentifier]" value={props.task.identifier.value} />
                 <div class={${'neos-control-group' + (constraintCheckResult.hasFailedAtPath('target') ? ' neos-error' : '')}}>
                     <label class="neos-control-label" for="title">{q(labels).get('task.target.label')}</label>
                     <div class="neos-controls neos-controls-row">

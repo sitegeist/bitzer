@@ -19,16 +19,16 @@ prototype(Sitegeist.Bitzer:Application.Schedule) < prototype(Neos.Fusion:Compone
                     <tr>
                         <td><i class={'fas fa-' + task.image + ' icon-white'}></i></td>
                         <td>{Date.format(task.scheduledTime, 'Y-m-d H:i')}</td>
-                        <td>{q(labels).get('actionStatusType.' + String.toString(task.actionStatus) + '.label')}</td>
+                        <td>{q(labels).get('actionStatusType.' + task.actionStatus.value + '.label')}</td>
                         <td>{task.shortType}</td>
                         <td>{task.description}</td>
                         <td>{task.agent.label}</td>
                         <td>{task.object.label}</td>
                         <td class="neos-action">
                             <div class="neos-pull-right">
-                                <Sitegeist.Bitzer:ActionLink actionName="editTask" actionArguments={{taskIdentifier: String.toString(task.identifier)}} icon="pencil-alt" />
-                                <Sitegeist.Bitzer:CommandForm commandName="completeTask" commandArguments={{taskIdentifier: String.toString(task.identifier)}} icon="check" />
-                                <Sitegeist.Bitzer:CommandForm commandName="cancelTask" commandArguments={{taskIdentifier: String.toString(task.identifier)}} icon="times" />
+                                <Sitegeist.Bitzer:ActionLink actionName="editTask" actionArguments={{taskIdentifier: task.identifier.value}} icon="pencil-alt" />
+                                <Sitegeist.Bitzer:CommandForm commandName="completeTask" commandArguments={{taskIdentifier: task.identifier.value}} icon="check" />
+                                <Sitegeist.Bitzer:CommandForm commandName="cancelTask" commandArguments={{taskIdentifier: task.identifier.value}} icon="times" />
                             </div>
                         </td>
                     </tr>

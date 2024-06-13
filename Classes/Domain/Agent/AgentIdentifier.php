@@ -15,6 +15,13 @@ final class AgentIdentifier implements \Stringable
     ) {
     }
 
+    public static function tryFromString(string $string): ?self
+    {
+        return \substr_count($string, ':') === 1
+            ? self::fromString($string)
+            : null;
+    }
+
     public static function fromString(string $string): self
     {
         list($type, $identifier) = explode(':', $string, 2);

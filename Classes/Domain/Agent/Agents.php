@@ -17,11 +17,11 @@ final class Agents implements \IteratorAggregate, \Countable
     /**
      * @var array<int,Agent>
      */
-    private array $agents;
+    private array $items;
 
     public function __construct(Agent ...$items)
     {
-        $this->agents = array_values($items);
+        $this->items = array_values($items);
     }
 
     /**
@@ -31,7 +31,7 @@ final class Agents implements \IteratorAggregate, \Countable
     {
         return array_map(function (Agent $agent): string {
             return $agent->identifier->toString();
-        }, $this->agents);
+        }, $this->items);
     }
 
     /**
@@ -39,11 +39,16 @@ final class Agents implements \IteratorAggregate, \Countable
      */
     public function getIterator(): \Traversable
     {
-        return yield from $this->agents;
+        return yield from $this->items;
+    }
+
+    public function isEmpty(): bool
+    {
+        return $this->items === [];
     }
 
     public function count(): int
     {
-        return count($this->agents);
+        return count($this->items);
     }
 }

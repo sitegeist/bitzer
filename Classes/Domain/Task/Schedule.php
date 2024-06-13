@@ -280,8 +280,11 @@ final class Schedule
      * @throws DriverException
      * @throws DbalException
      */
-    final public function findActiveOrPotentialTasksForObject(NodeAddress $object, ?TaskClassName $taskClassName = null): Tasks
-    {
+    final public function findActiveOrPotentialTasksForObject(
+        NodeAddress $object,
+        ?TaskClassName $taskClassName = null,
+        ?AgentIdentifier $agentIdentifier = null
+    ): Tasks {
         $query = 'SELECT * FROM ' . self::TABLE_NAME . '
                     WHERE object = :object
                     AND actionstatus IN (:actionStatusTypes)';
@@ -296,6 +299,11 @@ final class Schedule
             $query .= '
                 AND classname = :taskClassName';
             $params['taskClassName'] = $taskClassName->value;
+        }
+        if ($agentIdentifier) {
+            $query .= '
+                AND agent = :agent';
+            $params['agent'] = $agentIdentifier->toString();
         }
 
         $tableRows = $this->databaseConnection->executeQuery(
@@ -358,7 +366,7 @@ final class Schedule
                 'classname' => (string)$command->className,
                 'properties' => $command->properties,
                 'scheduledtime' => $command->scheduledTime,
-                'actionstatus' => ActionStatusType::TYPE_POTENTIAL,
+                'actionstatus' => ActionStatusType::TYPE_POTENTIAL->value,
                 'agent' => $agent,
                 'object' => $command->object ? json_encode($command->object) : null,
                 'target' => $command->target
@@ -379,6 +387,7 @@ final class Schedule
             self::TABLE_NAME,
             [
                 'scheduledtime' => $scheduledTime,
+                'actionstatus' => ActionStatusType::TYPE_POTENTIAL->value,
             ],
             [
                 'identifier' => $taskIdentifier,
@@ -478,10 +487,10 @@ final class Schedule
         $this->databaseConnection->update(
             self::TABLE_NAME,
             [
-                'actionstatus' => $actionStatus,
+                'actionstatus' => $actionStatus->value,
             ],
             [
-                'identifier' => $taskIdentifier
+                'identifier' => $taskIdentifier->value
             ]
         );
         $this->emitTaskActionStatusUpdated($taskIdentifier, $actionStatus);
