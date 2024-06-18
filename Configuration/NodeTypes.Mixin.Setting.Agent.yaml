@@ -13,5 +13,5 @@
           editorOptions:
             multiple: true
             allowEmpty: true
-            placeholder: Sitegeist.Bitzer:NodeTypes.Mixin.Setting.Agent:properties.bitzerTaskAgent.selectBoxEditor.placeholder
+            placeholder: Sitegeist.Bitzer:NodeTypes.Mixin.Setting.Agent:properties.bitzerTaskAgents.selectBoxEditor.placeholder
             dataSourceIdentifier: 'sitegeist-bitzer-agent'
