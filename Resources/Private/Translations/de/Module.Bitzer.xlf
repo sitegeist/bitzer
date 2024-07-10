@@ -200,15 +200,23 @@
       </trans-unit>
       <trans-unit id="taskDueStatusType.pastDue.label" xml:space="preserve" approved="yes">
         <source>past due</source>
-        <target state="translated">überfällig</target>
+        <target state="translated">Überfällig</target>
       </trans-unit>
       <trans-unit id="taskDueStatusType.due.label" xml:space="preserve" approved="yes">
         <source>due</source>
-        <target state="translated">heute fällig</target>
+        <target state="translated">Heute fällig</target>
       </trans-unit>
       <trans-unit id="taskDueStatusType.upcoming.label" xml:space="preserve" approved="yes">
         <source>upcoming</source>
-        <target state="translated">demnächst fällig</target>
+        <target state="translated">Demnächst fällig</target>
+      </trans-unit>
+      <trans-unit id="filters.taskClassName.label" xml:space="preserve" approved="yes">
+        <source>Filter by task type</source>
+        <target state="translated">Filter nach Task-Typ</target>
+      </trans-unit>
+      <trans-unit id="filters.taskClassName.allTasks" xml:space="preserve" approved="yes">
+        <source>All tasks</source>
+        <target state="translated">Alle Tasks</target>
       </trans-unit>
       <trans-unit id="taskClassName.Sitegeist\Bitzer\Domain\Task\Generic\GenericTask.label" xml:space="preserve" approved="yes">
         <source>Generic</source>

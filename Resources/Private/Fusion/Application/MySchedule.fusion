@@ -1,8 +1,29 @@
 prototype(Sitegeist.Bitzer:Application.MySchedule) < prototype(Neos.Fusion:Component) {
     groupedTasks = ${[]}
 
+    myScheduleUri = Neos.Fusion:UriBuilder {
+        package = 'Sitegeist.Bitzer'
+        subpackage = 'Application'
+        controller = 'Bitzer'
+        action = 'mySchedule'
+    }
+
     renderer = afx`
         <Sitegeist.Bitzer:FlashMessages />
+        <form action={props.myScheduleUri} method="get">
+            <input type="hidden" name="moduleArguments[@package]" value="sitegeist.bitzer" />
+            <input type="hidden" name="moduleArguments[@subpackage]" value="application" />
+            <input type="hidden" name="moduleArguments[@controller]" value="bitzer" />
+            <input type="hidden" name="moduleArguments[@action]" value="myschedule" />
+            <input type="hidden" name="moduleArguments[@format]" value="html" />
+            <label class="neos-control-label" for="taskClassName">{q(labels).get('filters.taskClassName.label')}</label>
+            <select id="taskClassName" name="moduleArguments[taskClassName]" onchange="this.form.submit()">
+                <option value="">{q(labels).get('filters.taskClassName.allTasks') || 'all'}</option>
+                <Neos.Fusion:Loop items={taskClassNameOptions} itemName="taskClassNameOption">
+                    <option value={taskClassNameOption.identifier} selected selected.@if.isSelected={taskClassNameOption.isSelected}>{taskClassNameOption.label}</option>
+                </Neos.Fusion:Loop>
+            </select>
+        </form>
         <table class="neos-table">
             <thead>
                 <tr>
@@ -20,6 +41,7 @@ prototype(Sitegeist.Bitzer:Application.MySchedule) < prototype(Neos.Fusion:Compo
                 <Sitegeist.Bitzer:MyScheduleTable @if.hasPastDueTasks={props.groupedTasks.pastDue} tasks={props.groupedTasks.pastDue} groupIdentifier="pastDue" />
                 <Sitegeist.Bitzer:MyScheduleTable @if.hasDueTasks={props.groupedTasks.due} tasks={props.groupedTasks.due} groupIdentifier="due" />
                 <Sitegeist.Bitzer:MyScheduleTable @if.hasUpcomingTasks={props.groupedTasks.upcoming} tasks={props.groupedTasks.upcoming} groupIdentifier="upcoming" />
+                <Sitegeist.Bitzer:CompletedTable @if.hasCompletedTasks={props.completedTasks} tasks={props.completedTasks} />
             </tbody>
         </table>
         <Sitegeist.Bitzer:ToggleScript />`
@@ -34,7 +56,7 @@ prototype(Sitegeist.Bitzer:MyScheduleTable) < prototype(Neos.Fusion:Component) {
 
     renderer = afx`
         <tr class="neos-folder">
-            <td class="neos-priority1" colspan="7">{q(labels).get('taskDueStatusType.' + props.groupIdentifier + '.label')}</td>
+            <td class="neos-priority1" colspan="7">{q(labels).get('taskDueStatusType.' + props.groupIdentifier + '.label') || props.groupIdentifier}</td>
             <td class="neos-priority1 neos-aRight">
                 <i class="fold-toggle icon-white fas fa-chevron-up" data-toggle={'fold-tasks_' + props.groupIdentifier}></i>
             </td>
@@ -44,7 +66,7 @@ prototype(Sitegeist.Bitzer:MyScheduleTable) < prototype(Neos.Fusion:Component) {
                 <td><i class={'fas fa-' + task.image + ' icon-white'}></i></td>
                 <td>{Date.format(task.scheduledTime, 'Y-m-d H:i')}</td>
                 <td>{q(labels).get('actionStatusType.' + task.actionStatus.value + '.label')}</td>
-                <td>{task.shortType}</td>
+                <td>{q(labels).get('task.className.' + Type.className(task))}</td>
                 <td>{task.description}</td>
                 <td>{task.agent.label}</td>
                 <td>{task.object.label}</td>
@@ -54,6 +76,30 @@ prototype(Sitegeist.Bitzer:MyScheduleTable) < prototype(Neos.Fusion:Component) {
                         <Sitegeist.Bitzer:CommandForm commandName="completeTask" commandArguments={{taskIdentifier: task.identifier.value}} icon="check" />
                     </div>
                 </td>
+            </tr>
+        </Neos.Fusion:Collection>`
+}
+
+prototype(Sitegeist.Bitzer:CompletedTable) < prototype(Neos.Fusion:Component) {
+    tasks = ${[]}
+
+    renderer = afx`
+        <tr class="neos-folder">
+            <td class="neos-priority1" colspan="7">{q(labels).get('actionStatusType.https://schema.org/CompletedActionStatus.label')}</td>
+            <td class="neos-priority1 neos-aRight">
+                <i class="fold-toggle icon-white fas fa-chevron-up" data-toggle={'fold-tasks_completed'}></i>
+            </td>
+        </tr>
+        <Neos.Fusion:Collection collection={props.tasks} itemName="task">
+            <tr class={'fold-tasks_completed'} style="display: table-row">
+                <td><i class={'fas fa-' + task.image + ' icon-white'}></i></td>
+                <td>{Date.format(task.scheduledTime, 'Y-m-d H:i')}</td>
+                <td></td>
+                <td>{q(labels).get('task.className.' + Type.className(task))}</td>
+                <td>{task.description}</td>
+                <td>{task.agent.label}</td>
+                <td>{task.object.label}</td>
+                <td></td>
             </tr>
         </Neos.Fusion:Collection>`
 }

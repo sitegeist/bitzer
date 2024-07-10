@@ -55,6 +55,11 @@ final readonly class TaskClassName
         throw new ShortTypeDefinesNoTask('Given short type "' . $shortType . '" does not define a task implementation.', 1567507976);
     }
 
+    public function equals(self $other): bool
+    {
+        return $this->value === $other->value;
+    }
+
     public function __toString(): string
     {
         return $this->value;

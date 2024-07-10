@@ -62,6 +62,66 @@ final class Schedule
     }
 
     /**
+     * @return array<string,array<int,TaskInterface>>
+     * @throws DbalException
+     * @throws DriverException
+     */
+    final public function findPastDueDueAndUpcoming(
+        \DateInterval $upcomingInterval,
+        ?Agents $agents = null,
+        ?TaskClassName $taskClassName = null
+    ): array {
+        $now = ScheduledTime::now();
+        $referenceDate = $now->add($upcomingInterval);
+
+        $query = 'SELECT * FROM ' . self::TABLE_NAME . '
+                    WHERE scheduledtime <= :referenceDate
+                    AND actionstatus IN (:actionStatusTypes)';
+        $parameters = [
+            'referenceDate' => $referenceDate,
+            'actionStatusTypes' => [
+                ActionStatusType::TYPE_POTENTIAL->value,
+                ActionStatusType::TYPE_ACTIVE->value,
+            ]
+        ];
+        $types = [
+            'referenceDate' => Types::DATETIME_IMMUTABLE,
+            'actionStatusTypes' => Connection::PARAM_STR_ARRAY
+        ];
+
+        if ($agents) {
+            $parameters['agentIdentifiers'] = $agents->getIdentifiers();
+            $types['agentIdentifiers'] = Connection::PARAM_STR_ARRAY;
+            $query .= ' AND agent IN (:agentIdentifiers)';
+        }
+
+        if ($taskClassName !== null) {
+            $query .= ' AND classname = :className';
+            $parameters['className'] = $taskClassName->getValue();
+        }
+
+        $query .= ' ORDER BY scheduledtime ASC';
+
+        $rawDataSet = $this->databaseConnection->executeQuery(
+            $query,
+            $parameters,
+            $types
+        )->fetchAllAssociative();
+        $tasks = $this->createTasksFromTableRows($rawDataSet);
+
+        $groupedTasks = [
+            TaskDueStatusType::STATUS_PAST_DUE->value => [],
+            TaskDueStatusType::STATUS_DUE->value => [],
+            TaskDueStatusType::STATUS_UPCOMING->value => []
+        ];
+        foreach ($tasks as $task) {
+            $groupedTasks[TaskDueStatusType::forTask($task)->value][] = $task;
+        }
+
+        return $groupedTasks;
+    }
+
+    /**
      * @throws DriverException
      * @throws DbalException
      */
@@ -89,29 +149,21 @@ final class Schedule
     }
 
     /**
-     * @return array<string,array<int,TaskInterface>>
      * @throws DbalException
      * @throws DriverException
      */
-    final public function findPastDueDueAndUpcoming(\DateInterval $upcomingInterval, ?Agents $agents = null): array
+    final public function findCompleted(?TaskClassName $taskClassName = null, ?Agents $agents = null): Tasks
     {
-        $now = ScheduledTime::now();
-        $referenceDate = $now->add($upcomingInterval);
-
         $query = 'SELECT * FROM ' . self::TABLE_NAME . '
-                    WHERE scheduledtime <= :referenceDate
-                    AND actionstatus IN (:actionStatusTypes)';
+                    WHERE actionstatus = :actionStatusType';
         $parameters = [
-            'referenceDate' => $referenceDate,
-            'actionStatusTypes' => [
-                ActionStatusType::TYPE_POTENTIAL->value,
-                ActionStatusType::TYPE_ACTIVE->value,
-            ]
+            'actionStatusType' => ActionStatusType::TYPE_COMPLETED
         ];
-        $types = [
-            'referenceDate' => Types::DATETIME_IMMUTABLE,
-            'actionStatusTypes' => Connection::PARAM_STR_ARRAY
-        ];
+        $types = [];
+        if ($taskClassName) {
+            $query .= ' AND classname = :taskClassName';
+            $parameters['taskClassName'] = $taskClassName->getValue();
+        }
 
         if ($agents) {
             $parameters['agentIdentifiers'] = $agents->getIdentifiers();
@@ -125,18 +177,8 @@ final class Schedule
             $parameters,
             $types
         )->fetchAllAssociative();
-        $tasks = $this->createTasksFromTableRows($rawDataSet);
 
-        $groupedTasks = [
-            TaskDueStatusType::STATUS_PAST_DUE->value => [],
-            TaskDueStatusType::STATUS_DUE->value => [],
-            TaskDueStatusType::STATUS_UPCOMING->value => []
-        ];
-        foreach ($tasks as $task) {
-            $groupedTasks[TaskDueStatusType::forTask($task)->value][] = $task;
-        }
-
-        return $groupedTasks;
+        return $this->createTasksFromTableRows($rawDataSet);
     }
 
     /**
