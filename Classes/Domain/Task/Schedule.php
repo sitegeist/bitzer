@@ -67,6 +67,66 @@ final class Schedule
     }
 
     /**
+     * @return array<string,array<int,TaskInterface>>
+     * @throws DbalException
+     * @throws DriverException
+     */
+    final public function findPastDueDueAndUpcoming(
+        \DateInterval $upcomingInterval,
+        ?Agents $agents = null,
+        ?TaskClassName $taskClassName = null
+    ): array {
+        $now = ScheduledTime::now();
+        $referenceDate = $now->add($upcomingInterval);
+
+        $query = 'SELECT * FROM ' . self::TABLE_NAME . '
+                    WHERE scheduledtime <= :referenceDate
+                    AND actionstatus IN (:actionStatusTypes)';
+        $parameters = [
+            'referenceDate' => $referenceDate,
+            'actionStatusTypes' => [
+                ActionStatusType::TYPE_POTENTIAL,
+                ActionStatusType::TYPE_ACTIVE
+            ]
+        ];
+        $types = [
+            'referenceDate' => Types::DATETIME_IMMUTABLE,
+            'actionStatusTypes' => Connection::PARAM_STR_ARRAY
+        ];
+
+        if ($agents) {
+            $parameters['agentIdentifiers'] = $agents->getIdentifiers();
+            $types['agentIdentifiers'] = Connection::PARAM_STR_ARRAY;
+            $query .= ' AND agent IN (:agentIdentifiers)';
+        }
+
+        if ($taskClassName !== null) {
+            $query .= ' AND classname = :className';
+            $parameters['className'] = $taskClassName->getValue();
+        }
+
+        $query .= ' ORDER BY scheduledtime ASC';
+
+        $rawDataSet = $this->databaseConnection->executeQuery(
+            $query,
+            $parameters,
+            $types
+        )->fetchAllAssociative();
+        $tasks = $this->createTasksFromTableRows($rawDataSet);
+
+        $groupedTasks = [
+            TaskDueStatusType::STATUS_PAST_DUE => [],
+            TaskDueStatusType::STATUS_DUE => [],
+            TaskDueStatusType::STATUS_UPCOMING => []
+        ];
+        foreach ($tasks as $task) {
+            $groupedTasks[(string)TaskDueStatusType::forTask($task)][] = $task;
+        }
+
+        return $groupedTasks;
+    }
+
+    /**
      * @throws DriverException
      * @throws DbalException
      */
@@ -94,57 +154,6 @@ final class Schedule
     }
 
     /**
-     * @return array<string,array<int,TaskInterface>>
-     * @throws DbalException
-     * @throws DriverException
-     */
-    final public function findPastDueDueAndUpcoming(\DateInterval $upcomingInterval, ?Agents $agents = null): array
-    {
-        $now = ScheduledTime::now();
-        $referenceDate = $now->add($upcomingInterval);
-
-        $query = 'SELECT * FROM ' . self::TABLE_NAME . '
-                    WHERE scheduledtime <= :referenceDate
-                    AND actionstatus IN (:actionStatusTypes)';
-        $parameters = [
-            'referenceDate' => $referenceDate,
-            'actionStatusTypes' => [
-                ActionStatusType::TYPE_POTENTIAL,
-                ActionStatusType::TYPE_ACTIVE
-            ]
-        ];
-        $types = [
-            'referenceDate' => Types::DATETIME_IMMUTABLE,
-            'actionStatusTypes' => Connection::PARAM_STR_ARRAY
-        ];
-
-        if ($agents) {
-            $parameters['agentIdentifiers'] = $agents->getIdentifiers();
-            $types['agentIdentifiers'] = Connection::PARAM_STR_ARRAY;
-            $query .= ' AND agent IN (:agentIdentifiers)';
-        }
-        $query .= ' ORDER BY scheduledtime ASC';
-
-        $rawDataSet = $this->databaseConnection->executeQuery(
-            $query,
-            $parameters,
-            $types
-        )->fetchAllAssociative();
-        $tasks = $this->createTasksFromTableRows($rawDataSet);
-
-        $groupedTasks = [
-            TaskDueStatusType::STATUS_PAST_DUE => [],
-            TaskDueStatusType::STATUS_DUE => [],
-            TaskDueStatusType::STATUS_UPCOMING => []
-        ];
-        foreach ($tasks as $task) {
-            $groupedTasks[(string)TaskDueStatusType::forTask($task)][] = $task;
-        }
-
-        return $groupedTasks;
-    }
-
-    /**
      * @throws DbalException
      * @throws DriverException
      */
@@ -155,9 +164,10 @@ final class Schedule
         $parameters = [
             'actionStatusType' => ActionStatusType::TYPE_COMPLETED
         ];
+        $types = [];
         if ($taskClassName) {
             $query .= ' AND classname = :taskClassName';
-            $params['taskClassName'] = $taskClassName->getValue();
+            $parameters['taskClassName'] = $taskClassName->getValue();
         }
 
         if ($agents) {

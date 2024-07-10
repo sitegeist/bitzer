@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace Sitegeist\Bitzer\Application\Controller;
 
 use GuzzleHttp\Psr7\Uri;
@@ -160,31 +163,44 @@ final class BitzerController extends ModuleController
         }
     }
 
-    public function myScheduleAction(): void
+    public function myScheduleAction(?string $taskClassName = null): void
     {
+        $taskClassName = $taskClassName ? TaskClassName::createFromString($taskClassName) : null;
         $agents = $this->agentRepository->findCurrent();
-        $groupedTasks = $this->schedule->findPastDueDueAndUpcoming($this->upcomingInterval, $agents);
+        $groupedTasks = $this->schedule->findPastDueDueAndUpcoming($this->upcomingInterval, $agents, $taskClassName);
+        $taskClassNameOptions = $this->getTaskClassNameOptions($taskClassName);
+
+        $taskClassNameLabels = [];
+        foreach ($taskClassNameOptions as $taskClassNameOption) {
+            $taskClassNameLabels['task.className.' . $taskClassNameOption['identifier']] = $taskClassNameOption['label'];
+        }
 
         $this->view->setFusionPath('mySchedule');
         $this->view->assignMultiple([
+            'taskClassNameOptions' => $taskClassNameOptions,
             'groupedTasks' => $groupedTasks,
-            'completedTasks' => $this->showCompletedTasks ? $this->schedule->findCompleted(null, $agents) : null,
-            'labels' => [
-                'task.scheduledTime.label' => $this->getLabel('task.scheduledTime.label'),
-                'task.actionStatus.label' => $this->getLabel('task.actionStatus.label'),
-                'task.type.label' => $this->getLabel('task.type.label'),
-                'task.properties.description.label' => $this->getLabel('task.properties.description.label'),
-                'task.agent.label' => $this->getLabel('task.agent.label'),
-                'task.object.label' => $this->getLabel('task.object.label'),
-                'actions.label' => $this->getLabel('actions.label'),
-                'taskDueStatusType.due.label' => $this->getLabel('taskDueStatusType.due.label'),
-                'taskDueStatusType.upcoming.due' => $this->getLabel('taskDueStatusType.upcoming.label'),
-                'taskDueStatusType.pastDue.label' => $this->getLabel('taskDueStatusType.pastDue.label'),
-                'actionStatusType.https://schema.org/ActiveActionStatus.label' => $this->getLabel('actionStatusType.https://schema.org/ActiveActionStatus.label'),
-                'actionStatusType.https://schema.org/CompletedActionStatus.label' => $this->getLabel('actionStatusType.https://schema.org/CompletedActionStatus.label'),
-                'actionStatusType.https://schema.org/FailedActionStatus.label' => $this->getLabel('actionStatusType.https://schema.org/FailedActionStatus.label'),
-                'actionStatusType.https://schema.org/PotentialActionStatus.label' => $this->getLabel('actionStatusType.https://schema.org/PotentialActionStatus.label')
-            ]
+            'completedTasks' => $this->showCompletedTasks ? $this->schedule->findCompleted($taskClassName, $agents) : null,
+            'labels' => array_merge(
+                [
+                    'task.scheduledTime.label' => $this->getLabel('task.scheduledTime.label'),
+                    'task.actionStatus.label' => $this->getLabel('task.actionStatus.label'),
+                    'task.type.label' => $this->getLabel('task.type.label'),
+                    'task.properties.description.label' => $this->getLabel('task.properties.description.label'),
+                    'task.agent.label' => $this->getLabel('task.agent.label'),
+                    'task.object.label' => $this->getLabel('task.object.label'),
+                    'filters.taskClassName.label' => $this->getLabel('filters.taskClassName.label'),
+                    'filters.taskClassName.allTasks' => $this->getLabel('filters.taskClassName.allTasks'),
+                    'actions.label' => $this->getLabel('actions.label'),
+                    'taskDueStatusType.due.label' => $this->getLabel('taskDueStatusType.due.label'),
+                    'taskDueStatusType.upcoming.label' => $this->getLabel('taskDueStatusType.upcoming.label'),
+                    'taskDueStatusType.pastDue.label' => $this->getLabel('taskDueStatusType.pastDue.label'),
+                    'actionStatusType.https://schema.org/ActiveActionStatus.label' => $this->getLabel('actionStatusType.https://schema.org/ActiveActionStatus.label'),
+                    'actionStatusType.https://schema.org/CompletedActionStatus.label' => $this->getLabel('actionStatusType.https://schema.org/CompletedActionStatus.label'),
+                    'actionStatusType.https://schema.org/FailedActionStatus.label' => $this->getLabel('actionStatusType.https://schema.org/FailedActionStatus.label'),
+                    'actionStatusType.https://schema.org/PotentialActionStatus.label' => $this->getLabel('actionStatusType.https://schema.org/PotentialActionStatus.label')
+                ],
+                $taskClassNameLabels
+            )
         ]);
     }
 
@@ -369,13 +385,14 @@ final class BitzerController extends ModuleController
     /**
      * @return array<int,array<string,string>>
      */
-    private function getTaskClassNameOptions(): array
+    private function getTaskClassNameOptions(?TaskClassName $selectedTaskClassName = null): array
     {
-        return array_map(function (TaskClassName $taskClassName): array {
+        return array_map(function (TaskClassName $taskClassName) use($selectedTaskClassName): array {
             $id = 'taskClassName.' . $taskClassName->getValue() . '.label';
             return [
                 'identifier' => $taskClassName->getValue(),
-                'label' => $this->getLabel($id)
+                'label' => $this->getLabel($id),
+                'isSelected' => $selectedTaskClassName?->equals($taskClassName),
             ];
         }, $this->taskClassNameRepository->findAll()->getIterator()->getArrayCopy());
     }

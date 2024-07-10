@@ -150,13 +150,19 @@
         <source>Schedule task</source>
       </trans-unit>
       <trans-unit id="taskDueStatusType.pastDue.label" xml:space="preserve" approved="yes">
-        <source>past due</source>
+        <source>Past due</source>
       </trans-unit>
       <trans-unit id="taskDueStatusType.due.label" xml:space="preserve" approved="yes">
-        <source>due</source>
+        <source>Due</source>
       </trans-unit>
       <trans-unit id="taskDueStatusType.upcoming.label" xml:space="preserve" approved="yes">
-        <source>upcoming</source>
+        <source>Upcoming</source>
+      </trans-unit>
+      <trans-unit id="filters.taskClassName.label" xml:space="preserve" approved="yes">
+        <source>Filter by task type</source>
+      </trans-unit>
+      <trans-unit id="filters.taskClassName.allTasks" xml:space="preserve" approved="yes">
+        <source>All tasks</source>
       </trans-unit>
       <trans-unit id="taskClassName.Sitegeist\Bitzer\Domain\Task\Generic\GenericTask.label" xml:space="preserve" approved="yes">
         <source>Generic</source>
