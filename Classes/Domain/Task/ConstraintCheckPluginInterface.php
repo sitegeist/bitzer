@@ -21,21 +21,21 @@ use Sitegeist\Bitzer\Domain\Task\Command\SetTaskProperties;
  */
 interface ConstraintCheckPluginInterface
 {
-    public function checkScheduleTask(ScheduleTask $command, ConstraintCheckResult $constraintCheckResult = null): void;
+    public function checkScheduleTask(ScheduleTask $command, ?ConstraintCheckResult $constraintCheckResult = null): void;
 
-    public function checkRescheduleTask(RescheduleTask $command, ConstraintCheckResult $constraintCheckResult = null): void;
+    public function checkRescheduleTask(RescheduleTask $command, ?ConstraintCheckResult $constraintCheckResult = null): void;
 
-    public function checkReassignTask(ReassignTask $command, ConstraintCheckResult $constraintCheckResult = null): void;
+    public function checkReassignTask(ReassignTask $command, ?ConstraintCheckResult $constraintCheckResult = null): void;
 
-    public function checkSetNewTaskTarget(SetNewTaskTarget $command, ConstraintCheckResult $constraintCheckResult = null): void;
+    public function checkSetNewTaskTarget(SetNewTaskTarget $command, ?ConstraintCheckResult $constraintCheckResult = null): void;
 
-    public function checkSetNewTaskObject(SetNewTaskObject $command, ConstraintCheckResult $constraintCheckResult = null): void;
+    public function checkSetNewTaskObject(SetNewTaskObject $command, ?ConstraintCheckResult $constraintCheckResult = null): void;
 
-    public function checkSetTaskProperties(SetTaskProperties $command, ConstraintCheckResult $constraintCheckResult = null): void;
+    public function checkSetTaskProperties(SetTaskProperties $command, ?ConstraintCheckResult $constraintCheckResult = null): void;
 
-    public function checkCancelTask(CancelTask $command, ConstraintCheckResult $constraintCheckResult = null): void;
+    public function checkCancelTask(CancelTask $command, ?ConstraintCheckResult $constraintCheckResult = null): void;
 
-    public function checkActivateTask(ActivateTask $command, ConstraintCheckResult $constraintCheckResult = null): void;
+    public function checkActivateTask(ActivateTask $command, ?ConstraintCheckResult $constraintCheckResult = null): void;
 
-    public function checkCompleteTask(CompleteTask $command, ConstraintCheckResult $constraintCheckResult = null): void;
+    public function checkCompleteTask(CompleteTask $command, ?ConstraintCheckResult $constraintCheckResult = null): void;
 }

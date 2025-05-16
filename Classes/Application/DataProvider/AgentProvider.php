@@ -28,7 +28,7 @@ final class AgentProvider extends AbstractDataSource implements ProtectedContext
         $this->agentRepository = $agentRepository;
     }
 
-    public function getData(NodeInterface $node = null, array $arguments = []): array
+    public function getData(?NodeInterface $node = null, array $arguments = []): array
     {
         $agents = [];
         foreach ($this->agentRepository->findAll() as $agent) {

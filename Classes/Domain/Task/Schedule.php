@@ -538,7 +538,7 @@ final class Schedule
      * @param TaskIdentifier $taskIdentifier
      * @param ActionStatusType|null $actionStatus
      */
-    public function emitTaskActionStatusUpdated(TaskIdentifier $taskIdentifier, ActionStatusType $actionStatus = null)
+    public function emitTaskActionStatusUpdated(TaskIdentifier $taskIdentifier, ?ActionStatusType $actionStatus = null)
     {
     }
 
