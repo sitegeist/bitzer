@@ -32,7 +32,7 @@ final class AgentProvider extends AbstractDataSource implements ProtectedContext
      * @param array<string,mixed> $arguments
      * @return array<string,mixed>
      */
-    public function getData(NodeInterface $node = null, array $arguments = []): array
+    public function getData(?NodeInterface $node = null, array $arguments = []): array
     {
         $agents = [];
         foreach ($this->agentRepository->findAll() as $agent) {

@@ -114,7 +114,7 @@ final class BitzerController extends ModuleController
      * @param array<string,mixed> $scheduledTime
      * @param array<string,mixed> $properties
      */
-    public function scheduleTaskAction(string $taskClassName, string $agent, array $scheduledTime = [], string $object = null, Uri $target = null, array $properties = []): void
+    public function scheduleTaskAction(string $taskClassName, string $agent, array $scheduledTime = [], ?string $object = null, Uri $target = null, array $properties = []): void
     {
         $constraintCheckResult = new ConstraintCheckResult();
         try {
