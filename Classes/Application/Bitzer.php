@@ -245,7 +245,7 @@ final class Bitzer
         }
     }
 
-    private function requireTaskToExist(TaskIdentifier $identifier, ConstraintCheckResult $constraintCheckResult = null): void
+    private function requireTaskToExist(TaskIdentifier $identifier, ?ConstraintCheckResult $constraintCheckResult = null): void
     {
         if (!$this->schedule->findByIdentifier($identifier)) {
             $exception = TaskDoesNotExist::althoughExpectedForIdentifier($identifier);
@@ -257,7 +257,7 @@ final class Bitzer
         }
     }
 
-    private function requireTaskToNotExist(TaskIdentifier $identifier, ConstraintCheckResult $constraintCheckResult = null): void
+    private function requireTaskToNotExist(TaskIdentifier $identifier, ?ConstraintCheckResult $constraintCheckResult = null): void
     {
         if ($this->schedule->findByIdentifier($identifier)) {
             $exception = TaskDoesExist::althoughNotExpectedForIdentifier($identifier);
@@ -269,7 +269,7 @@ final class Bitzer
         }
     }
 
-    private function requireScheduledTimeToBeSet(?\DateTimeImmutable $scheduledTime, ConstraintCheckResult $constraintCheckResult = null): void
+    private function requireScheduledTimeToBeSet(?\DateTimeImmutable $scheduledTime, ?ConstraintCheckResult $constraintCheckResult = null): void
     {
         if (!$scheduledTime) {
             $exception = ScheduledTimeIsUndefined::althoughExpected();
@@ -281,7 +281,7 @@ final class Bitzer
         }
     }
 
-    private function requireAgent(AgentIdentifier $agentId, ConstraintCheckResult $constraintCheckResult = null): ?Agent
+    private function requireAgent(AgentIdentifier $agentId, ?ConstraintCheckResult $constraintCheckResult = null): ?Agent
     {
         $agent = $this->agentRepository->findByIdentifier($agentId);
         if (!$agent) {
@@ -297,7 +297,7 @@ final class Bitzer
         }
     }
 
-    private function requireObjectToExist(NodeAddress $address, ConstraintCheckResult $constraintCheckResult = null): void
+    private function requireObjectToExist(NodeAddress $address, ?ConstraintCheckResult $constraintCheckResult = null): void
     {
         $contentContext = $this->contentContextFactory->createContentContext($address);
 
@@ -311,7 +311,7 @@ final class Bitzer
         }
     }
 
-    private function requireTargetToBeAbsoluteUri(UriInterface $target, ConstraintCheckResult $constraintCheckResult = null): void
+    private function requireTargetToBeAbsoluteUri(UriInterface $target, ?ConstraintCheckResult $constraintCheckResult = null): void
     {
         if (!$target->getHost()) {
             $exception = TargetIsInvalid::mustBeAnAbsoluteUri();
@@ -326,7 +326,7 @@ final class Bitzer
     /**
      * @param array<string,mixed> $properties
      */
-    private function requireDescriptionToBeSet(array $properties, ConstraintCheckResult $constraintCheckResult = null): void
+    private function requireDescriptionToBeSet(array $properties, ?ConstraintCheckResult $constraintCheckResult = null): void
     {
         if (!isset($properties['description']) || empty($properties['description'])) {
             $exception = DescriptionIsInvalid::mustNotBeEmpty();
