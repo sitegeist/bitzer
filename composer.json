@@ -10,7 +10,7 @@
     "neos/fusion-afx": "~8.2",
     "doctrine/dbal": "*",
     "doctrine/migrations": "*",
-    "neos/content-repository-dimensionspace": "1.0.x-dev"
+    "neos/content-repository-dimensionspace": "^1.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.5",
